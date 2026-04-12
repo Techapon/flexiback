@@ -12,6 +12,8 @@ import '../../domain/entities/therapist_entity.dart';
 class ProfileProvider extends ChangeNotifier {
   final getProfileUsecase = 
       GetProfileUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
+  final updateProfile =
+      UpdateProfileUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
 
   bool isLoading  = false;
   String? errorr;

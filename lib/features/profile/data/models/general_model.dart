@@ -24,7 +24,10 @@ class GeneralModel extends GeneralEntity {
   });
 
   @override
-  factory GeneralModel.fromMap(ProfileModel profileData, Map<dynamic, dynamic> generalData) {
+  factory GeneralModel.fromMap(
+    ProfileModel profileData,
+    Map<dynamic, dynamic> generalData
+  ) {
     return GeneralModel(
       id: profileData.id,
       role: profileData.role,
@@ -45,7 +48,27 @@ class GeneralModel extends GeneralEntity {
     );
   }
 
-  Map<String, dynamic> toMapForGeneral() {
+  factory GeneralModel.fromEntity(GeneralEntity entity) {
+    return GeneralModel(
+      id: entity.id,
+      role: entity.role,
+      img: entity.img,
+      title: entity.title,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
+      gender: entity.gender,
+      age: entity.age,
+      email: entity.email,
+      number: entity.number,
+      updateAt: entity.updateAt,
+      createdAt: entity.createdAt,
+      weight: entity.weight,
+      height: entity.height,
+      pmh: entity.pmh,
+    );
+  }
+
+  Map<String, dynamic> toMapGeneral() {
     return {
       'weight': weight,
       'height': height,

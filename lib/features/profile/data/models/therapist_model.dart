@@ -48,7 +48,28 @@ class TherapistModel extends TherapistEntity {
     );
   }
 
-  Map<String, dynamic> toMapForGeneral() {
+  factory TherapistModel.fromEntity(TherapistEntity entity) {
+    return TherapistModel(
+      id: entity.id,
+      role: entity.role,
+      img: entity.img,
+      title: entity.title,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
+      gender: entity.gender,
+      age: entity.age,
+      email: entity.email,
+      number: entity.number,
+      updateAt: entity.updateAt,
+      createdAt: entity.createdAt,
+      specialty: entity.specialty,
+      affiliation: entity.affiliation,
+      institution: entity.institution,
+      experience: entity.experience,
+    );
+  }
+
+  Map<String, dynamic> toMapTherapist() {
     return {
       'specialty': specialty,
       'affiliation': affiliation,

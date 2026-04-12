@@ -1,14 +1,20 @@
 import 'dart:io';
 
+import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future pickImageGallery() async {
+Future<ImageEntity?> pickImageGallery() async {
 
   final ImagePicker picker = ImagePicker();
 
-  final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+  final XFile? picked = await picker.pickImage(
+    source: ImageSource.gallery,
+    imageQuality: 80
+  );
 
-  if (file == null) return null;
+  if (picked == null) return null;
 
-  return File(file.path);
+  final mimeType = picked.mimeType ?? 'image/jpeg';
+
+  return ImageEntity(file: File(picked.path), type: mimeType);
 }

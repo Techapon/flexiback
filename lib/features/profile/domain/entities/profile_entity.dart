@@ -42,27 +42,6 @@ class ProfileEntity {
     createdAt: createdAt,
   );
 
-  // factory ProfileEntity.createGeneral(ProfileEntity profile) {
-  //   return GeneralEntity(
-  //     id: profile.id,
-  //     role: profile.role,
-  //     img: profile.img,
-  //     title: profile.title,
-  //     firstName: profile.firstName,
-  //     lastName: profile.lastName,
-  //     gender: profile.gender,
-  //     age: profile.age,
-  //     email: profile.email,
-  //     number: profile.number,
-  //     updateAt: profile.updateAt,
-  //     createdAt: profile.createdAt,
-
-  //     weight: ,
-  //     height: profile.height,
-  //     pmh: profile.pmh,
-  //   );
-  // }
-
   // Getter
   String get fullname {
     if (title == null && firstName == null && lastName == null) {
@@ -77,8 +56,6 @@ class ProfileEntity {
     }
     return number!;
   } 
-
-
 
   @override
   String toString() {

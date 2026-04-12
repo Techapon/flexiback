@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/features/profile/presentation/widgets/dropdown.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
+import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:flexiback/shared/utils/pick_img.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -25,8 +26,9 @@ class GeneralEdit extends StatefulWidget {
 
 class _GeneralEditState extends State<GeneralEdit> {
   GeneralEntity? generalNewProfile;
-  File? newImage;
 
+  ImageEntity? newImage;
+  
   final List<String> title_list = ["-","Mr","Ms.","Miss","Mrs.","Dr.","Prof.","Rev."];
   late ValueNotifier<String?> valueListenable_title;
 
@@ -46,20 +48,20 @@ class _GeneralEditState extends State<GeneralEdit> {
   }
 
   @override
-  void dispose() {
-    valueListenable_title.dispose();
-    valueListenable_gender.dispose();
-    generalNewProfile = null;
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
-
     valueListenable_title = ValueNotifier(null);
     valueListenable_gender = ValueNotifier(null);
   }
+  @override
+  void dispose() {
+    generalNewProfile = null;
+    newImage = null;
+    valueListenable_title.dispose();
+    valueListenable_gender.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +73,8 @@ class _GeneralEditState extends State<GeneralEdit> {
 
     ImageProvider? imageProvider = null;
 
-    if (newImage != null) {
-      imageProvider = FileImage(newImage!);
+    if (newImage?.file != null) {
+      imageProvider = FileImage(newImage!.file!);
     } else if (generalNewProfile!.img != null && generalNewProfile!.img != "") {
       imageProvider = NetworkImage(generalNewProfile!.img!);
     }
