@@ -129,8 +129,7 @@ class _GeneralEditState extends State<GeneralEdit> {
                         imageProvider: imageProvider,
                       ),
 
-                      
-                      
+                      Text("Bie"),
 
                       Positioned(
                         bottom: 0,
