@@ -5,7 +5,9 @@ import 'package:flexiback/features/auth/domain/usecases/login_usecase.dart';
 import 'package:flexiback/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:flutter/material.dart';
 
-class AuthProvider  extends ChangeNotifier {
+import '../../../../shared/entities/role_enum.dart';
+
+class AuthProvider extends ChangeNotifier {
     final loginUseCase = 
         LoginUseCase(AuthRepositoryImpl(AuthRemoteDataSource()));
 
@@ -14,6 +16,7 @@ class AuthProvider  extends ChangeNotifier {
 
     bool _isLoading = false;
     bool _isLoggedIn = false;
+    bool _isSignUp = false;
     String? error;
 
     String? errorEmail;
@@ -24,6 +27,8 @@ class AuthProvider  extends ChangeNotifier {
     // Getter
     bool get isLoading => _isLoading;
     bool get isLoggedIn => _isLoggedIn;
+    bool get isSignUp => _isSignUp;
+    UserEntity get getUser => _user!;
 
     // Validate
     String? validateEmail(String email) {
@@ -86,7 +91,8 @@ class AuthProvider  extends ChangeNotifier {
     Future<void> signup(
         String email,
         String password,
-        String confirmPassword
+        String confirmPassword,
+        Role role,
     ) async {
         errorEmail = validateEmail(email);
         errorPassword = validatePassword(password);
@@ -101,8 +107,9 @@ class AuthProvider  extends ChangeNotifier {
         notifyListeners();
 
         try  {
-            _user = await signupUseCase.call(email, password);
+            _user = await signupUseCase.call(email, password, role);
             error = null;
+            _isSignUp = true;
         }catch (e) {
             error = e.toString();
         }

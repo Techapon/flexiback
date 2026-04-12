@@ -20,7 +20,7 @@ class _EditBoxState extends State<EditBox> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: AppColor.base1,
           border: Border.all(
@@ -30,7 +30,7 @@ class _EditBoxState extends State<EditBox> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-          spacing: 16,
+          spacing: 18,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(

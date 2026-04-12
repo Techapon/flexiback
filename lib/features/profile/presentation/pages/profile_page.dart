@@ -4,11 +4,12 @@ import 'package:flexiback/features/profile/presentation/widgets/profile_img.dart
 import 'package:flexiback/shared/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../config/routes.dart';
+import '../../../../shared/entities/role_enum.dart';
+import '../../../../shared/utils/text_uppercase.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -42,7 +43,8 @@ class ProfilePage extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: Column(
-            // spacing: 16,
+            spacing: 16,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // header
               Padding(
@@ -70,33 +72,33 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 18),
-
               Stack(
                 children: [
-                  ProfileImg(),
+                  ProfileImg(
+                    imageProvider: profileProvider.profile!.img != null 
+                      ? NetworkImage(profileProvider.profile!.img!) 
+                      : null,
+                  ),
 
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: IconButton(
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColor.main2,
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(10),
-                        side: BorderSide(
-                          color: AppColor.base1,
-                          width: 2
-                        )
-                      ),
-                      onPressed: () {},
-                      icon: Icon(LucideIcons.camera, size: 18, color: AppColor.base1),
-                    )
-                  )
+                  // Positioned(
+                  //   bottom: 0,
+                  //   right: 0,
+                  //   child: IconButton(
+                  //     style: IconButton.styleFrom(
+                  //       backgroundColor: AppColor.main2,
+                  //       shape: CircleBorder(),
+                  //       padding: EdgeInsets.all(10),
+                  //       side: BorderSide(
+                  //         color: AppColor.base1,
+                  //         width: 2
+                  //       )
+                  //     ),
+                  //     onPressed: () {},
+                  //     icon: Icon(LucideIcons.camera, size: 18, color: AppColor.base1),
+                  //   )
+                  // )
                 ],
               ),
-
-              SizedBox(height: 16),
 
               Column(
                 children: [
@@ -141,15 +143,109 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
 
-              SizedBox(height: 24),
+              if (profileProvider.role == Role.Therapist)
+                Column(
+                  spacing: 2,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                
+                    Row(
+                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          LucideIcons.stethoscope500,
+                          color: AppColor.blue1,
+                          size: 18,
+                        ),
+                        Text(
+                          profileProvider.specialty,
+                          style: TextStyle(
+                            color: AppColor.blue1,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900
+                          ),
+                        )
+                      ],
+                    ),
+
+                    Row(
+                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          LucideIcons.mapPin500,
+                          color: AppColor.grey3,
+                          size: 18,
+                        ),
+                        Text(
+                          "${toFirstLetterUpper(profileProvider.affiliation)} ,Hospital",
+                          style: TextStyle(
+                            color: AppColor.grey3,
+                            fontSize: 16
+                          ),
+                        )
+                      ],
+                    ),
+
+                    Row(
+                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          LucideIcons.graduationCap500,
+                          color: AppColor.grey3,
+                          size: 18,
+                        ),
+                        Text(
+                          toFirstLetterUpper(profileProvider.institution),
+                          style: TextStyle(
+                            color: AppColor.grey3,
+                            fontSize: 16
+                          ),
+                        )
+                      ],
+                    ),
+
+                    Divider(color: AppColor.grey2,),
+
+                    Column(
+                      spacing: 4,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "experince : ",
+                          style: TextStyle(
+                            color: AppColor.grey3,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Text(
+                          "       ${profileProvider.experience}",
+                          style: TextStyle(
+                            color: AppColor.grey3,
+                            fontSize: 14
+                          ),
+                          softWrap: true,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    )
+                
+                  ],
+                ),
 
               EditBtn(
                 onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.generalEdit);
+                  if (profileProvider.role == Role.General) {
+                    Navigator.pushNamed(context, AppRoutes.generalEdit);
+                  } else if (profileProvider.role == Role.Therapist) {
+                    Navigator.pushNamed(context, AppRoutes.therapistEdit);
+                  }
                 },
               )
-
-
             ],
           ),
         )

@@ -1,5 +1,6 @@
 import 'package:flexiback/features/auth/presentation/pages/login_page.dart';
 import 'package:flexiback/features/auth/presentation/pages/signup_page.dart';
+import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dart';
 import 'package:flexiback/features/zz/chat.dart';
 import 'package:flexiback/features/zz/device.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
@@ -9,6 +10,7 @@ import 'package:flexiback/shared/navigation/shell/general_main_shell.dart';
 import 'package:flutter/material.dart';
 
 import '../features/profile/presentation/pages/general_edit.dart';
+import '../shared/navigation/shell/therapist_main_shell.dart';
 
 class AppRoutes {
   static const login = "/login";
@@ -22,10 +24,11 @@ class AppRoutes {
 
   // edit
   static const generalEdit = "/generalEdit";
-
+  static const therapistEdit = "/therapistEdit"; 
 
   // Shell
   static const generalMainShell = "/generalMainShell";
+  static const therapistMainShell = "/therapistMainShell";
 
 
   static Map<String, WidgetBuilder> routes = {
@@ -39,7 +42,9 @@ class AppRoutes {
     profile: (context) => ProfilePage(),
 
     generalEdit: (context) => GeneralEdit(),
+    therapistEdit: (context) => TherapistEdit(),
 
     generalMainShell: (context) => GeneralMainShell(),
+    therapistMainShell: (context) => TherapistMainShell()
   };
 }

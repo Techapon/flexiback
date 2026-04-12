@@ -1,3 +1,4 @@
+import 'package:flexiback/shared/entities/role_enum.dart';
 import 'package:flexiback/features/auth/presentation/controller/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,6 +24,8 @@ class _SignupPageState extends State<SignupPage> {
   final passwordC = TextEditingController();
   final confirmPasswordC = TextEditingController();
 
+  Role roleSelect = Role.General;
+
   @override
   void dispose() {
     emailC.dispose();
@@ -34,7 +37,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-
+    
     // Dialog
     if (authProvider.error != null) {
       final errorMsg = authProvider.error!;
@@ -150,85 +153,127 @@ class _SignupPageState extends State<SignupPage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 36, vertical: 32),
               child: Column(
+                spacing: 12,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-      
-                  // Email field
-                  Text(
-                    "email",
-                    style: TextStyle(
-                      color: AppColor.main1,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+
+                  Column(
+                    spacing: 6,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "email",
+                        style: TextStyle(
+                          color: AppColor.main1,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      
+                      Custom_Textfeild(
+                        hint: 'email here..',
+                        type: TextInputType.emailAddress,
+                        obscureText: false,
+                        controller: emailC,
+                        errorText: authProvider.errorEmail,
+                        icon: Icons.email,
+                      ),
+
+                    ],
                   ),
-                  SizedBox(height: 6),
-                  Custom_Textfeild(
-                    hint: 'email here..',
-                    type: TextInputType.emailAddress,
-                    obscureText: false,
-                    controller: emailC,
-                    errorText: authProvider.errorEmail,
-                    icon: Icons.email,
+
+                  Column(
+                    spacing: 6,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Password field
+                      Text(
+                        "password",
+                        style: TextStyle(
+                          color: AppColor.main2,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Custom_Textfeild(
+                        hint: 'password here..',
+                        type: TextInputType.text,
+                        obscureText: true,
+                        controller: passwordC,
+                        errorText: authProvider.errorPassword,
+                        icon: Icons.lock_outline_rounded,
+                      ),
+                      Custom_Textfeild(
+                        hint: 'comfirm password..',
+                        type: TextInputType.text,
+                        obscureText: true,
+                        controller: confirmPasswordC,
+                        errorText: authProvider.errorConfirmPassword,
+                        icon: Icons.check_rounded,
+                      ),
+                    ],
                   ),
-      
-                  SizedBox(height: 24),
-      
-                  // Password field
-                  Text(
-                    "password",
-                    style: TextStyle(
-                      color: AppColor.main2,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+
+                  Column(
+                    spacing: 6,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "your role",
+                        style: TextStyle(
+                          color: AppColor.main2,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      Row(
+                        spacing: 12,
+                        children: [
+                          RadioMenuButton(
+                            value: Role.General,
+                            groupValue: roleSelect,
+                            onChanged: (value) {
+                              setState(() {
+                                roleSelect = value!;
+                              });
+                            },
+                            child: Text(
+                              Role.General.entity
+                            ),
+                          ),
+                      
+                          RadioMenuButton(
+                            value: Role.Therapist,
+                            groupValue: roleSelect,
+                            onChanged: (value) {
+                              setState(() {
+                                roleSelect = value!;
+                              });
+                            },
+                            child: Text(
+                              Role.Therapist.entity
+                            )
+                          )
+                        ],
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 6),
-                  Custom_Textfeild(
-                    hint: 'password here..',
-                    type: TextInputType.text,
-                    obscureText: true,
-                    controller: passwordC,
-                    errorText: authProvider.errorPassword,
-                    icon: Icons.lock_outline_rounded,
-                  ),
-      
-                  SizedBox(height: 24),
-      
-                  // Confirm password field
-                  Text(
-                    "confirm password",
-                    style: TextStyle(
-                      color: AppColor.cream3,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Custom_Textfeild(
-                    hint: 'password again..',
-                    type: TextInputType.text,
-                    obscureText: true,
-                    controller: confirmPasswordC,
-                    errorText: authProvider.errorConfirmPassword,
-                    icon: Icons.check_rounded,
-                  ),
-      
-                  SizedBox(height: 24),
       
                   // Sign up button
                   Auth_Btn(
                     text: 'Sign up',
                     isLoading: authProvider.isLoading,
-                    onTap: () {
+                    onTap: () async {
                       if (authProvider.isLoading) return;
-                      authProvider.signup(
+                      await authProvider.signup(
                         emailC.text.trim(),
                         passwordC.text.trim(),
                         confirmPasswordC.text.trim(),
+                        roleSelect
                       );
 
-                      if (authProvider.error == null) {
+                      if (authProvider.error == null && authProvider.isSignUp) {
                         showSuccessDialog(
                           context: context,
                           message: "Welcome to FlexiBack, Please comfirm your email🦊",
@@ -239,8 +284,6 @@ class _SignupPageState extends State<SignupPage> {
                       }
                     },
                   ),
-      
-                  SizedBox(height: 12),
       
                   // Navigate to login
                   Row(
@@ -270,6 +313,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ],
                   ),
+
                 ],
               ),
             ),

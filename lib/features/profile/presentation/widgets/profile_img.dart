@@ -5,7 +5,11 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 class ProfileImg extends StatelessWidget {
-  const ProfileImg({super.key});
+  ImageProvider? imageProvider;
+  ProfileImg({
+    super.key,
+    required this.imageProvider
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +21,8 @@ class ProfileImg extends StatelessWidget {
       child: CircleAvatar(
         radius: 67.5,
         backgroundColor: AppColor.base2,
-        backgroundImage: profileProvider.profile?.img != null
-            ? NetworkImage(profileProvider.profile!.img!)
-            : null,
-        child: profileProvider.profile?.img == null
+        backgroundImage: imageProvider,
+        child: imageProvider == null
             ? Icon(LucideIcons.user300, size: 75, color: AppColor.grey1)
             : null,
       )

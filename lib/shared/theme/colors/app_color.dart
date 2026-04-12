@@ -17,6 +17,8 @@ class AppColor {
 
   static const black1 = Color(0xFF2A2A2A);
 
+  static const blue1 = Color(0xFF188FFF);
+
   static const cream1 = Color(0xFFFFCFBA);
   static const cream2 = Color(0xFFF8AD85);
   static const cream3 = Color(0xFFD47E5A);

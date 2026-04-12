@@ -44,8 +44,12 @@ dependencies:
   # ux/ui
   google_fonts: ^8.0.2
   hugeicons: ^1.1.5
+  font_awesome_flutter: ^11.0.0
   lucide_icons_flutter: ^3.1.12
   responsive_navigation_bar: ^6.2.0
+
+  # img
+  image_picker: ^1.2.1
 
   # env
   flutter_dotenv: ^6.0.0

@@ -10,20 +10,17 @@ import 'package:provider/provider.dart';
 import 'package:responsive_navigation_bar/responsive_navigation_bar.dart';
 
 import '../../../features/profile/presentation/controller/profile_provider.dart';
-class GeneralMainShell extends StatefulWidget {
-  const GeneralMainShell({super.key});
+class TherapistMainShell extends StatefulWidget {
+  const TherapistMainShell({super.key});
 
   @override
-  State<GeneralMainShell> createState() => _GeneralMainShellState();
+  State<TherapistMainShell> createState() => _TherapistMainShellState();
 }
 
-class _GeneralMainShellState extends State<GeneralMainShell> {
+class _TherapistMainShellState extends State<TherapistMainShell> {
   int _currentindex = 0;
 
   final List<Widget> _pages = [
-    TherapyPage(),
-    DevicePage(),
-    TrendPage(),
     ChatPage(),
     ProfilePage(),
   ];
@@ -78,21 +75,6 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
         inactiveIconColor: AppColor.grey3,
 
         navigationBarButtons: <NavigationBarButton>[
-          NavigationBarButton(
-            icon: LucideIcons.personStanding,
-            backgroundColor: AppColor.main2
-          ),
-
-          NavigationBarButton(
-            icon: LucideIcons.chartColumnBig,
-            backgroundColor: AppColor.main2
-          ),
-
-          NavigationBarButton(
-            icon: LucideIcons.rows3,
-            backgroundColor: AppColor.main2
-          ),
-
           NavigationBarButton(
             icon: LucideIcons.messageCircleMore,
             backgroundColor: AppColor.main2

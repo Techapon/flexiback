@@ -4,12 +4,14 @@ class UserModel extends UserEntity{
   UserModel({
     required super.id,
     required super.email,
+    required super.role
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'],
       email: map['email'],
+      role: map['role']
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../config/routes.dart';
+import '../../../../shared/entities/role_enum.dart';
 import '../controller/auth_provider.dart';
 import '../widgets/authbtn.dart';
 import '../../../../shared/widgets/dialog/error/dialog_error.dart';
@@ -113,11 +114,20 @@ class _LoginPageState extends State<LoginPage> {
                         );
 
                         if (authProvider.isLoggedIn) {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.generalMainShell,
-                          );
+                          Role userRole = authProvider.getUser.role;
+                          if (userRole == Role.General) {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.generalMainShell,
+                            );
+                          } else if (userRole == Role.Therapist) {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.therapistMainShell,
+                            );
+                          }
                         }
+                        
                       },
                       isLoading: authProvider.isLoading,
                     ),

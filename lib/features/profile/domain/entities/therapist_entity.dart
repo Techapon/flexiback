@@ -1,11 +1,12 @@
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 
-class GeneralEntity extends ProfileEntity {
-  double? weight;
-  double? height;
-  String? pmh;
+class TherapistEntity extends ProfileEntity {
+  String? specialty; 
+  String? affiliation; 
+  String? institution;
+  String? experience; 
 
-  GeneralEntity({
+  TherapistEntity({
     required super.id,
     required super.role,
     required super.img,
@@ -19,13 +20,14 @@ class GeneralEntity extends ProfileEntity {
     required super.updateAt,
     required super.createdAt,
 
-    required this.weight,
-    required this.height,
-    required this.pmh,
+    required this.specialty,
+    required this.affiliation,
+    required this.institution,
+    required this.experience,
   });
 
   @override
-  GeneralEntity get getProfileData => GeneralEntity(
+  TherapistEntity get getProfileData => TherapistEntity(
     id: id,
     role: role,
     img: img,
@@ -39,13 +41,14 @@ class GeneralEntity extends ProfileEntity {
     updateAt: updateAt,
     createdAt: createdAt,
 
-    weight: weight,
-    height: height,
-    pmh: pmh,
+    specialty: specialty,
+    affiliation: affiliation,
+    institution: institution,
+    experience: experience
   );
 
   @override
   String toString() {
-    return 'GENERAL -- ProfileEntity(id: $id, role: $role, title: $title, firstName: $firstName, lastName: $lastName, gender: $gender, age: $age, email: $email, number: $number, updateAt: $updateAt, createdAt: $createdAt)';
+    return 'THEARPIST -- ProfileEntity(id: $id, role: $role, title: $title, firstName: $firstName, lastName: $lastName, gender: $gender, age: $age, email: $email, number: $number, updateAt: $updateAt, createdAt: $createdAt)';
   }
 }

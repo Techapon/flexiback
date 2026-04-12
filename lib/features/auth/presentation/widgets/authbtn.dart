@@ -45,7 +45,7 @@ class _Auth_BtnState extends State<Auth_Btn> {
           child: widget.isLoading 
           ? SizedBox(
             height: 25,
-            width: 20,
+            width: 25,
             child: CircularProgressIndicator(
               color: Colors.white,
               strokeWidth: 2.5,

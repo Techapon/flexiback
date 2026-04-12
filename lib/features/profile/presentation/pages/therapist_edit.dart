@@ -1,13 +1,18 @@
-import 'dart:io';
-
+import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
+import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
+import 'package:flexiback/features/profile/presentation/widgets/card_field.dart';
 import 'package:flexiback/features/profile/presentation/widgets/dropdown.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
+import 'package:flexiback/features/profile/presentation/widgets/side_card_field.dart';
 import 'package:flexiback/shared/utils/pick_img.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../shared/entities/role_enum.dart';
 import '../../../../shared/theme/colors/app_color.dart';
 import '../../domain/entities/general_entity.dart';
 import '../widgets/edit_box_part.dart';
@@ -16,16 +21,15 @@ import '../widgets/edit_head_part.dart';
 import '../widgets/pill_field.dart';
 import '../widgets/profile_img.dart';
 
-class GeneralEdit extends StatefulWidget {
-  GeneralEdit({super.key});
+class TherapistEdit extends StatefulWidget {
+  TherapistEdit({super.key});
 
   @override
-  State<GeneralEdit> createState() => _GeneralEditState();
+  State<TherapistEdit> createState() => _TherapistEditState();
 }
 
-class _GeneralEditState extends State<GeneralEdit> {
-  GeneralEntity? generalNewProfile;
-  File? newImage;
+class _TherapistEditState extends State<TherapistEdit> {
+  TherapistEntity? therapistNewProfile;
 
   final List<String> title_list = ["-","Mr","Ms.","Miss","Mrs.","Dr.","Prof.","Rev."];
   late ValueNotifier<String?> valueListenable_title;
@@ -33,23 +37,11 @@ class _GeneralEditState extends State<GeneralEdit> {
   final List<String> gender_list = ["-","Male","Female","Other","Croissant"];
   late ValueNotifier<String?> valueListenable_gender;
 
-  // picker Image
-  Future<void> pickerImage() async {
-    final file = await pickImageGallery();
-
-    if (file == null) return;
-
-    setState(() {
-      newImage = file;
-    });
-
-  }
-
   @override
   void dispose() {
     valueListenable_title.dispose();
     valueListenable_gender.dispose();
-    generalNewProfile = null;
+    therapistNewProfile = null;
     super.dispose();
   }
 
@@ -64,24 +56,17 @@ class _GeneralEditState extends State<GeneralEdit> {
   @override
   Widget build(BuildContext context) {
     final profileProvider = context.watch<ProfileProvider>();
-    generalNewProfile = (profileProvider.profile as GeneralEntity).getProfileData;
+    therapistNewProfile = (profileProvider.profile as TherapistEntity).getProfileData;
 
-    valueListenable_title.value = generalNewProfile!.title ?? title_list[0];
-    valueListenable_gender.value = generalNewProfile!.gender ?? gender_list[0];
-
-    ImageProvider? imageProvider = null;
-
-    if (newImage != null) {
-      imageProvider = FileImage(newImage!);
-    } else if (generalNewProfile!.img != null && generalNewProfile!.img != "") {
-      imageProvider = NetworkImage(generalNewProfile!.img!);
-    }
+    valueListenable_title.value = therapistNewProfile!.title ?? title_list[0];
+    valueListenable_gender.value = therapistNewProfile!.gender ?? gender_list[0];
 
     return Scaffold(
       backgroundColor: AppColor.base2,
 
       appBar: AppBar(
         backgroundColor: AppColor.base1,
+        surfaceTintColor: AppColor.base1,
         elevation: 0,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft),
@@ -125,13 +110,10 @@ class _GeneralEditState extends State<GeneralEdit> {
                   
                   Stack(
                     children: [
-                      ProfileImg(
-                        imageProvider: imageProvider,
-                      ),
-
-                      
-                      
-
+                      // ProfileImg(
+                        
+                      // ),
+                
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -146,7 +128,7 @@ class _GeneralEditState extends State<GeneralEdit> {
                             )
                           ),
                           onPressed: () {
-                            pickerImage();
+                            // pickImage();
                           },
                           icon: Icon(LucideIcons.camera, size: 18, color: AppColor.base1),
                         )
@@ -162,24 +144,24 @@ class _GeneralEditState extends State<GeneralEdit> {
                         children: [
                           EditBoxPart(
                             title: "Email",
-                            value: generalNewProfile!.email,
+                            value: therapistNewProfile!.email,
                             keyboardType: TextInputType.emailAddress,
                             hint: "email address",
                             icon: LucideIcons.mail,
             
                             onChanged: (value) {
-                              generalNewProfile!.email = value;
+                              therapistNewProfile!.email = value;
                             },
                           ),
                           EditBoxPart(
                             title: "Phone",
-                            value: generalNewProfile!.number,
+                            value: therapistNewProfile!.number,
                             keyboardType: TextInputType.phone,
                             hint: "no phone number",
                             icon: LucideIcons.phone,
             
                             onChanged: (value) {
-                              generalNewProfile!.number = value;
+                              therapistNewProfile!.number = value;
                             },
                           ),
                         ],
@@ -202,7 +184,7 @@ class _GeneralEditState extends State<GeneralEdit> {
                                   List_items: title_list,
             
                                   onChanged: (value) {
-                                    generalNewProfile!.title = value;
+                                    therapistNewProfile!.title = value;
                                   },
                                 )
                               ),
@@ -214,22 +196,22 @@ class _GeneralEditState extends State<GeneralEdit> {
                             children: [
                               Expanded(
                                 child: EditField(
-                                  value: generalNewProfile!.firstName ?? "",
+                                  value: therapistNewProfile!.firstName ?? "",
                                   hintText: "first name",
             
                                   onChanged: (value) {
-                                    generalNewProfile!.firstName = value;
+                                    therapistNewProfile!.firstName = value;
                                   },
                                 )
                               ),
             
                               Expanded(
                                 child: EditField(
-                                  value: generalNewProfile!.lastName ?? "",
+                                  value: therapistNewProfile!.lastName ?? "",
                                   hintText: "last name",
             
                                   onChanged: (value) {
-                                    generalNewProfile!.lastName = value;
+                                    therapistNewProfile!.lastName = value;
                                   },
                                 )
                               ),
@@ -246,14 +228,14 @@ class _GeneralEditState extends State<GeneralEdit> {
                             valueListenable_title: valueListenable_gender,
                             List_items: gender_list,
                             onChanged: (value) {
-                              generalNewProfile!.gender = value;
+                              therapistNewProfile!.gender = value;
                             }
                           )
                         ]
                       ),
 
                       EditHeadPart(
-                        title: generalNewProfile is GeneralEntity ? "body" : "age",
+                        title: therapistNewProfile is GeneralEntity ? "body" : "age",
                         children: [
                           Wrap(
                             spacing: 8,       
@@ -261,29 +243,11 @@ class _GeneralEditState extends State<GeneralEdit> {
                             children: [
                               PillField(
                                 title: "age" ,
-                                value: generalNewProfile!.age,
+                                value: therapistNewProfile!.age,
                                 unit: null,
                                 keyboardType: TextInputType.number,
                                 onChanged: (value) {
-                                  generalNewProfile!.age = value;
-                                },
-                              ),
-                              PillField(
-                                title: "weight",
-                                value: generalNewProfile?.weight,
-                                unit: "kg",
-                                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                onChanged: (value) {
-                                  generalNewProfile?.weight = value;
-                                },
-                              ),
-                              PillField(
-                                title: "height",
-                                value: generalNewProfile?.height,
-                                unit: "cm",
-                                keyboardType: TextInputType.number,
-                                onChanged: (value) {
-                                  generalNewProfile?.height = value;
+                                  therapistNewProfile!.age = value;
                                 },
                               ),
                             ],
@@ -294,37 +258,65 @@ class _GeneralEditState extends State<GeneralEdit> {
                   ),
 
                   EditBox(
-                    title: "Medical History",
+                    title: "Medical Background",
                     children: [
                       EditHeadPart(
-                        title: "past medical history",
+                        title: "Specialty and Affiliation",
                         children: [
-                          EditField(
-                            value: "",
-                            hintText: "-",
+                          CardField(
+                            title: "Specialty",
+                            icon: LucideIcons.userStar500,
+                            hintText: '-',
+                            value: therapistNewProfile?.specialty,
+                            onChanged: (String value) {
+                              therapistNewProfile?.specialty = value;
+                            },
+                          ),
+                          CardField(
+                            title: "Affiliation",
+                            icon: LucideIcons.hospital500,
+                            hintText: '-',
+                            value: therapistNewProfile?.affiliation,
+                            onChanged: (value) {
+                              therapistNewProfile?.affiliation = value;
+                            },
+                          ),
+                        ]
+                      ),
+
+                      EditHeadPart(
+                        title: "Educate",
+                        children: [
+                          SideCardField(
+                            icon: LucideIcons.graduationCap500,
+                            hintText: '-',
+                            value: therapistNewProfile?.institution,
                             maxLine: 5,
                             maxLength: 150,
                             onChanged: (value) {
-                              generalNewProfile?.pmh = value;
+                              therapistNewProfile?.institution = value;
+                            },
+                          ),
+                          
+                        ]
+                      ),
+
+                      EditHeadPart(
+                        title: "Experince",
+                        children: [
+                          EditField(
+                            value: therapistNewProfile?.experience ?? "",
+                            hintText: "-",
+                            maxLine: 6,
+                            maxLength: 200,
+                            onChanged: (value) {
+                              therapistNewProfile?.experience = value;
                             }
                           )
                         ]
                       )
                     ]
                   )
-                  
-                  // if (generalNewProfile is TherapistEntity) ...[
-                  //   Builder(
-                  //     builder: (_) {
-                  //       therapistgeneralNewProfile = generalNewProfile as TherapistEntity;
-                  //       return Text(
-                  //         therapistgeneralNewProfile?.specialty ?? "-"
-                  //       );
-                  //     }
-                  //   )
-                  // ]
-                  
-                
                 ],
               ),
             )

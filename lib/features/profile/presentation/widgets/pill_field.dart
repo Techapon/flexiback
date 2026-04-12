@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 
 import '../../../../shared/theme/colors/app_color.dart' show AppColor;
 
-class PillFeild<T> extends StatelessWidget {
+class PillField<T> extends StatelessWidget {
   
   final String title;
   final T? value;
   final String? unit;
   final TextInputType keyboardType;
   final Function(T?) onChanged;
-  const PillFeild({
+  const PillField({
     super.key, 
     required this.title,
     required this.value,
