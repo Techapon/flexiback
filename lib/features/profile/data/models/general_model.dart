@@ -42,8 +42,8 @@ class GeneralModel extends GeneralEntity {
       updateAt: profileData.updateAt,
       createdAt: profileData.createdAt,
 
-      weight: generalData['weight'],
-      height: generalData['height'],
+      weight: (generalData['weight'] as num?)?.toDouble(),
+      height: (generalData['height'] as num?)?.toDouble(),
       pmh: generalData['pmh'],
     );
   }

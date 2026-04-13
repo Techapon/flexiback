@@ -15,11 +15,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<ProfileEntity> updateProfile(
+  Future updateProfile(
     ProfileEntity newProfile,
-    ImageEntity newImage,
-    String oldImage
+    ImageEntity? newImage,
+    String? oldImage
   ) {
-    return profileRemoteDatasource.getProfile();
+    return profileRemoteDatasource.upadteProfile(
+      newProfile,
+      newImage,
+      oldImage
+    );
   }
 }

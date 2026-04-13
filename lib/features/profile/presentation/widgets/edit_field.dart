@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class EditField extends StatelessWidget {
 
   final String hintText;
-  final String value;
+  final String? value;
   final int maxLine;
   final int? maxLength;
   final Function(String) onChanged;

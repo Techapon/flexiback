@@ -25,7 +25,7 @@ class ProfileModel extends ProfileEntity {
     return ProfileModel(
       id: map['id'],
       role: map['role'],
-      img: map['img'],
+      img: map['img_src'],
       title: map['title'],
       firstName: map['first_name'],
       lastName: map['last_name'],

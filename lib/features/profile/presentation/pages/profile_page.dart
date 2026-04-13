@@ -28,7 +28,7 @@ class ProfilePage extends StatelessWidget {
       return Scaffold(
         body: Center(
           child: Text(
-            profileProvider.errorr ?? "User not found",
+            profileProvider.error ?? "User not found",
             style: TextStyle(
               fontSize: 16,
               color: AppColor.black1,

@@ -15,6 +15,7 @@ class EditBoxPart extends StatelessWidget {
   final String hint;
   final IconData icon;
   final TextInputType keyboardType;
+  final bool readOnly;
   const EditBoxPart({
     super.key, 
     required this.title, 
@@ -22,6 +23,7 @@ class EditBoxPart extends StatelessWidget {
     required this.icon,
     required this.hint,
     required this.keyboardType,
+    this.readOnly = false,
     required this.onChanged
   });
 
@@ -71,6 +73,7 @@ class EditBoxPart extends StatelessWidget {
                     onChanged: (value) {
                       onChanged(value);
                     },
+                    readOnly: readOnly,
                     style: TextStyle(
                       color: AppColor.black1,
                       fontWeight: FontWeight.bold,

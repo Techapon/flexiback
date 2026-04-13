@@ -84,9 +84,9 @@ class PillField<T> extends StatelessWidget {
                         ),
                         onChanged: (value) {
                           if (T == int) {
-                            onChanged(int.parse(value) as T?);
+                            onChanged(int.tryParse(value) as T?);
                           } else if (T == double) {
-                            onChanged(double.parse(value) as T?);
+                            onChanged(double.tryParse(value) as T?);
                           }
                         },
                         style: TextStyle(

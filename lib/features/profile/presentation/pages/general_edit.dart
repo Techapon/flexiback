@@ -5,6 +5,7 @@ import 'package:flexiback/features/profile/presentation/widgets/dropdown.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
 import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:flexiback/shared/utils/pick_img.dart';
+import 'package:flexiback/shared/widgets/dialog/success/dialog_success.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -66,6 +67,27 @@ class _GeneralEditState extends State<GeneralEdit> {
   @override
   Widget build(BuildContext context) {
     final profileProvider = context.watch<ProfileProvider>();
+
+    if (profileProvider.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (profileProvider.profile == null) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            profileProvider.error ?? "User not found",
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColor.black1,
+            ),
+          ),
+        ),
+      );
+    }
+
     generalNewProfile = (profileProvider.profile as GeneralEntity).getProfileData;
 
     valueListenable_title.value = generalNewProfile!.title ?? title_list[0];
@@ -75,7 +97,8 @@ class _GeneralEditState extends State<GeneralEdit> {
 
     if (newImage?.file != null) {
       imageProvider = FileImage(newImage!.file!);
-    } else if (generalNewProfile!.img != null && generalNewProfile!.img != "") {
+    } else if (generalNewProfile!.img != null) {
+      
       imageProvider = NetworkImage(generalNewProfile!.img!);
     }
 
@@ -99,8 +122,19 @@ class _GeneralEditState extends State<GeneralEdit> {
               splashColor: AppColor.success,
               focusColor: AppColor.success,
               hoverColor: AppColor.success,
-              onPressed: () {
-                
+              onPressed: () async {
+                if (profileProvider.isLoading) return;
+                await profileProvider.updateProfile(
+                  generalNewProfile!,
+                  newImage
+                );
+
+                if (profileProvider.error == null) {
+                  showSuccessDialog(
+                    context: context,
+                    message: "Update profile success!!",
+                  );
+                }
               },
             ),
           ),
@@ -130,8 +164,6 @@ class _GeneralEditState extends State<GeneralEdit> {
                       ProfileImg(
                         imageProvider: imageProvider,
                       ),
-
-                      Text("Bie"),
 
                       Positioned(
                         bottom: 0,
@@ -167,6 +199,7 @@ class _GeneralEditState extends State<GeneralEdit> {
                             keyboardType: TextInputType.emailAddress,
                             hint: "email address",
                             icon: LucideIcons.mail,
+                            readOnly: true,
             
                             onChanged: (value) {
                               generalNewProfile!.email = value;
@@ -301,7 +334,7 @@ class _GeneralEditState extends State<GeneralEdit> {
                         title: "past medical history",
                         children: [
                           EditField(
-                            value: "",
+                            value: generalNewProfile?.pmh,
                             hintText: "-",
                             maxLine: 5,
                             maxLength: 150,

@@ -3,20 +3,22 @@ import 'package:flexiback/features/profile/data/repositories/profile_repository_
 import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/profile/domain/usecase/get_profile_usecase.dart';
+import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../shared/entities/role_enum.dart';
 import '../../../../shared/utils/get_role.dart';
 import '../../domain/entities/therapist_entity.dart';
+import '../../domain/usecase/update_profile_usecase.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final getProfileUsecase = 
       GetProfileUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
-  final updateProfile =
+  final updateProfileUsecase =
       UpdateProfileUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
 
   bool isLoading  = false;
-  String? errorr;
+  String? error;
   ProfileEntity? profile;
 
   // Getter 
@@ -76,19 +78,44 @@ class ProfileProvider extends ChangeNotifier {
     return "-";
   }
 
-  // ----- Fuction -----
+  // ----- Call -----
  
   Future<void> getProfile() async {
     isLoading = true;
     notifyListeners();
     try {
       profile = await getProfileUsecase.call();
-      errorr = null;
+      error = null;
 
       print(profile.toString());
     } catch (e) {
-      errorr = e.toString();
+      error = e.toString();
       
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateProfile(
+    ProfileEntity newProifle,
+    ImageEntity? imageFile,
+  ) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await updateProfileUsecase.call(
+          newProifle,
+          imageFile, 
+          profile?.img
+        );
+
+      profile = await getProfileUsecase.call();
+
+      error = null;
+    }catch (e) {
+      error = e.toString();
     }
 
     isLoading = false;

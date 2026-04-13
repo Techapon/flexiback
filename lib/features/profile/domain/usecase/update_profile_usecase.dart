@@ -9,8 +9,8 @@ class UpdateProfileUsecase {
 
   Future call(
     ProfileEntity newProfile,
-    ImageEntity newImage,
-    String oldImage
+    ImageEntity? newImage,
+    String? oldImage
   ) {
     return repo.updateProfile(
       newProfile,

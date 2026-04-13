@@ -48,7 +48,7 @@ class ProfileRemoteDatasource {
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
-      print("unknown error : ${e.toString()}");
+      print("------------ unknown error : ${e.toString()}");
       throw CoreFailure.unknown(e.toString());
     }
   }
@@ -69,7 +69,7 @@ class ProfileRemoteDatasource {
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
-      print("unknown error : ${e.toString()}");
+      print("G------------unknown error : ${e.toString()}");
       throw CoreFailure.unknown(e.toString());
     }
   }
@@ -87,7 +87,7 @@ class ProfileRemoteDatasource {
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
-      print("unknown error : ${e.toString()}");
+      print("T------------ unknown error : ${e.toString()}");
       throw CoreFailure.unknown(e.toString());
     }
   }
@@ -96,11 +96,11 @@ class ProfileRemoteDatasource {
   Future upadteProfile(ProfileEntity newProfile, ImageEntity? newImage,String? oldImage) async {
     try {
       
-      final String? imgUrl = await uploadImg(newImage);
+      final String? imgUrl = await uploadNewProfile(newImage,oldImage);
 
       final profileModel = ProfileModel.formEntity(newProfile);
 
-      profileModel.img = imgUrl;
+      if (imgUrl != null) profileModel.img = imgUrl;
 
       await supabase
         .from("profiles")
@@ -158,7 +158,7 @@ class ProfileRemoteDatasource {
   }
 
   // Upload Image Profile
-  Future<String?> uploadImg(ImageEntity? imgFile) async {
+  Future<String?> uploadNewProfile(ImageEntity? imgFile, String? oldImage) async {
     if (imgFile == null) return null;
 
     try {
@@ -172,6 +172,7 @@ class ProfileRemoteDatasource {
 
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.$extension';
 
+      // upload
       await supabase.storage
         .from('profile')
         .uploadBinary(
@@ -181,6 +182,13 @@ class ProfileRemoteDatasource {
             contentType: imgFile.type ?? 'image/jpeg'
           )
         );
+
+      // remove old profile image
+      if (oldImage != null) {
+        await supabase.storage
+          .from('profile')
+          .remove([oldImage]);
+      }
 
       final url = supabase.storage.from('profile').getPublicUrl(fileName);
 
