@@ -185,9 +185,10 @@ class ProfileRemoteDatasource {
 
       // remove old profile image
       if (oldImage != null) {
+        final oldFileName = Uri.parse(oldImage).pathSegments.last;
         await supabase.storage
           .from('profile')
-          .remove([oldImage]);
+          .remove([oldFileName]);
       }
 
       final url = supabase.storage.from('profile').getPublicUrl(fileName);

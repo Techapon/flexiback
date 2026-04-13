@@ -90,7 +90,6 @@ class ProfileProvider extends ChangeNotifier {
       print(profile.toString());
     } catch (e) {
       error = e.toString();
-      
     }
 
     isLoading = false;
@@ -110,7 +109,7 @@ class ProfileProvider extends ChangeNotifier {
           imageFile, 
           profile?.img
         );
-
+      
       profile = await getProfileUsecase.call();
 
       error = null;

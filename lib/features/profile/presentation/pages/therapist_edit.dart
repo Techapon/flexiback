@@ -5,7 +5,11 @@ import 'package:flexiback/features/profile/presentation/widgets/card_field.dart'
 import 'package:flexiback/features/profile/presentation/widgets/dropdown.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
 import 'package:flexiback/features/profile/presentation/widgets/side_card_field.dart';
+import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:flexiback/shared/utils/pick_img.dart';
+import 'package:flexiback/shared/widgets/dialog/success/dialog_success.dart';
+import 'package:flexiback/shared/widgets/status/error/error_status.dart';
+import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -31,42 +35,76 @@ class TherapistEdit extends StatefulWidget {
 class _TherapistEditState extends State<TherapistEdit> {
   TherapistEntity? therapistNewProfile;
 
+  ImageEntity? newImage;
+
   final List<String> title_list = ["-","Mr","Ms.","Miss","Mrs.","Dr.","Prof.","Rev."];
   late ValueNotifier<String?> valueListenable_title;
 
   final List<String> gender_list = ["-","Male","Female","Other","Croissant"];
   late ValueNotifier<String?> valueListenable_gender;
 
-  @override
-  void dispose() {
-    valueListenable_title.dispose();
-    valueListenable_gender.dispose();
-    therapistNewProfile = null;
-    super.dispose();
+  // picker Image
+  Future<void> pickerImage() async {
+    final file = await pickImageGallery();
+
+    if (file == null) return;
+
+    setState(() {
+      newImage = file;
+    });
+
   }
 
   @override
   void initState() {
     super.initState();
-
     valueListenable_title = ValueNotifier(null);
     valueListenable_gender = ValueNotifier(null);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final profileProvider = context.read<ProfileProvider>();
+      therapistNewProfile = (profileProvider.profile as TherapistEntity).getProfileData;
+      valueListenable_title.value = therapistNewProfile!.title ?? title_list[0];
+      valueListenable_gender.value = therapistNewProfile!.gender ?? gender_list[0];
+      setState(() {});
+    });
   }
+
+  @override
+  void dispose() {
+    valueListenable_title.dispose();
+    valueListenable_gender.dispose();
+    therapistNewProfile = null;
+    newImage = null;
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     final profileProvider = context.watch<ProfileProvider>();
-    therapistNewProfile = (profileProvider.profile as TherapistEntity).getProfileData;
 
-    valueListenable_title.value = therapistNewProfile!.title ?? title_list[0];
-    valueListenable_gender.value = therapistNewProfile!.gender ?? gender_list[0];
+    if (profileProvider.isLoading || therapistNewProfile == null) {
+      return LoadingStatus(text: "Updating Profile ...",);
+    }
+
+    if (profileProvider.profile == null) {
+      return ErrorStatus(text: profileProvider.error);
+    }
+
+    ImageProvider? imageProvider = null;
+
+    if (newImage?.file != null) {
+      imageProvider = FileImage(newImage!.file!);
+    } else if (therapistNewProfile!.img != null) {
+      imageProvider = NetworkImage(therapistNewProfile!.img!);
+    }
 
     return Scaffold(
       backgroundColor: AppColor.base2,
 
       appBar: AppBar(
         backgroundColor: AppColor.base1,
-        surfaceTintColor: AppColor.base1,
         elevation: 0,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft),
@@ -82,8 +120,19 @@ class _TherapistEditState extends State<TherapistEdit> {
               splashColor: AppColor.success,
               focusColor: AppColor.success,
               hoverColor: AppColor.success,
-              onPressed: () {
-                
+              onPressed: () async {
+                if (profileProvider.isLoading) return;
+                await profileProvider.updateProfile(
+                  therapistNewProfile!,
+                  newImage
+                );
+
+                if (profileProvider.error == null) {
+                  showSuccessDialog(
+                    context: context,
+                    message: "Update profile success!!",
+                  );
+                }
               },
             ),
           ),
@@ -110,9 +159,9 @@ class _TherapistEditState extends State<TherapistEdit> {
                   
                   Stack(
                     children: [
-                      // ProfileImg(
-                        
-                      // ),
+                      ProfileImg(
+                        imageProvider: imageProvider,
+                      ),
                 
                       Positioned(
                         bottom: 0,
@@ -128,7 +177,7 @@ class _TherapistEditState extends State<TherapistEdit> {
                             )
                           ),
                           onPressed: () {
-                            // pickImage();
+                            pickerImage();
                           },
                           icon: Icon(LucideIcons.camera, size: 18, color: AppColor.base1),
                         )

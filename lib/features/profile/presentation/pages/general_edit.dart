@@ -6,6 +6,8 @@ import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
 import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:flexiback/shared/utils/pick_img.dart';
 import 'package:flexiback/shared/widgets/dialog/success/dialog_success.dart';
+import 'package:flexiback/shared/widgets/status/error/error_status.dart';
+import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +55,16 @@ class _GeneralEditState extends State<GeneralEdit> {
     super.initState();
     valueListenable_title = ValueNotifier(null);
     valueListenable_gender = ValueNotifier(null);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final profileProvider = context.read<ProfileProvider>();
+      generalNewProfile = (profileProvider.profile as GeneralEntity).getProfileData;
+      valueListenable_title.value = generalNewProfile!.title ?? title_list[0];
+      valueListenable_gender.value = generalNewProfile!.gender ?? gender_list[0];
+      setState(() {});
+    });
   }
+
   @override
   void dispose() {
     generalNewProfile = null;
@@ -63,42 +74,26 @@ class _GeneralEditState extends State<GeneralEdit> {
     super.dispose();
   }
 
+  
+
 
   @override
   Widget build(BuildContext context) {
     final profileProvider = context.watch<ProfileProvider>();
 
-    if (profileProvider.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+    if (profileProvider.isLoading || generalNewProfile == null) {
+      return LoadingStatus(text: "Updating Profile ...",);
     }
 
     if (profileProvider.profile == null) {
-      return Scaffold(
-        body: Center(
-          child: Text(
-            profileProvider.error ?? "User not found",
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColor.black1,
-            ),
-          ),
-        ),
-      );
+      return ErrorStatus(text: profileProvider.error);
     }
-
-    generalNewProfile = (profileProvider.profile as GeneralEntity).getProfileData;
-
-    valueListenable_title.value = generalNewProfile!.title ?? title_list[0];
-    valueListenable_gender.value = generalNewProfile!.gender ?? gender_list[0];
 
     ImageProvider? imageProvider = null;
 
     if (newImage?.file != null) {
       imageProvider = FileImage(newImage!.file!);
     } else if (generalNewProfile!.img != null) {
-      
       imageProvider = NetworkImage(generalNewProfile!.img!);
     }
 
@@ -253,6 +248,7 @@ class _GeneralEditState extends State<GeneralEdit> {
             
                                   onChanged: (value) {
                                     generalNewProfile!.firstName = value;
+                                    // print("NAME : ${generalNewProfile!.firstName}");
                                   },
                                 )
                               ),
@@ -346,19 +342,6 @@ class _GeneralEditState extends State<GeneralEdit> {
                       )
                     ]
                   )
-                  
-                  // if (generalNewProfile is TherapistEntity) ...[
-                  //   Builder(
-                  //     builder: (_) {
-                  //       therapistgeneralNewProfile = generalNewProfile as TherapistEntity;
-                  //       return Text(
-                  //         therapistgeneralNewProfile?.specialty ?? "-"
-                  //       );
-                  //     }
-                  //   )
-                  // ]
-                  
-                
                 ],
               ),
             )

@@ -2,7 +2,7 @@ import 'package:flexiback/shared/theme/colors/app_color.dart';
 import 'package:flexiback/shared/utils/text_uppercase.dart';
 import 'package:flutter/material.dart';
 
-class EditField extends StatelessWidget {
+class EditField extends StatefulWidget {
 
   final String hintText;
   final String? value;
@@ -18,10 +18,21 @@ class EditField extends StatelessWidget {
     required this.onChanged
   });
 
+  @override
+  State<EditField> createState() => _EditFieldState();
+}
+
+class _EditFieldState extends State<EditField> {
+  late TextEditingController feildController;
+
+  @override
+  void initState() {
+    super.initState();
+    feildController = TextEditingController(text: widget.value);
+  }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController feildController = TextEditingController(text: value);
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -31,14 +42,14 @@ class EditField extends StatelessWidget {
       child: TextFormField(
         controller: feildController,
         keyboardType: TextInputType.text,
-        maxLines: maxLine,
-        maxLength: maxLength ?? 15,
+        maxLines: widget.maxLine,
+        maxLength: widget.maxLength ?? 15,
         decoration: InputDecoration(
           border: InputBorder.none,
           isDense: true,
           contentPadding: EdgeInsets.zero,
-          counterText: maxLength == null ? '' : null,
-          hintText: hintText,
+          counterText: widget.maxLength == null ? '' : null,
+          hintText: widget.hintText,
           hintStyle: TextStyle(
             color: AppColor.grey3,
             fontWeight: FontWeight.bold,
@@ -47,7 +58,7 @@ class EditField extends StatelessWidget {
         ),
         onChanged: (value) {
           feildController.text = toFirstLetterUpper(value);
-          onChanged(value);
+          widget.onChanged(value);
         },
         style: TextStyle(
           color: AppColor.black1,

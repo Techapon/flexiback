@@ -2,6 +2,8 @@ import 'package:flexiback/features/profile/presentation/controller/profile_provi
 import 'package:flexiback/features/profile/presentation/widgets/edit_btn.dart';
 import 'package:flexiback/features/profile/presentation/widgets/profile_img.dart';
 import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/shared/widgets/status/error/error_status.dart';
+import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -19,19 +21,40 @@ class ProfilePage extends StatelessWidget {
     final profileProvider = context.watch<ProfileProvider>();
 
     if (profileProvider.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return LoadingStatus(text: "Loading Profile ...",);
     }
 
     if (profileProvider.profile == null) {
+      return ErrorStatus(text: profileProvider.error);
+    }
+    
+    if (profileProvider.profile == null) {
       return Scaffold(
-        body: Center(
-          child: Text(
-            profileProvider.error ?? "User not found",
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColor.black1,
+        body: Padding(
+          padding: EdgeInsets.all(12),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Some thing went wrong :",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: AppColor.black1,
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+                Text(
+                  profileProvider.error ?? "User not found",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColor.black1,
+                  ),
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ],
             ),
           ),
         ),
@@ -78,25 +101,9 @@ class ProfilePage extends StatelessWidget {
                     imageProvider: profileProvider.profile!.img != null 
                       ? NetworkImage(profileProvider.profile!.img!) 
                       : null,
+                    clickable:  true,
                   ),
 
-                  // Positioned(
-                  //   bottom: 0,
-                  //   right: 0,
-                  //   child: IconButton(
-                  //     style: IconButton.styleFrom(
-                  //       backgroundColor: AppColor.main2,
-                  //       shape: CircleBorder(),
-                  //       padding: EdgeInsets.all(10),
-                  //       side: BorderSide(
-                  //         color: AppColor.base1,
-                  //         width: 2
-                  //       )
-                  //     ),
-                  //     onPressed: () {},
-                  //     icon: Icon(LucideIcons.camera, size: 18, color: AppColor.base1),
-                  //   )
-                  // )
                 ],
               ),
 
