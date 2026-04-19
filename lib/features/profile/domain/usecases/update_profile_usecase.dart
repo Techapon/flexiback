@@ -17,5 +17,6 @@ class UpdateProfileUsecase {
       newImage,
       oldImage
     );
+
   }
 }

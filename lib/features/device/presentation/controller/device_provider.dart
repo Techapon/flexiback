@@ -63,9 +63,7 @@ class DeviceProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final result = await connectDeviceUsecase.call(device);
-      if (!result) {
-        error = "Failed to connect to device";
-      }
+
     } catch (e) {
       error = e.toString();
       print("ERROR --- $error");

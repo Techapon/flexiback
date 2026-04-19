@@ -73,6 +73,7 @@ class _GeneralEditState extends State<GeneralEdit> {
     valueListenable_gender.dispose();
     super.dispose();
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +90,7 @@ class _GeneralEditState extends State<GeneralEdit> {
 
     ImageProvider? imageProvider = null;
 
-    if (newImage?.file != null) {
+    if (newImage?.file != null) { 
       imageProvider = FileImage(newImage!.file!);
     } else if (generalNewProfile!.img != null) {
       imageProvider = NetworkImage(generalNewProfile!.img!);
@@ -124,12 +125,10 @@ class _GeneralEditState extends State<GeneralEdit> {
 
                 if (profileProvider.error == null) {
                   await profileProvider.getProfile();
-                  if (profileProvider.error == null) {
-                    showSuccessDialog(
-                      context: context,
-                      message: "Update profile success!!",
-                    );
-                  }
+                  showSuccessDialog(
+                    context: context,
+                    message: "Update profile success!!",
+                  );
                 }
               },
             ),

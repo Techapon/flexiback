@@ -7,10 +7,7 @@ class AuthFailure implements Exception {
   const AuthFailure({
     required this.type,
     required this.message,
-    this.debugMessage,
   });
-
-  final String? debugMessage;
 
   factory AuthFailure.invalidCredentials() => const AuthFailure(
         type: AuthErrorType.invalidCredentials,

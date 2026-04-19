@@ -59,6 +59,9 @@ class _DevicePageState extends State<DevicePage> {
                       }
                     );
                     break;
+                  
+                  default:
+                    break;
                 }
               }else {
                 print("Alllow");

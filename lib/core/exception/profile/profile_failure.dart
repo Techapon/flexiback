@@ -7,10 +7,7 @@ class ProfileFailure implements Exception {
   const ProfileFailure({
     required this.type,
     required this.message,
-    this.debugMessage,
   });
-
-  final String? debugMessage;
 
   factory ProfileFailure.sessionExpired() => const ProfileFailure(
         type: ProfileErrorType.sessionExpired,
