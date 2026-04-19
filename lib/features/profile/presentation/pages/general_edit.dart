@@ -74,12 +74,10 @@ class _GeneralEditState extends State<GeneralEdit> {
     super.dispose();
   }
 
-  
-
-
   @override
   Widget build(BuildContext context) {
     final profileProvider = context.watch<ProfileProvider>();
+    
 
     if (profileProvider.isLoading || generalNewProfile == null) {
       return LoadingStatus(text: "Updating Profile ...",);
@@ -125,10 +123,13 @@ class _GeneralEditState extends State<GeneralEdit> {
                 );
 
                 if (profileProvider.error == null) {
-                  showSuccessDialog(
-                    context: context,
-                    message: "Update profile success!!",
-                  );
+                  await profileProvider.getProfile();
+                  if (profileProvider.error == null) {
+                    showSuccessDialog(
+                      context: context,
+                      message: "Update profile success!!",
+                    );
+                  }
                 }
               },
             ),

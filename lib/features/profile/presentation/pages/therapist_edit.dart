@@ -11,12 +11,9 @@ import 'package:flexiback/shared/widgets/dialog/success/dialog_success.dart';
 import 'package:flexiback/shared/widgets/status/error/error_status.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../shared/entities/role_enum.dart';
 import '../../../../shared/theme/colors/app_color.dart';
 import '../../domain/entities/general_entity.dart';
 import '../widgets/edit_box_part.dart';

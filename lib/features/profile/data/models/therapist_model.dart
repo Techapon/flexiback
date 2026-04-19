@@ -1,7 +1,6 @@
 
 import 'package:flexiback/features/profile/data/models/profile_model.dart';
 
-import '../../domain/entities/general_entity.dart';
 import '../../domain/entities/therapist_entity.dart';
 
 class TherapistModel extends TherapistEntity {

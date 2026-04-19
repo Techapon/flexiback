@@ -1,11 +1,6 @@
-import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/shared/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:provider/provider.dart';
 
-import '../../../../shared/utils/text_uppercase.dart';
-import '../controller/profile_provider.dart';
 
 class EditBoxPart extends StatelessWidget {
   

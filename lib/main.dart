@@ -1,5 +1,6 @@
 import 'package:flexiback/config/routes.dart';
 import 'package:flexiback/features/auth/presentation/controller/auth_provider.dart';
+import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart' show ProfileProvider;
 import 'package:flexiback/shared/theme/app/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,10 @@ void main() async {
 
         ChangeNotifierProvider(
           create: (_) => ProfileProvider()
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => DeviceProvider()
         )
 
       ],

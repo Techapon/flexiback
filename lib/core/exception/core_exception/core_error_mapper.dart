@@ -4,8 +4,6 @@ class CoreErrorMapper {
   CoreErrorMapper._();
  
   static Exception fromCoreException(CoreFailure e) {
-    final msg = e.message.toLowerCase();
-   
     // ── Fallback ────────────────────────────────────────────────────────────
     return CoreFailure.unknown(e.message);
   }

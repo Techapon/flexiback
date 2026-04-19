@@ -1,8 +1,6 @@
-import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/shared/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:provider/provider.dart';
 
 class ProfileImg extends StatelessWidget {
   ImageProvider? imageProvider;

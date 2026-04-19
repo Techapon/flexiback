@@ -1,6 +1,5 @@
 import 'package:flexiback/shared/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class Auth_Btn extends StatefulWidget {
   final String text;

@@ -48,7 +48,7 @@ class AuthRemoteDataSource {
     on AuthException  catch (e) {
       throw AuthErrorMapper.fromAuthException(e);
     }
-    on CoreFailure catch (e) {
+    on CoreFailure catch (_) {
       rethrow;
     }
     catch (_) {

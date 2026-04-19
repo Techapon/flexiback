@@ -1,5 +1,5 @@
+import 'package:flexiback/features/device/presentation/pages/device_page.dart';
 import 'package:flexiback/features/zz/chat.dart';
-import 'package:flexiback/features/zz/device.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
 import 'package:flexiback/features/zz/trend.dart';
@@ -84,12 +84,12 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
           ),
 
           NavigationBarButton(
-            icon: LucideIcons.chartColumnBig,
+            icon: LucideIcons.rows3,
             backgroundColor: AppColor.main2
           ),
 
           NavigationBarButton(
-            icon: LucideIcons.rows3,
+            icon: LucideIcons.chartColumnBig,
             backgroundColor: AppColor.main2
           ),
 

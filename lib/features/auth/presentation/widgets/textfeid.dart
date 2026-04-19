@@ -1,7 +1,5 @@
 import 'package:flexiback/shared/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hugeicons/hugeicons.dart';
 
 class Custom_Textfeild extends StatefulWidget {
   final String hint;

@@ -28,39 +28,6 @@ class ProfilePage extends StatelessWidget {
       return ErrorStatus(text: profileProvider.error);
     }
     
-    if (profileProvider.profile == null) {
-      return Scaffold(
-        body: Padding(
-          padding: EdgeInsets.all(12),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "Some thing went wrong :",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: AppColor.black1,
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
-                Text(
-                  profileProvider.error ?? "User not found",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColor.black1,
-                  ),
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -74,7 +41,7 @@ class ProfilePage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "MY PROFILE",
@@ -91,6 +58,21 @@ class ProfilePage extends StatelessWidget {
                         ).createShader(Rect.fromLTWH(0, 0, 100, 70))
                       ),
                     ),
+                    
+                    IconButton(
+                      // padding: EdgeInsets.zero,
+                      onPressed: () async {
+                        profileProvider.signOut();
+
+                        Navigator.pushNamed(context, AppRoutes.login);
+                      },
+                      icon: Icon(
+                        LucideIcons.logOut500,
+                        size: 24,
+                        color: AppColor.main2,
+                      )
+                    )
+                    
                   ],
                 ),
               ),

@@ -2,13 +2,13 @@ import 'package:flexiback/features/auth/presentation/pages/login_page.dart';
 import 'package:flexiback/features/auth/presentation/pages/signup_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dart';
 import 'package:flexiback/features/zz/chat.dart';
-import 'package:flexiback/features/zz/device.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
 import 'package:flexiback/features/zz/trend.dart';
 import 'package:flexiback/shared/navigation/shell/general_main_shell.dart';
 import 'package:flutter/material.dart';
 
+import '../features/device/presentation/pages/device_page.dart';
 import '../features/profile/presentation/pages/general_edit.dart';
 import '../shared/navigation/shell/therapist_main_shell.dart';
 

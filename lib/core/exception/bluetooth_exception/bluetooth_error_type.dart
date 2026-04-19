@@ -1,0 +1,4 @@
+enum BluetoothErrorType {
+  noPermission,
+  bluetoothoff
+}

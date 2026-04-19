@@ -1,9 +1,5 @@
 import 'package:flexiback/shared/theme/colors/app_color.dart';
-import 'package:flexiback/shared/utils/text_uppercase.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hugeicons/hugeicons.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SideCardField extends StatelessWidget {
   final IconData icon;

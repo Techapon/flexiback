@@ -1,4 +1,3 @@
-
 import '../../../../shared/entities/image_entity.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../../domain/repositories/profile_repository.dart';
@@ -26,4 +25,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
       oldImage
     );
   }
+
+  @override
+  Future signOut() async {
+    profileRemoteDatasource.signout();
+  }
+
+  
 }

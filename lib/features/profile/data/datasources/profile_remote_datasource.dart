@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'package:flexiback/core/exception/auth_exception/auth_error_mapper.dart';
 import 'package:flexiback/shared/entities/image_entity.dart';
-import 'package:mime/mime.dart';
 
 import 'package:flexiback/core/exception/profile/profile_failure.dart';
 import 'package:flexiback/features/profile/data/models/therapist_model.dart';
@@ -205,4 +205,14 @@ class ProfileRemoteDatasource {
       throw CoreFailure.unknown(e.toString());
     }
   }
+
+  Future<void> signout() async {
+    try {
+      await supabase.auth.signOut();
+    } on AuthException catch(e) {
+      throw AuthErrorMapper.fromAuthException(e);
+    } catch (_) {
+      CoreFailure.network();
+    }
+  } 
 }

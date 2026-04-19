@@ -2,20 +2,23 @@ import 'package:flexiback/features/profile/data/datasources/profile_remote_datas
 import 'package:flexiback/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
-import 'package:flexiback/features/profile/domain/usecase/get_profile_usecase.dart';
+import 'package:flexiback/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:flexiback/features/profile/domain/usecases/signout_usecase.dart';
 import 'package:flexiback/shared/entities/image_entity.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../shared/entities/role_enum.dart';
 import '../../../../shared/utils/get_role.dart';
 import '../../domain/entities/therapist_entity.dart';
-import '../../domain/usecase/update_profile_usecase.dart';
+import '../../domain/usecases/update_profile_usecase.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final getProfileUsecase = 
       GetProfileUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
   final updateProfileUsecase =
       UpdateProfileUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
+  final signoutUsecase =
+      SignoutUsecase(ProfileRepositoryImpl(ProfileRemoteDatasource()));
 
   bool isLoading  = false;
   String? error;
@@ -109,9 +112,6 @@ class ProfileProvider extends ChangeNotifier {
           imageFile, 
           profile?.img
         );
-      
-      profile = await getProfileUsecase.call();
-
       error = null;
     }catch (e) {
       error = e.toString();
@@ -119,6 +119,14 @@ class ProfileProvider extends ChangeNotifier {
 
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> signOut() async {
+    try {
+      await signoutUsecase.call();
+    }catch (e) {
+      error = e.toString();
+    }
   }
 
 }
