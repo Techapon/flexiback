@@ -19,6 +19,13 @@ class BluetoothFailre implements Exception {
         message: 'Your need to opeon your Bluetooth to connect the devices',
       );
 
+  factory BluetoothFailre.noConnection([String? debugMessage]) => BluetoothFailre(
+        type: BluetoothErrorType.noCennection,
+        message: 'No device connection.',
+      );
+
+      
+
   @override
   String toString() => message;
 }

@@ -1,4 +1,3 @@
-import 'package:flexiback/core/exception/bluetooth_exception/bluetooth_failure.dart';
 import 'package:flexiback/core/exception/device_exception/device_error_type.dart';
 
 class DeviceFailure implements Exception {

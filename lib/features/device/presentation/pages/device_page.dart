@@ -32,7 +32,7 @@ class _DevicePageState extends State<DevicePage> {
         Center(
           child: FilledButton(
             onPressed: () async {
-              if (deviceProvider.isStream) return;
+              if (deviceProvider.isScaning) return;
 
               await deviceProvider.findDevices();
               if (deviceProvider.failre != null) {
@@ -69,13 +69,13 @@ class _DevicePageState extends State<DevicePage> {
               
             },
             child: Text(
-              deviceProvider.isStream ? "Findding the Devices..." : "Find the Devices"
+              deviceProvider.isScaning ? "Findding the Devices..." : "Find the Devices"
             )
           ),
         ),
 
         Text(
-          "Is Streaming : ${deviceProvider.isStream}"
+          "Is Streaming : ${deviceProvider.isScaning}"
         ),
 
         if (deviceProvider.devices.isEmpty) 

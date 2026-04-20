@@ -1,16 +1,21 @@
-import 'package:flexiback/features/device/domain/entities/bt_request.dart';
+import 'package:flexiback/features/device/domain/entities/enums/bt_request.dart';
 import 'package:flexiback/features/device/domain/repositories/bluetooth_repository.dart';
+import 'package:flexiback/features/device/domain/entities/classes/preview_entity.dart';
 
 class DowloadPreviewUsecase {
-  BluetoothRepository repo;
+  final BluetoothRepository repo;
 
   DowloadPreviewUsecase(this.repo);
 
-  Stream<String> call(BtRequest request) async* {
-    final requestResult = await repo.sendRequest(request);
+  Stream<PreviewEntity> call() async* {
+    try {
+      final requestResult = await repo.sendRequest(BtRequest.DowloadPreview);
 
-    if (requestResult) {
-      yield* repo.dowloadPreview();
+      if (requestResult) {
+        yield* repo.dowloadPreview();
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 }

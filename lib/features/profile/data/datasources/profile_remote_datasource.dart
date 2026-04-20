@@ -48,7 +48,6 @@ class ProfileRemoteDatasource {
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
-      print("------------ unknown error : ${e.toString()}");
       throw CoreFailure.unknown(e.toString());
     }
   }

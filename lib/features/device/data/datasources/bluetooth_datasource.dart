@@ -5,12 +5,12 @@ import 'package:flexiback/core/exception/bluetooth_exception/bluetooth_failure.d
 import 'package:flexiback/core/exception/core_exception/core_error_failure.dart';
 import 'package:flexiback/core/exception/device_exception/device_failure.dart';
 import 'package:flexiback/features/device/data/models/device_model.dart';
-import 'package:flexiback/features/device/domain/entities/bt_request.dart';
+import 'package:flexiback/features/device/domain/entities/enums/bt_request.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import '../../domain/entities/bt_connection_state.dart';
-import '../../domain/entities/bt_response.dart';
+import '../../domain/entities/enums/bt_connection_state.dart';
+import '../../domain/entities/enums/bt_response.dart';
 
 class BluetoothDatasource {
   
@@ -23,16 +23,23 @@ class BluetoothDatasource {
   BluetoothDevice? _connectedDevice;
 
   // Stream Controller 
-  final _dataController = StreamController<String>.broadcast();
+  StreamController<String>? _dataController;
   StreamController<List<DeviceModel>>? _devicesDataController;
   final _stateController = StreamController<BtConnectionState>();
+
+  // Get Stream
   Stream<List<DeviceModel>> get deviceStream {
     _devicesDataController ??= StreamController<List<DeviceModel>>.broadcast();
     return _devicesDataController!.stream;
   }
 
+  Stream<String> get dataStream {
+    _dataController ??= StreamController<String>.broadcast();
+    return _dataController!.stream;
+  }
+
   // Getters
-  Stream<String> get dataStream => _dataController.stream;
+  
   Stream<BtConnectionState> get stateStream => _stateController.stream;
   bool get isConnected => _connection?.isConnected ?? false;
   BluetoothDevice? get conntedDevice => _connectedDevice;
@@ -44,7 +51,7 @@ class BluetoothDatasource {
   // ---------------
   // Find Data
   // ---------------
-  void findDevice() {
+  void findDevice() async {
     _devices.clear();
 
     if (_devicesDataController == null || _devicesDataController!.isClosed) {
@@ -75,6 +82,7 @@ class BluetoothDatasource {
   Future<bool> connect(BluetoothDevice device) async{
     if (isConnected) await disconnect();
 
+    // state
     _stateController.add(BtConnectionState.connecting);
 
     try {
@@ -83,6 +91,8 @@ class BluetoothDatasource {
                     .timeout(const Duration(seconds: 15));
 
       _connectedDevice = device;
+
+      // state
       _stateController.add(BtConnectionState.connected);
 
       print("Connected to ${_connectedDevice!.address}");
@@ -90,19 +100,24 @@ class BluetoothDatasource {
       return true;
 
     } on TimeoutException {
+      // state
       _stateController.add(BtConnectionState.error);
       throw DeviceFailure.timOut();
     } catch (e) {
+      // state
       _stateController.add(BtConnectionState.error);
       throw CoreFailure.unknown(e.toString());
     }
   }
 
-  // ---------------
+  // ---------------s
   // Send to Device
   // ---------------
   Future<bool> sendString(String text) async {
-    if (!isConnected) return false;
+    if (!isConnected) {
+      throw BluetoothFailre.noConnection();
+    };
+
     try {
       _connection!.output.add(
         Uint8List.fromList(utf8.encode("$text\n"))
@@ -116,7 +131,10 @@ class BluetoothDatasource {
   }
 
   Future<bool> sendRequest(BtRequest request) async {
-    if (!isConnected) return false;
+    if (!isConnected) {
+      throw BluetoothFailre.noConnection();
+    };
+
     try {
       await sendString(request.entity);
 
@@ -133,6 +151,11 @@ class BluetoothDatasource {
   String _buffer = '';
 
   void startListening() {
+    
+    if (_dataController == null || _dataController!.isClosed) {
+      _dataController = StreamController<String>.broadcast();
+    }
+
     _dowloadSub = _connection!.input!.listen(
       (Uint8List data) {
         _buffer += utf8.decode(data);
@@ -141,12 +164,12 @@ class BluetoothDatasource {
           final idx = _buffer.indexOf(BtResponse.newLine.entity);
           final line = _buffer.substring(0, idx).trim();
           _buffer = _buffer.substring(idx+1);
-          if (line.isNotEmpty) _dataController.add(line); 
+          if (line.isNotEmpty) _dataController!.add(line); 
         }
 
         if (_buffer.contains(BtResponse.end.entity)) {
           final lastLine = _buffer.substring(0,_buffer.indexOf(BtResponse.end.entity)).trim();
-          if (lastLine.isNotEmpty) _dataController.add(lastLine);
+          if (lastLine.isNotEmpty) _dataController!.add(lastLine);
           _stopListening(); 
         }
 
@@ -163,9 +186,12 @@ class BluetoothDatasource {
     );
   }
 
-  void _stopListening() {
-    _dowloadSub?.cancel();
+  Future<void> _stopListening() async {
+    await _dowloadSub?.cancel();
     _dowloadSub = null;
+
+    await _dataController?.close();
+    _dataController = null;
     _buffer = '';
   }
 
@@ -182,9 +208,16 @@ class BluetoothDatasource {
     _stateController.add(BtConnectionState.disconnected);
   }
 
-  void dispose() {
-    _devicesDataController?.close();
-    _dataController?.close();
+  Future<void> dispose() async {
+    await _devicesDataController?.close();
+    _devicesDataController = null;
+
+    await  _dowloadSub?.cancel();
+    _dowloadSub = null;
+
+    await _dataController?.close();
+    _dataController = null;
+
     _connection?.dispose();
   }
 
