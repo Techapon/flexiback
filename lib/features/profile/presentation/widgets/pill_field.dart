@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../shared/theme/colors/app_color.dart' show AppColor;
+import '../../../../config/theme/colors/app_color.dart' show AppColor;
 
 class PillField<T> extends StatelessWidget {
   

@@ -3,13 +3,14 @@ import 'package:flexiback/features/zz/chat.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
 import 'package:flexiback/features/zz/trend.dart';
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_navigation_bar/responsive_navigation_bar.dart';
 
 import '../../../features/profile/presentation/controller/profile_provider.dart';
+import '../items/geneeral_items.dart';
 class GeneralMainShell extends StatefulWidget {
   const GeneralMainShell({super.key});
 
@@ -20,9 +21,15 @@ class GeneralMainShell extends StatefulWidget {
 class _GeneralMainShellState extends State<GeneralMainShell> {
   int _currentindex = 0;
 
-  final List<Widget> _pages = [
+  List<Widget> get _pages => [
     TherapyPage(),
-    DevicePage(),
+    DevicePage(
+      setCurrent: (GeneeralMainTap newCurrent) {
+        setState(() {
+          _currentindex = newCurrent.index;
+        });
+      },
+    ),
     TrendPage(),
     ChatPage(),
     ProfilePage(),
@@ -71,7 +78,7 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
         activeButtonFlexFactor: 1,
         inactiveButtonsFlexFactor: 1,
 
-        animationDuration: Duration(milliseconds: 0),
+        animationDuration: Duration.zero,
         
         iconSize: 24,
         activeIconColor: AppColor.base1,

@@ -2,10 +2,10 @@ import 'package:flexiback/core/exception/auth_exception/auth_error_mapper.dart';
 import 'package:flexiback/core/exception/auth_exception/auth_failure.dart';
 import 'package:flexiback/core/exception/core_exception/core_error_failure.dart';
 import 'package:flexiback/features/auth/data/models/user_model.dart';
-import 'package:flexiback/shared/entities/role_enum.dart';
+import 'package:flexiback/features/identity/domain/enums/role.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../shared/utils/get_role.dart';
+import '../../../identity/data/mappers/get_role.dart';
 
 class AuthRemoteDataSource {
   final supabase = Supabase.instance.client;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme/colors/app_color.dart';
+import '../../../../config/theme/colors/app_color.dart';
 
 void showErrorDialog({
   required BuildContext context,

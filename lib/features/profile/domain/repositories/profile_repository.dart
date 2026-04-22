@@ -1,4 +1,4 @@
-import 'package:flexiback/shared/entities/image_entity.dart';
+import 'package:flexiback/core/entities/image_entity.dart';
 
 import '../entities/profile_entity.dart';
 

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flexiback/core/exception/auth_exception/auth_error_mapper.dart';
-import 'package:flexiback/shared/entities/image_entity.dart';
+import 'package:flexiback/core/entities/image_entity.dart';
 
 import 'package:flexiback/core/exception/profile/profile_failure.dart';
 import 'package:flexiback/features/profile/data/models/therapist_model.dart';
-import 'package:flexiback/shared/entities/role_enum.dart';
+import 'package:flexiback/features/identity/domain/enums/role.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/exception/core_exception/core_error_failure.dart';

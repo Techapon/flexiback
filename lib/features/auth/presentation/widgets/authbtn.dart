@@ -1,4 +1,4 @@
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 
 class Auth_Btn extends StatefulWidget {
@@ -22,12 +22,7 @@ class _Auth_BtnState extends State<Auth_Btn> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppColor.main1,
-            AppColor.main2,
-            AppColor.main3,
-            AppColor.main4,
-          ],
+          colors:AppColor.mainGradientColrs
         ),
         borderRadius: BorderRadius.circular(20),
       ),

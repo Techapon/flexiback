@@ -1,5 +1,6 @@
 import 'package:flexiback/core/exception/core_exception/core_error_failure.dart';
 import 'package:flexiback/features/device/data/models/device_model.dart';
+import 'package:flexiback/features/device/data/models/fulldata_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/exception/profile/profile_failure.dart';
@@ -15,7 +16,7 @@ class DeviceRemoteDatasource {
 
       if (userId == null) throw ProfileFailure.sessionExpired();
 
-      await supabase.from("device").upsert(setting.toMap());
+      await supabase.from("device").upsert(setting.toMap(userId: userId));
 
     } on PostgrestException catch(e) {
       throw CoreFailure.databaseError(e.message);
@@ -46,5 +47,32 @@ class DeviceRemoteDatasource {
     } catch (e) {
       throw CoreFailure.unknown(e.toString());
     }   
+  }
+
+  Future<void> uploadDeviceUsage(FulldataModel downsampedData) async {
+    try {
+      final currentUser = supabase.auth.currentUser;
+      final userId = currentUser?.id;
+
+      if (userId == null) throw ProfileFailure.sessionExpired();
+
+      // Time usage
+      await supabase
+        .from("device_usage_times")
+        .insert(downsampedData.toMapTime(user_id: userId));
+
+      // Dots list
+      await supabase
+        .from("device_usage_times")
+        .insert([
+          downsampedData.toMapDots(user_id: userId)
+        ]); 
+
+    } on PostgrestException catch(e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+    
   }
 }

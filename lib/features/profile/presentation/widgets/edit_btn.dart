@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/theme/colors/app_color.dart';
+import '../../../../config/theme/colors/app_color.dart';
 
 class EditBtn extends StatefulWidget {
   final VoidCallback onTap;

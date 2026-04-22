@@ -1,7 +1,7 @@
 import 'package:flexiback/features/device/domain/repositories/bluetooth_repository.dart';
 import 'package:flexiback/features/device/domain/repositories/device_db_repository.dart';
 
-import '../entities/classes/device_setting_entity.dart';
+import '../entities/device_setting_entity.dart';
 
 class UploadDeviceSettingUsecase {
   BluetoothRepository btRepo;
@@ -13,8 +13,8 @@ class UploadDeviceSettingUsecase {
     try {
       final uploadResult = await btRepo.uploadDeviceSetting(setting);
 
-        await dbRepo.upDateDeviceSetting(setting);
-        return dbRepo.getDeviceSetting();
+      await dbRepo.upDateDeviceSetting(setting);
+      return dbRepo.getDeviceSetting();
     } catch (e) {
       rethrow;
     }

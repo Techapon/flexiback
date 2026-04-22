@@ -8,9 +8,9 @@ import 'package:flexiback/features/zz/trend.dart';
 import 'package:flexiback/shared/navigation/shell/general_main_shell.dart';
 import 'package:flutter/material.dart';
 
-import '../features/device/presentation/pages/device_page.dart';
-import '../features/profile/presentation/pages/general_edit.dart';
-import '../shared/navigation/shell/therapist_main_shell.dart';
+import '../../features/device/presentation/pages/device_page.dart';
+import '../../features/profile/presentation/pages/general_edit.dart';
+import '../../shared/navigation/shell/therapist_main_shell.dart';
 
 class AppRoutes {
   static const login = "/login";

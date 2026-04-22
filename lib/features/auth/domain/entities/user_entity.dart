@@ -1,4 +1,4 @@
-import '../../../../shared/entities/role_enum.dart';
+import '../../../identity/domain/enums/role.dart';
 
 class UserEntity {
   final String id;

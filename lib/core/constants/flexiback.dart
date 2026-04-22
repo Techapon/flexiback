@@ -8,4 +8,7 @@ class Flexiback {
   static const Duration minCustomNofityDuration = Duration(seconds: 2);
   static const Duration maxCustomlNofityDuration = Duration(seconds: 45);
 
+  // Data Analysis (LTTB)
+  static const int bucketSize = 60; // seconds
+
 }

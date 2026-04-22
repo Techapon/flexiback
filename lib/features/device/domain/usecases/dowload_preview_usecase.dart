@@ -1,6 +1,6 @@
-import 'package:flexiback/features/device/domain/entities/enums/bt_request.dart';
+import 'package:flexiback/features/device/domain/enums/bt_request.dart';
 import 'package:flexiback/features/device/domain/repositories/bluetooth_repository.dart';
-import 'package:flexiback/features/device/domain/entities/classes/preview_entity.dart';
+import 'package:flexiback/features/device/domain/entities/preview_entity.dart';
 
 class DowloadPreviewUsecase {
   final BluetoothRepository repo;

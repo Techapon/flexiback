@@ -1,7 +1,7 @@
 import 'package:flexiback/features/auth/domain/entities/user_entity.dart';
 import 'package:flexiback/features/auth/domain/repositories/auth_repository.dart';
 
-import '../../../../shared/entities/role_enum.dart';
+import '../../../identity/domain/enums/role.dart';
 class SignupUseCase {
   final AuthRepository repo;
 

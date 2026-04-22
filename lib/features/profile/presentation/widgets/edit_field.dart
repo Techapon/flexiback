@@ -1,5 +1,5 @@
-import 'package:flexiback/shared/theme/colors/app_color.dart';
-import 'package:flexiback/shared/utils/text_uppercase.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
+import 'package:flexiback/core/utils/text_uppercase.dart';
 import 'package:flutter/material.dart';
 
 class EditField extends StatefulWidget {

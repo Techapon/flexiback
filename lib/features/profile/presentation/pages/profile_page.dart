@@ -1,7 +1,7 @@
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_btn.dart';
 import 'package:flexiback/features/profile/presentation/widgets/profile_img.dart';
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/shared/widgets/status/error/error_status.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../config/routes.dart';
-import '../../../../shared/entities/role_enum.dart';
-import '../../../../shared/utils/text_uppercase.dart';
+import '../../../../config/router/routes.dart';
+import '../../../identity/domain/enums/role.dart';
+import '../../../../core/utils/text_uppercase.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -31,50 +31,47 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 8
+          ),
           child: Column(
             spacing: 16,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // header
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "MY PROFILE",
-                      style: GoogleFonts.paytoneOne(
-                        fontSize: 26,
-                        wordSpacing: 4,
-                        foreground: Paint()..shader = LinearGradient(
-                          colors: [
-                            AppColor.main1,
-                            AppColor.main2,
-                            AppColor.main3,
-                            AppColor.main4,
-                          ]
-                        ).createShader(Rect.fromLTWH(0, 0, 100, 70))
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "MY PROFILE",
+                    style: GoogleFonts.paytoneOne(
+                      fontSize: 26,
+                      wordSpacing: 4,
+                      foreground: Paint()..shader = LinearGradient(
+                        colors: AppColor.mainGradientColrs
+                      ).createShader(Rect.fromLTWH(0, 0, 100, 70))
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: () async {
+                      profileProvider.signOut();
+              
+                      Navigator.pushNamed(context, AppRoutes.login);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Icon(
+                          LucideIcons.logOut500,
+                          size: 24,
+                          color: AppColor.main2,
                       ),
                     ),
-                    
-                    IconButton(
-                      // padding: EdgeInsets.zero,
-                      onPressed: () async {
-                        profileProvider.signOut();
-
-                        Navigator.pushNamed(context, AppRoutes.login);
-                      },
-                      icon: Icon(
-                        LucideIcons.logOut500,
-                        size: 24,
-                        color: AppColor.main2,
-                      )
-                    )
-                    
-                  ],
-                ),
+                  )
+                ],
               ),
 
               Stack(

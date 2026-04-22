@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import '../../domain/entities/classes/device_setting_entity.dart';
-import '../../domain/entities/enums/device_challenges_type.dart';
+import '../../domain/entities/device_setting_entity.dart';
+import '../../domain/enums/device_challenges_type.dart';
 
 class DeviceSettingModel {
   final DeviceChallengesType challengesType;
@@ -20,8 +20,9 @@ class DeviceSettingModel {
     );
   }
 
-  Map<String,dynamic> toMap() {
+  Map<String,dynamic> toMap({String? userId}) {
     return {
+      if (userId != null) "user_id" : userId,
       "type" : challengesType.entity,
       "duration" : duration
     };

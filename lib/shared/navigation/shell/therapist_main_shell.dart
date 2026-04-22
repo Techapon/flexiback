@@ -1,6 +1,6 @@
 import 'package:flexiback/features/zz/chat.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';

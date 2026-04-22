@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flexiback/features/device/domain/entities/enums/device_challenges_type.dart';
+import 'package:flexiback/features/device/domain/enums/device_challenges_type.dart';
 
 class DeviceSettingEntity {
   final DeviceChallengesType challengesType;

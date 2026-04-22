@@ -4,11 +4,11 @@ import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:flexiback/features/profile/domain/usecases/signout_usecase.dart';
-import 'package:flexiback/shared/entities/image_entity.dart';
+import 'package:flexiback/core/entities/image_entity.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../../shared/entities/role_enum.dart';
-import '../../../../shared/utils/get_role.dart';
+import '../../../identity/domain/enums/role.dart';
+import '../../../identity/data/mappers/get_role.dart';
 import '../../domain/entities/therapist_entity.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
 

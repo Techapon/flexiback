@@ -5,12 +5,12 @@ import 'package:flexiback/core/exception/bluetooth_exception/bluetooth_failure.d
 import 'package:flexiback/core/exception/core_exception/core_error_failure.dart';
 import 'package:flexiback/core/exception/device_exception/device_failure.dart';
 import 'package:flexiback/features/device/data/models/device_model.dart';
-import 'package:flexiback/features/device/domain/entities/enums/bt_request.dart';
+import 'package:flexiback/features/device/domain/enums/bt_request.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import '../../domain/entities/enums/bt_connection_state.dart';
-import '../../domain/entities/enums/bt_response.dart';
+import '../../domain/enums/bt_connection_state.dart';
+import '../../domain/enums/bt_response.dart';
 
 class BluetoothDatasource {
   

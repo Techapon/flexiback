@@ -1,9 +1,9 @@
-import 'package:flexiback/shared/entities/role_enum.dart';
+import 'package:flexiback/features/identity/domain/enums/role.dart';
 import 'package:flexiback/features/auth/presentation/controller/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 
 import '../../../../shared/widgets/dialog/error/dialog_error.dart';
 import '../../../../shared/widgets/dialog/success/dialog_success.dart';

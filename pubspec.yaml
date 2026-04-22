@@ -47,6 +47,7 @@ dependencies:
   font_awesome_flutter: ^11.0.0
   lucide_icons_flutter: ^3.1.12
   responsive_navigation_bar: ^6.2.0
+  dotted_border: ^2.0.0
 
   # img
   image_picker: ^1.2.1
@@ -93,10 +94,16 @@ flutter:
       - assets/brand/app_icon.png
       - assets/brand/app_logo.png
 
+      - assets/device/flexiback.png
+      - assets/device/flexiback_outline.png
+
       - assets/emoji/fox.png
       - assets/emoji/lighting.png
       - assets/emoji/setting.png
       - assets/emoji/graph.png
+
+      - assets/images/graph.png
+      - assets/images/device_logo.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

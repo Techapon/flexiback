@@ -10,6 +10,13 @@ class AppColor {
   static const main3 = Color(0xFFF64F48);
   static const main4 = Color(0xFFEc3577);
 
+  static const mainGradientColrs = [
+    AppColor.main1,
+    AppColor.main2,
+    AppColor.main3,
+    AppColor.main4,
+  ];
+
   static const grey1 = Color(0xFFE8E8E8);
   static const grey2 = Color(0xFFDBDBDB);
   static const grey3 = Color(0xFF999999);
@@ -19,6 +26,9 @@ class AppColor {
 
   static const blue1 = Color(0xFF188FFF);
   static const blue2 = Color.fromARGB(255, 31, 195, 255);
+  static const blue3 = Color(0xFF575DED);
+  static const blue4 = Color(0xFF3632E1);
+  
 
   static const yellow1 = Color.fromARGB(255, 255, 223, 43);
   static const yellow2 = Color.fromARGB(255, 255, 202, 43);

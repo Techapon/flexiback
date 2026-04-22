@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flexiback/core/exception/bluetooth_exception/bluetooth_failure.dart';
 import 'package:flexiback/features/device/data/datasources/bluetooth_datasource.dart';
 import 'package:flexiback/features/device/data/repositories/bluetooth_repository_impl.dart';
-import 'package:flexiback/features/device/domain/entities/classes/device_entity.dart';
-import 'package:flexiback/features/device/domain/entities/classes/device_setting_entity.dart';
-import 'package:flexiback/features/device/domain/entities/classes/preview_entity.dart';
+import 'package:flexiback/features/device/domain/entities/device_entity.dart';
+import 'package:flexiback/features/device/domain/entities/device_setting_entity.dart';
+import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
+import 'package:flexiback/features/device/domain/entities/preview_entity.dart';
 import 'package:flexiback/features/device/domain/repositories/device_db_repository.dart';
 import 'package:flexiback/features/device/domain/usecases/connect_device_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/disconnect_usecase.dart';
@@ -17,6 +18,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/datasources/device_remote_datasource.dart';
 import '../../data/repositories/device_db_repository_impl.dart';
+import '../../domain/usecases/check_premission_usecase.dart';
+import '../../domain/usecases/dowload_fulldata_usecase.dart';
 
 class DeviceProvider extends ChangeNotifier {
   final findDevicesUsecase = 
@@ -25,8 +28,16 @@ class DeviceProvider extends ChangeNotifier {
     OpenSettingsUsecase();
   final connectDeviceUsecase = 
     ConnectDeviceUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+  final checkPremissionUsecase = CheckPremissionUsecase();
+
   final dowloadPreviewUsecase = 
     DowloadPreviewUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+  final dowloadFullUsecase = 
+    DowloadFulldataUsecase(
+      BluetoothRepositoryImpl(BluetoothDatasource()),
+      DeviceDbRepositoryImpl(DeviceRemoteDatasource())
+    );
+
   final disconnectUsecase = 
     DisconnectUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
   final uploadSettingUsecase = 
@@ -38,29 +49,57 @@ class DeviceProvider extends ChangeNotifier {
   bool isLoading = false;
 
   // device loading
-  bool isConnecting = false;
+  bool isChecking = false;
   bool isScaning = false;
+  bool isConnecting = false;
   bool isLoadingData = false;
 
   String? error;
   BluetoothFailre? failre;
 
-  // Deive
+  // Device
   List<DeviceEntity> devices = [];
+
+  // preview
+  StreamSubscription? _devicesSub;
   PreviewEntity? dataFromDevice;
 
-  StreamSubscription? _devicesSub;
+  // full data
   StreamSubscription? _dataSub;
+  FullDataEntity? fulldata;
 
   // Database
   DeviceSettingEntity? deviceSetting;
+
+  void dispose() {
+    
+  }
+
+  // ---------------
+  // Check Permission
+  // ---------------
+  Future<void> checkPer() async {
+    error = null;
+    failre = null;
+    
+    isChecking = true;
+    notifyListeners();
+
+    try {
+      await checkPremissionUsecase.call();
+    } on BluetoothFailre catch (e) {
+      failre = e;
+      error = e.toString();
+    }
+
+    isChecking = false;
+    notifyListeners();
+  } 
 
   // ---------------
   // Find Device
   // ---------------
   Future<void> findDevices() async {
-    error = null;
-    failre = null;
     isScaning = true;
     
     devices = [];
@@ -81,9 +120,6 @@ class DeviceProvider extends ChangeNotifier {
       }
       );
 
-    } on BluetoothFailre catch (e) {
-      failre = e;
-      error = e.toString();
     } catch (e) {
       error = e.toString();
     }
@@ -133,6 +169,31 @@ class DeviceProvider extends ChangeNotifier {
       
     } catch (e) {
       error = e.toString();
+    }
+  }
+
+    // ---------------
+  // Dowlaod Full Data
+  // ---------------
+  Future<void> dowlaodFullData() async {
+    error = null;
+    isLoadingData = true;
+    notifyListeners();
+    try {
+      final streamData = dowloadFullUsecase.call();
+      await for (final data in streamData) {
+        fulldata = data;
+        notifyListeners();
+      }
+
+      print(fulldata.toString());
+
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      error = e.toString();
+      isLoading = false;
+      notifyListeners();
     }
   }
 

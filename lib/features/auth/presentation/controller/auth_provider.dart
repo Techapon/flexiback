@@ -5,7 +5,7 @@ import 'package:flexiback/features/auth/domain/usecases/login_usecase.dart';
 import 'package:flexiback/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../shared/entities/role_enum.dart';
+import '../../../identity/domain/enums/role.dart';
 
 class AuthProvider extends ChangeNotifier {
     final loginUseCase = 

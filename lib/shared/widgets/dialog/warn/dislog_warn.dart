@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../theme/colors/app_color.dart';
+import '../../../../config/theme/colors/app_color.dart';
 
 void showWarnDialog({
   required BuildContext context,

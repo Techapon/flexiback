@@ -5,8 +5,8 @@ import 'package:flexiback/features/profile/presentation/widgets/card_field.dart'
 import 'package:flexiback/features/profile/presentation/widgets/dropdown.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
 import 'package:flexiback/features/profile/presentation/widgets/side_card_field.dart';
-import 'package:flexiback/shared/entities/image_entity.dart';
-import 'package:flexiback/shared/utils/pick_img.dart';
+import 'package:flexiback/core/entities/image_entity.dart';
+import 'package:flexiback/shared/helpers/pick_img.dart';
 import 'package:flexiback/shared/widgets/dialog/success/dialog_success.dart';
 import 'package:flexiback/shared/widgets/status/error/error_status.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../shared/theme/colors/app_color.dart';
+import '../../../../config/theme/colors/app_color.dart';
 import '../../domain/entities/general_entity.dart';
 import '../widgets/edit_box_part.dart';
 import '../widgets/edit_field.dart';

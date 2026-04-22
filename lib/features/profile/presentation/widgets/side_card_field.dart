@@ -1,4 +1,4 @@
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 
 class SideCardField extends StatelessWidget {

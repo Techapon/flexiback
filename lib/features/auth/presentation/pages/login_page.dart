@@ -1,9 +1,9 @@
-import 'package:flexiback/shared/theme/colors/app_color.dart';
+import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../config/routes.dart';
-import '../../../../shared/entities/role_enum.dart';
+import '../../../../config/router/routes.dart';
+import '../../../identity/domain/enums/role.dart';
 import '../controller/auth_provider.dart';
 import '../widgets/authbtn.dart';
 import '../../../../shared/widgets/dialog/error/dialog_error.dart';

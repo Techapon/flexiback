@@ -1,4 +1,4 @@
-import '../../../../../shared/entities/flexiback.dart';
+import '../../../../core/constants/flexiback.dart';
 
 enum DeviceChallengesType {
   normal (

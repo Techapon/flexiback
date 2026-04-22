@@ -1,6 +1,6 @@
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/profile/domain/repositories/profile_repository.dart';
-import 'package:flexiback/shared/entities/image_entity.dart';
+import 'package:flexiback/core/entities/image_entity.dart';
 
 class UpdateProfileUsecase {
   final ProfileRepository repo;
