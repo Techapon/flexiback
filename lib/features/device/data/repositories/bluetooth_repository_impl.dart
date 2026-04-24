@@ -6,6 +6,7 @@ import 'package:flexiback/features/device/data/models/device_model.dart';
 import 'package:flexiback/features/device/data/models/device_setting_model.dart';
 import 'package:flexiback/features/device/domain/entities/device_setting_entity.dart';
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
+import 'package:flexiback/features/device/domain/enums/bt_connection_state.dart';
 import 'package:flexiback/features/device/domain/enums/bt_request.dart';
 import 'package:flexiback/features/device/domain/entities/device_entity.dart';
 import 'package:flexiback/features/device/domain/repositories/bluetooth_repository.dart';
@@ -35,6 +36,14 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
   }
 
   // -------------
+  // State
+  // -------------
+  @override
+  Stream<BtConnectionState> stateStraem(){
+    return datasource.stateStream;
+  }
+
+  // -------------
   // Connection
   // -------------
   @override
@@ -42,6 +51,11 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
     return datasource.connect(
       DeviceModel.fromEntity(device).toBtDevice()
     );
+  }
+
+  @override
+  DeviceEntity getDeviceData() {
+    return DeviceModel.fromBtDevice(datasource.conntedDevice!);
   }
 
   // -------------
@@ -82,8 +96,18 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
   // Dispsoe
   // -------------
   @override
-  Future<void> disconnect() {
+  Future<void> dispose() {
     return datasource.dispose();
+  }
+
+  @override
+  Future<void> cancelFind() {
+    return datasource.cancelFind();
+  }
+
+  @override
+  Future<void> disconect() {
+    return datasource.disconnect();
   }
 
 }

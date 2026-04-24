@@ -63,6 +63,8 @@ class AuthProvider extends ChangeNotifier {
 
     //  Usecase
     Future<void> login(String email, String password) async {
+        _isLoggedIn = false;
+        
         errorEmail = validateEmail(email);
         errorPassword = validatePassword(password);
 
@@ -94,6 +96,8 @@ class AuthProvider extends ChangeNotifier {
         String confirmPassword,
         Role role,
     ) async {
+        _isSignUp = false;
+
         errorEmail = validateEmail(email);
         errorPassword = validatePassword(password);
         errorConfirmPassword = validateConfirmPassword(password, confirmPassword);

@@ -53,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
             right: 48
           ),
           child: SingleChildScrollView(
+            clipBehavior: Clip.none,
             child: Column(
               spacing: 24,
               mainAxisAlignment: MainAxisAlignment.start,

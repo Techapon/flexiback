@@ -11,8 +11,9 @@ class FindDevicesUsecase {
   FindDevicesUsecase(this.repo);
 
   Stream<List<DeviceEntity>> call() async* {
-    yield* repo.findDeivce().map((
-      devices) => devices.where((device) => device.name == Flexiback.name).toList()
-    );
+    // yield* repo.findDeivce().map(
+    //   (devices) => devices.where((device) => device.name == Flexiback.name).toList()
+    // );
+    yield* repo.findDeivce();
   }
 }

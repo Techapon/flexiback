@@ -39,18 +39,22 @@ class BluetoothDatasource {
   }
 
   // Getters
-  
   Stream<BtConnectionState> get stateStream => _stateController.stream;
   bool get isConnected => _connection?.isConnected ?? false;
-  BluetoothDevice? get conntedDevice => _connectedDevice;
+  BluetoothDevice? get conntedDevice {
+    if (!isConnected) return null;
+    _connectedDevice;
+  }
 
 
   final List<DeviceModel> _devices = [];
 
-
   // ---------------
   // Find Data
   // ---------------
+
+  StreamSubscription? _findSub;
+
   void findDevice() async {
     _devices.clear();
 
@@ -58,17 +62,17 @@ class BluetoothDatasource {
       _devicesDataController = StreamController<List<DeviceModel>>.broadcast();
     }
 
-    FlutterBluetoothSerial.instance.startDiscovery().listen((result) {
+    _findSub = FlutterBluetoothSerial.instance.startDiscovery().listen((result) {
       final device = DeviceModel.fromBtDevice(result.device);
       final exists = _devices.any((d) => d.address == device.address);
-
+      
       if (!exists) {
         _devices.add(device);
         _devicesDataController!.add(List.unmodifiable(_devices));
       }
     },
     onDone: () {
-      dispose();
+      cancelFind();
     },
     onError: (e) {
       _devicesDataController!.addError(e);
@@ -196,27 +200,45 @@ class BluetoothDatasource {
   }
 
 
+  // ---------------
+  // Cancel
+  // ---------------
+  Future<void> cancelFind() async {
+    await _devicesDataController?.close();
+    _devicesDataController = null;
 
-  // ---------------
-  // Helper
-  // ---------------
+    await _findSub?.cancel();
+    _findSub = null;
+    
+    print("Cancel success");
+  }
+
   Future<void> disconnect() async {
     await _connection?.close();
     _connection = null;
     _connectedDevice = null;
     
     _stateController.add(BtConnectionState.disconnected);
+    
   }
 
+  // ---------------
+  // Dispose
+  // ---------------
   Future<void> dispose() async {
+    // finding data service
     await _devicesDataController?.close();
     _devicesDataController = null;
 
+    // dowload data service
     await  _dowloadSub?.cancel();
     _dowloadSub = null;
-
+    
     await _dataController?.close();
     _dataController = null;
+
+    // state stream
+    await _stateController.close;
 
     _connection?.dispose();
   }

@@ -2,6 +2,7 @@ import 'package:flexiback/features/profile/presentation/controller/profile_provi
 import 'package:flexiback/features/profile/presentation/widgets/edit_btn.dart';
 import 'package:flexiback/features/profile/presentation/widgets/profile_img.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
+import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/status/error/error_status.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
@@ -29,50 +30,58 @@ class ProfilePage extends StatelessWidget {
     }
     
     return Scaffold(
+      appBar: Appbar1(
+        title: "my profile",
+        icon: LucideIcons.logOut500,
+        action: () async {
+          profileProvider.signOut();
+              
+          Navigator.pushNamed(context, AppRoutes.login);
+        },
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
             left: 16,
             right: 16,
-            top: 8
           ),
           child: Column(
             spacing: 16,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // header
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "MY PROFILE",
-                    style: GoogleFonts.paytoneOne(
-                      fontSize: 26,
-                      wordSpacing: 4,
-                      foreground: Paint()..shader = LinearGradient(
-                        colors: AppColor.mainGradientColrs
-                      ).createShader(Rect.fromLTWH(0, 0, 100, 70))
-                    ),
-                  ),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Text(
+              //       "MY PROFILE",
+              //       style: GoogleFonts.paytoneOne(
+              //         fontSize: 26,
+              //         wordSpacing: 4,
+              //         foreground: Paint()..shader = LinearGradient(
+              //           colors: AppColor.mainGradientColrs
+              //         ).createShader(Rect.fromLTWH(0, 0, 100, 70))
+              //       ),
+              //     ),
 
-                  GestureDetector(
-                    onTap: () async {
-                      profileProvider.signOut();
+              //     GestureDetector(
+              //       onTap: () async {
+                      // profileProvider.signOut();
               
-                      Navigator.pushNamed(context, AppRoutes.login);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(
-                          LucideIcons.logOut500,
-                          size: 24,
-                          color: AppColor.main2,
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                      // Navigator.pushNamed(context, AppRoutes.login);
+                    // },
+              //       child: Padding(
+              //         padding: EdgeInsets.symmetric(horizontal: 8),
+              //         child: Icon(
+              //             LucideIcons.logOut500,
+              //             size: 24,
+              //             color: AppColor.main2,
+              //         ),
+              //       ),
+              //     )
+              //   ],
+              // ),
 
               Stack(
                 children: [

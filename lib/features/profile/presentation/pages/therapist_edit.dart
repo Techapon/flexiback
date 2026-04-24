@@ -103,6 +103,7 @@ class _TherapistEditState extends State<TherapistEdit> {
       appBar: AppBar(
         backgroundColor: AppColor.base1,
         elevation: 0,
+        surfaceTintColor: AppColor.base1,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft),
           onPressed: () {

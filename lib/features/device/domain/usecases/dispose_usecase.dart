@@ -1,11 +1,11 @@
 import 'package:flexiback/features/device/domain/repositories/bluetooth_repository.dart';
 
-class DisconnectUsecase {
-  BluetoothRepository repo;
+class DisposeUsecase {
+  final BluetoothRepository repo;
 
-  DisconnectUsecase(this.repo);
+  DisposeUsecase(this.repo);
 
   Future<void> call() {
-    return repo.disconect();
+    return repo.dispose();
   }
 }
