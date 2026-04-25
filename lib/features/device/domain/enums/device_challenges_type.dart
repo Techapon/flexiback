@@ -26,4 +26,11 @@ enum DeviceChallengesType {
     this.min,
     this.max
   });
+
+  static DeviceChallengesType fromEntity(String entity) {
+    return values.firstWhere(
+      (e) => e.entity == entity,
+      orElse: () => DeviceChallengesType.normal
+    );
+  }
 }

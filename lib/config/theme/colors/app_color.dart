@@ -33,7 +33,9 @@ class AppColor {
   static const yellow1 = Color.fromARGB(255, 255, 223, 43);
   static const yellow2 = Color.fromARGB(255, 255, 202, 43);
 
+  static const green1 = Color(0xFF10B981);
 
+  static const red1 = Color(0xFFE11D20);
 
   static const cream1 = Color(0xFFFFCFBA);
   static const cream2 = Color(0xFFF8AD85);

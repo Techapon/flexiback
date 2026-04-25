@@ -57,7 +57,10 @@ class _EditFieldState extends State<EditField> {
           )
         ),
         onChanged: (value) {
-          feildController.text = toFirstLetterUpper(value);
+          feildController.value = TextEditingValue(
+            text: toFirstLetterUpper(value),
+            selection: TextSelection.collapsed(offset: feildController.selection.baseOffset)
+          );
           widget.onChanged(value);
         },
         style: TextStyle(

@@ -14,6 +14,7 @@ import 'package:flexiback/features/device/domain/usecases/disconnect_usecase.dar
 import 'package:flexiback/features/device/domain/usecases/dispose_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/dowload_preview_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/find_devices_usecase.dart';
+import 'package:flexiback/features/device/domain/usecases/get_device_setting_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/get_device_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/open_settings_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/state_stream_usecase.dart';
@@ -42,6 +43,8 @@ class DeviceProvider extends ChangeNotifier {
     );
   final getDeviceUsecase =
     GetDeviceUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+  final getDeviceSettingUsecase =
+    GetDeviceSettingUsecase(DeviceDbRepositoryImpl(DeviceRemoteDatasource()));
   final stateStreamUsecase = 
     StateStreamUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
 
@@ -86,6 +89,8 @@ class DeviceProvider extends ChangeNotifier {
   List<DeviceEntity> devices = [];
   DeviceEntity? _connectedDevice;
 
+  DeviceSettingEntity? deviceSetting;
+ 
   // state
   StreamSubscription? _stateSub;
   BtConnectionState state = BtConnectionState.disconnected;
@@ -99,7 +104,6 @@ class DeviceProvider extends ChangeNotifier {
   FullDataEntity? fulldata;
 
   // Database
-  DeviceSettingEntity? deviceSetting;
 
   // ---------------
   // Check Permission
@@ -244,7 +248,6 @@ class DeviceProvider extends ChangeNotifier {
         fulldata = data;
         notifyListeners();
       }
-
       print(fulldata.toString());
 
       isLoading = false;
@@ -257,7 +260,23 @@ class DeviceProvider extends ChangeNotifier {
   }
 
   // ---------------
-  // Updaste Device Setting
+  // Get Device Setting
+  // ---------------
+  Future<void> getDeviceSetting() async {
+    error = null;
+    isLoading = true;
+    notifyListeners();
+    try {
+      deviceSetting = await getDeviceSettingUsecase.call();
+    } catch (e) {
+      error = e.toString();
+    }
+    isLoading = false;
+    notifyListeners();
+  }
+
+  // ---------------
+  // Update Device Setting
   // ---------------
   Future<void> updateDeviceSetting(DeviceSettingEntity setting) async {
     error = null;
@@ -284,13 +303,16 @@ class DeviceProvider extends ChangeNotifier {
   // ---------------
   Future<void> disposeBluetooth() async {
     await disposeUsecase.call();
+    notifyListeners();
   }
 
   Future<void> calcelFind() async {
     await cancelFindUsecase.call();
+    notifyListeners();
   }
 
   Future<void> disconnect() async {
     await disconncetUsecase.call();
+    notifyListeners();
   }
 }

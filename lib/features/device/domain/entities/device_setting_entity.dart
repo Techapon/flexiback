@@ -23,7 +23,9 @@ class DeviceSettingEntity {
       challengesType: DeviceChallengesType.custom,
       duration: duration.inSeconds < DeviceChallengesType.custom.min!.inSeconds 
                   ? DeviceChallengesType.custom.min 
-                  : duration
+                  : duration.inSeconds > DeviceChallengesType.custom.max!.inSeconds
+                    ? DeviceChallengesType.custom.max 
+                    : duration
     );
   }
 

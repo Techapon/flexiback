@@ -2,6 +2,9 @@ import 'dart:ui';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
+import 'package:flexiback/features/device/presentation/widgets/device_setter.dart';
+import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/features/device/presentation/widgets/preview_comfirm.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -183,89 +186,74 @@ class _DevicePageState extends State<DevicePage> {
                         
                         // Find device button
                         if (!deviceProvider.isConnected)
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors:AppColor.mainGradientColrs
-                              ),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: FilledButton(
-                              style: FilledButton.styleFrom(
-                                padding: EdgeInsets.symmetric(vertical: 16),
-                                backgroundColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
+                          GradientButton(
+                            child: Row(
+                              spacing: 4,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.plus,
+                                  color: AppColor.base1,
+                                  size: 22,
                                 ),
-                              ),
-                              onPressed: () async {
-                                if (deviceProvider.isChecking || deviceProvider.isScaning) return;
-                                
-                                await deviceProvider.checkPer();
-                                if (deviceProvider.failre != null) {
-                                  switch(deviceProvider.failre!.type) {
                           
-                                    case BluetoothErrorType.noPermission:
-                                      showWarnDialog(
-                                        context: context,
-                                        message: deviceProvider.error ?? '',
-                                        actionText: "open setting",
-                                        action: ()  async {
-                                          await deviceProvider.openSetting();
-                                        }
-                                      );
-                                      break;
-                          
-                                    case BluetoothErrorType.bluetoothoff:
-                                      showWarnDialog(
-                                        context: context,
-                                        message: deviceProvider.error ?? '',
-                                        actionText: "close",
-                                        action: () {
-                                          Navigator.pop(context);
-                                        }
-                                      );
-                                      break;
-                                    
-                                    default:
-                                      break;
-                                  }
-                                }else {
-                                  deviceProvider.findDevices();
-                                  print("No-Problem");
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return BluetoothDialog();
-                                    }
-                                  );
-                                }
-                                
-                              },
-                              child: Row(
-                                spacing: 4,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    LucideIcons.plus,
-                                    color: AppColor.base1,
-                                    size: 22,
+                                Text(
+                                  deviceProvider.isChecking 
+                                    ? "Checking Permission..." 
+                                    : "Search for device",
+                                  style: TextStyle(
+                                    color:AppColor.base1,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold
                                   ),
-                            
-                                  Text(
-                                    deviceProvider.isChecking 
-                                      ? "Checking Permission..." 
-                                      : "Search for device",
-                                    style: TextStyle(
-                                      color:AppColor.base1,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold
-                                    ),
-                                  )
-                                ],
-                              )
+                                )
+                              ],
                             ),
-                          ),  
+                            onTap: () async {
+                              if (deviceProvider.isChecking || deviceProvider.isScaning) return;
+                                
+                              await deviceProvider.checkPer();
+                              if (deviceProvider.failre != null) {
+                                switch(deviceProvider.failre!.type) {
+                        
+                                  case BluetoothErrorType.noPermission:
+                                    showWarnDialog(
+                                      context: context,
+                                      message: deviceProvider.error ?? '',
+                                      actionText: "open setting",
+                                      action: ()  async {
+                                        await deviceProvider.openSetting();
+                                      }
+                                    );
+                                    break;
+                        
+                                  case BluetoothErrorType.bluetoothoff:
+                                    showWarnDialog(
+                                      context: context,
+                                      message: deviceProvider.error ?? '',
+                                      actionText: "close",
+                                      action: () {
+                                        Navigator.pop(context);
+                                      }
+                                    );
+                                    break;
+                                  
+                                  default:
+                                    break;
+                                }
+                              }else {
+                                deviceProvider.findDevices();
+                                print("No-Problem");
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return BluetoothDialog();
+                                  }
+                                );
+                              }
+
+                            },
+                          ),
 
                         if (deviceProvider.isConnected)
                           FilledButton(
@@ -285,7 +273,14 @@ class _DevicePageState extends State<DevicePage> {
                                 )
                                 : null
                             ),
-                            onPressed: () {},
+                            onPressed: 
+                            deviceProvider.connectedDevice == null
+                              ? () async {
+                                await deviceProvider.disconnect();
+                              }
+                              : () {
+                                // open previre data
+                              },
                             child: Row(
                               spacing: 6,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -442,7 +437,12 @@ class _DevicePageState extends State<DevicePage> {
                         imagPath: "assets/emoji/setting.png", 
                         btnText: "setting device",
                         onTap: () {
-            
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return DeviceSetter();
+                            }
+                          );
                         },
                       )
                     )

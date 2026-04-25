@@ -2,7 +2,7 @@ import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/features/profile/presentation/widgets/card_field.dart';
-import 'package:flexiback/features/profile/presentation/widgets/dropdown.dart';
+import 'package:flexiback/shared/widgets/form/dropdown.dart';
 import 'package:flexiback/features/profile/presentation/widgets/edit_box.dart';
 import 'package:flexiback/features/profile/presentation/widgets/side_card_field.dart';
 import 'package:flexiback/core/entities/image_entity.dart';
@@ -19,7 +19,7 @@ import '../../domain/entities/general_entity.dart';
 import '../widgets/edit_box_part.dart';
 import '../widgets/edit_field.dart';
 import '../widgets/edit_head_part.dart';
-import '../widgets/pill_field.dart';
+import '../../../../shared/widgets/form/pill_field.dart';
 import '../widgets/profile_img.dart';
 
 class TherapistEdit extends StatefulWidget {
