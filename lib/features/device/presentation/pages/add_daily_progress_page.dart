@@ -411,8 +411,18 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                             cancel: "No",
 
                                             onConfirm: () async {
-                                              // dailyProgressProvider.deleteDailyProgress(id);
+                                              await dailyProgressProvider.deleteDailyProgress(item.id!);
                                               Navigator.pop(context);
+                                              if (dailyProgressProvider.error == null) {
+                                                if (context.mounted) {
+                                                  Navigator.pop(context); // Close dialog
+                                                  showSuccessDialog(context: context, message: "Delete daily progress success!");
+                                                }
+                                              } else {
+                                                if (context.mounted) {
+                                                  showErrorDialog(context: context, message: dailyProgressProvider.error!);
+                                                }
+                                              }
                                             }
                                           );
                                         },

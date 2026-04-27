@@ -179,6 +179,38 @@ class DeviceRemoteDatasource {
     }
   }
 
+  Future<void> deleteDailyProgress(String id) async {
+    try {
+      final currentUser = supabase.auth.currentUser;
+      final userId = currentUser?.id;
+
+      if (userId == null) throw ProfileFailure.sessionExpired();
+
+      final response = await supabase
+          .from("daily_progress")
+          .select("image_src")
+          .eq("id", id)
+          .single();
+
+      final String? imageUrl = response["image_src"];
+
+      if (imageUrl != null) {
+        await deleteImage(imageUrl);
+      }
+
+      // 3. Delete the record from database
+      await supabase.from("daily_progress").delete().eq("id", id);
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } on StorageFailure {
+      rethrow;
+    } on CoreFailure {
+      rethrow;
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
   // Upload Image 
   Future<void> deleteImage(String? oldImage) async {
     try {

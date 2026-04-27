@@ -50,4 +50,9 @@ class DeviceDbRepositoryImpl implements DeviceDBRepository {
       image
     );
   }
+
+  @override
+  Future<void> deleteDailyProgress(String id) {
+    return datasource.deleteDailyProgress(id);
+  }
 }

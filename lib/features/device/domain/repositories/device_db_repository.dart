@@ -10,6 +10,6 @@ abstract class DeviceDBRepository {
 
   // dialy progress
   Future<void> addDailyProgress(DailyProgressEntity dailyProgress,ImageEntity image);
-  // Future<void> deleteDailyProgress(String id);
+  Future<void> deleteDailyProgress(String id);
   Stream<List<DailyProgressEntity>> getDailyProgress(String userId);
 }

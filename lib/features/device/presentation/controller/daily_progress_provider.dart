@@ -3,6 +3,7 @@ import 'package:flexiback/features/device/data/datasources/device_remote_datasou
 import 'package:flexiback/features/device/data/repositories/device_db_repository_impl.dart';
 import 'package:flexiback/features/device/domain/entities/daily_progress_entity.dart';
 import 'package:flexiback/features/device/domain/usecases/add_daily_progress_usecase.dart';
+import 'package:flexiback/features/device/domain/usecases/delete_daily_progress_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/get_daily_progress_usecase.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,8 @@ class DailyProgressProvider extends ChangeNotifier {
     AddDailyProgressUsecase(DeviceDbRepositoryImpl(DeviceRemoteDatasource()));
   final getDailyProgressUsecase = 
     GetDailyProgressUsecase(DeviceDbRepositoryImpl(DeviceRemoteDatasource()));
+  final deleteDailyProgressUsecase = 
+    DeleteDailyProgressUsecase(DeviceDbRepositoryImpl(DeviceRemoteDatasource()));
 
   bool isLoading = false;
   String? error;
@@ -52,7 +55,19 @@ class DailyProgressProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-  
 
+  Future<void> deleteDailyProgress(String id) async {
+    error = null;
 
+    isLoading = true;
+    notifyListeners();
+    try {
+      await deleteDailyProgressUsecase.call(id);
+    } catch (e) {
+      error = e.toString();
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
 }
