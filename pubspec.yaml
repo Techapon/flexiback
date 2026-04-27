@@ -49,6 +49,7 @@ dependencies:
   responsive_navigation_bar: ^6.2.0
   dotted_border: ^2.0.0
   fl_chart: ^1.2.0
+  intl: ^0.20.2
 
   # img
   image_picker: ^1.2.1

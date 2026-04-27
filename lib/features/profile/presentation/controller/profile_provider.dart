@@ -7,8 +7,8 @@ import 'package:flexiback/features/profile/domain/usecases/signout_usecase.dart'
 import 'package:flexiback/core/entities/image_entity.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../identity/domain/enums/role.dart';
-import '../../../identity/data/mappers/get_role.dart';
+import '../../../../core/enums/role.dart';
+import '../../../../core/mappers/get_role.dart';
 import '../../domain/entities/therapist_entity.dart';
 import '../../domain/usecases/update_profile_usecase.dart';
 

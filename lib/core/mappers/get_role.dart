@@ -1,4 +1,4 @@
-import '../../domain/enums/role.dart';
+import '../enums/role.dart';
 
 Role getRole(String role) {
   final r = role.toLowerCase();

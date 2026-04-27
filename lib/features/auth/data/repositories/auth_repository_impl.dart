@@ -1,6 +1,6 @@
 import 'package:flexiback/features/auth/domain/repositories/auth_repository.dart';
 
-import '../../../identity/domain/enums/role.dart';
+import '../../../../core/enums/role.dart';
 import '../../domain/entities/user_entity.dart';
 import '../datasources/auth_remote_datasource.dart';
 

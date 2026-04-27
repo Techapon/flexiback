@@ -1,5 +1,6 @@
 import 'package:flexiback/features/auth/presentation/pages/login_page.dart';
 import 'package:flexiback/features/auth/presentation/pages/signup_page.dart';
+import 'package:flexiback/features/device/presentation/pages/add_daily_progress_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dart';
 import 'package:flexiback/features/zz/chat.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
@@ -26,6 +27,9 @@ class AppRoutes {
   static const generalEdit = "/generalEdit";
   static const therapistEdit = "/therapistEdit"; 
 
+  // device
+  static const addDailyProgressPage = "/addDailyProgressPage";
+
   // Shell
   static const generalMainShell = "/generalMainShell";
   static const therapistMainShell = "/therapistMainShell";
@@ -41,10 +45,18 @@ class AppRoutes {
     chat: (context) => ChatPage(),
     profile: (context) => ProfilePage(),
 
+    // edit
     generalEdit: (context) => GeneralEdit(),
     therapistEdit: (context) => TherapistEdit(),
 
-    generalMainShell: (context) => GeneralMainShell(),
+    // device - add daily progress
+    addDailyProgressPage: (context) => AddDailyProgressPage(),
+
+    // shell
+    generalMainShell: (context) {
+      final userid = ModalRoute.of(context)!.settings.arguments as String;
+      return GeneralMainShell(userId: userid,);
+    },
     therapistMainShell: (context) => TherapistMainShell()
   };
 }

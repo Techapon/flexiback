@@ -1,4 +1,5 @@
 import 'package:flexiback/config/theme/colors/app_color.dart';
+import 'package:flexiback/shared/widgets/dialog/image_showcase/image_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -18,22 +19,7 @@ class ProfileImg extends StatelessWidget {
       onTap: () {
         if (!clickable || imageProvider == null) return;
 
-        showDialog(
-          context: context,
-          builder: (context) {
-            return Dialog(
-              backgroundColor: AppColor.grey1,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero
-              ),
-              insetPadding: EdgeInsets.symmetric(horizontal: 12),
-              child: Image(
-                image: imageProvider!,
-                fit: BoxFit.cover,
-              ),
-            );
-          }
-        );
+        ImageShowcase(context,imageProvider!);
 
       },
       child: CircleAvatar(

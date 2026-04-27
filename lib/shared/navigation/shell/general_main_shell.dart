@@ -12,7 +12,11 @@ import 'package:responsive_navigation_bar/responsive_navigation_bar.dart';
 import '../../../features/profile/presentation/controller/profile_provider.dart';
 import '../items/geneeral_items.dart';
 class GeneralMainShell extends StatefulWidget {
-  const GeneralMainShell({super.key});
+  final String? userId;
+  const GeneralMainShell({
+    super.key,
+    this.userId
+  });
 
   @override
   State<GeneralMainShell> createState() => _GeneralMainShellState();
@@ -24,11 +28,12 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
   List<Widget> get _pages => [
     TherapyPage(),
     DevicePage(
-      setCurrent: (GeneeralMainTap newCurrent) {
+      setCurrent: (GeneralMainTap newCurrent) {
         setState(() {
           _currentindex = newCurrent.index;
         });
       },
+      userId: widget.userId,
     ),
     TrendPage(),
     ChatPage(),

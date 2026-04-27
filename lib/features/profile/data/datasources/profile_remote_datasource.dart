@@ -4,7 +4,7 @@ import 'package:flexiback/core/entities/image_entity.dart';
 
 import 'package:flexiback/core/exception/profile/profile_failure.dart';
 import 'package:flexiback/features/profile/data/models/therapist_model.dart';
-import 'package:flexiback/features/identity/domain/enums/role.dart';
+import 'package:flexiback/core/enums/role.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/exception/core_exception/core_error_failure.dart';
@@ -68,7 +68,6 @@ class ProfileRemoteDatasource {
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
-      print("G------------unknown error : ${e.toString()}");
       throw CoreFailure.unknown(e.toString());
     }
   }
@@ -86,7 +85,6 @@ class ProfileRemoteDatasource {
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
-      print("T------------ unknown error : ${e.toString()}");
       throw CoreFailure.unknown(e.toString());
     }
   }

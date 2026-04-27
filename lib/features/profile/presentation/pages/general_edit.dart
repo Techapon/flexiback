@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 import '../../../../config/theme/colors/app_color.dart';
 import '../../domain/entities/general_entity.dart';
 import '../widgets/edit_box_part.dart';
-import '../widgets/edit_field.dart';
+import '../../../../shared/widgets/form/edit_field.dart';
 import '../widgets/edit_head_part.dart';
 import '../../../../shared/widgets/form/pill_field.dart';
 import '../widgets/profile_img.dart';
@@ -32,7 +32,7 @@ class _GeneralEditState extends State<GeneralEdit> {
 
   ImageEntity? newImage;
   
-  final List<String> title_list = ["-","Mr","Ms.","Miss","Mrs.","Dr.","Prof.","Rev."];
+  final List<String> title_list = ["-","Mr.","Ms.","Miss.","Mrs.","Dr.","Prof.","Rev."];
   late ValueNotifier<String?> valueListenable_title;
 
   final List<String> gender_list = ["-","Male","Female","Other","Croissant"];
@@ -249,8 +249,8 @@ class _GeneralEditState extends State<GeneralEdit> {
             
                                   onChanged: (value) {
                                     generalNewProfile!.firstName = value;
-                                    // print("NAME : ${generalNewProfile!.firstName}");
                                   },
+                                  firstUpper: true,
                                 )
                               ),
             
@@ -262,6 +262,7 @@ class _GeneralEditState extends State<GeneralEdit> {
                                   onChanged: (value) {
                                     generalNewProfile!.lastName = value;
                                   },
+                                  firstUpper: true,
                                 )
                               ),
                             ],
@@ -337,7 +338,8 @@ class _GeneralEditState extends State<GeneralEdit> {
                             maxLength: 150,
                             onChanged: (value) {
                               generalNewProfile?.pmh = value;
-                            }
+                            },
+                            firstUpper: false,
                           )
                         ]
                       )

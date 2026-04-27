@@ -1,4 +1,4 @@
-import '../../../identity/domain/enums/role.dart';
+import '../../../../core/enums/role.dart';
 
 class UserEntity {
   final String id;

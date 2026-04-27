@@ -1,4 +1,4 @@
-enum GeneeralMainTap { 
+enum GeneralMainTap { 
   therapy,
   device,
   trend,

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flexiback/config/router/routes.dart';
+import 'package:flexiback/features/device/presentation/controller/daily_progress_provider.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/device_setter.dart';
 import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
@@ -19,10 +21,12 @@ import '../widgets/bluetooth_dialog.dart';
 import '../widgets/device_content.dart';
 
 class DevicePage extends StatefulWidget {
-  final Function(GeneeralMainTap)? setCurrent;
+  final Function(GeneralMainTap)? setCurrent;
+  final String? userId;
   const DevicePage({
     super.key,
-    this.setCurrent
+    this.setCurrent,
+    this.userId
   });
 
   @override
@@ -31,6 +35,7 @@ class DevicePage extends StatefulWidget {
 
 class _DevicePageState extends State<DevicePage> {
   late DeviceProvider _deviceProvider;
+  late DailyProgressProvider _dailyProvider;
 
   @override
   void initState() {
@@ -39,6 +44,11 @@ class _DevicePageState extends State<DevicePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _deviceProvider = context.read<DeviceProvider>();
       _deviceProvider.getState();
+
+      // daily get data
+      _dailyProvider = context.read<DailyProgressProvider>();
+      _dailyProvider.getDailyProgress(widget.userId!);
+
     });
   }
 
@@ -63,6 +73,7 @@ class _DevicePageState extends State<DevicePage> {
           padding: EdgeInsets.only(
             left: 16,
             right: 16,
+            bottom: 16
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -243,7 +254,6 @@ class _DevicePageState extends State<DevicePage> {
                                 }
                               }else {
                                 deviceProvider.findDevices();
-                                print("No-Problem");
                                 showDialog(
                                   context: context,
                                   builder: (context) {
@@ -383,7 +393,7 @@ class _DevicePageState extends State<DevicePage> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    widget.setCurrent!(GeneeralMainTap.trend);
+                                    widget.setCurrent!(GeneralMainTap.trend);
                                   },
                                   child: Text(
                                     "more",
@@ -423,9 +433,9 @@ class _DevicePageState extends State<DevicePage> {
                       child: DeviceContent(
                         title: "Progress",
                         imagPath: "assets/images/graph.png", 
-                        btnText: "view progress",
+                        btnText: "add progress",
                         onTap: () {
-                          widget.setCurrent!(GeneeralMainTap.trend);
+                          Navigator.pushNamed(context, AppRoutes.addDailyProgressPage);
                         },
                       )
                     ),

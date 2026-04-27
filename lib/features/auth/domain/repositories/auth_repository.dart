@@ -1,6 +1,6 @@
 import 'package:flexiback/features/auth/domain/entities/user_entity.dart';
 
-import '../../../identity/domain/enums/role.dart';
+import '../../../../core/enums/role.dart';
 
 abstract class AuthRepository {
   Future<UserEntity> login(String email, String password);

@@ -17,7 +17,7 @@ import 'package:provider/provider.dart';
 import '../../../../config/theme/colors/app_color.dart';
 import '../../domain/entities/general_entity.dart';
 import '../widgets/edit_box_part.dart';
-import '../widgets/edit_field.dart';
+import '../../../../shared/widgets/form/edit_field.dart';
 import '../widgets/edit_head_part.dart';
 import '../../../../shared/widgets/form/pill_field.dart';
 import '../widgets/profile_img.dart';
@@ -34,7 +34,7 @@ class _TherapistEditState extends State<TherapistEdit> {
 
   ImageEntity? newImage;
 
-  final List<String> title_list = ["-","Mr","Ms.","Miss","Mrs.","Dr.","Prof.","Rev."];
+  final List<String> title_list = ["-","Mr.","Ms.","Miss.","Mrs.","Dr.","Prof.","Rev."];
   late ValueNotifier<String?> valueListenable_title;
 
   final List<String> gender_list = ["-","Male","Female","Other","Croissant"];
@@ -249,6 +249,7 @@ class _TherapistEditState extends State<TherapistEdit> {
                                   onChanged: (value) {
                                     therapistNewProfile!.firstName = value;
                                   },
+                                  firstUpper: true,
                                 )
                               ),
             
@@ -260,6 +261,7 @@ class _TherapistEditState extends State<TherapistEdit> {
                                   onChanged: (value) {
                                     therapistNewProfile!.lastName = value;
                                   },
+                                  firstUpper: true,
                                 )
                               ),
                             ],
@@ -358,7 +360,8 @@ class _TherapistEditState extends State<TherapistEdit> {
                             maxLength: 200,
                             onChanged: (value) {
                               therapistNewProfile?.experience = value;
-                            }
+                            },
+                            firstUpper: false,
                           )
                         ]
                       )

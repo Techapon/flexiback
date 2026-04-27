@@ -11,7 +11,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../config/router/routes.dart';
-import '../../../identity/domain/enums/role.dart';
+import '../../../../core/enums/role.dart';
 import '../../../../core/utils/text_uppercase.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -83,16 +83,11 @@ class ProfilePage extends StatelessWidget {
               //   ],
               // ),
 
-              Stack(
-                children: [
-                  ProfileImg(
-                    imageProvider: profileProvider.profile!.img != null 
-                      ? NetworkImage(profileProvider.profile!.img!) 
-                      : null,
-                    clickable:  true,
-                  ),
-
-                ],
+              ProfileImg(
+                imageProvider: profileProvider.profile!.img != null 
+                  ? NetworkImage(profileProvider.profile!.img!) 
+                  : null,
+                clickable:  true,
               ),
 
               Column(

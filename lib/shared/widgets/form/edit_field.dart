@@ -9,13 +9,17 @@ class EditField extends StatefulWidget {
   final int maxLine;
   final int? maxLength;
   final Function(String) onChanged;
+
+  final bool firstUpper;
   const EditField({
     super.key, 
     required this.value,
     this.maxLine = 1,
     this.maxLength,
     required this.hintText,
-    required this.onChanged
+    required this.onChanged,
+
+    this.firstUpper = false
   });
 
   @override
@@ -54,11 +58,15 @@ class _EditFieldState extends State<EditField> {
             color: AppColor.grey3,
             fontWeight: FontWeight.bold,
             fontSize: 16,
-          )
+          ),
         ),
         onChanged: (value) {
           feildController.value = TextEditingValue(
-            text: toFirstLetterUpper(value),
+            text: widget.firstUpper 
+              ? (value.length >= 1) 
+                ? toFirstLetterUpper(value) 
+                : value 
+              : value,
             selection: TextSelection.collapsed(offset: feildController.selection.baseOffset)
           );
           widget.onChanged(value);

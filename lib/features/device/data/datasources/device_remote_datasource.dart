@@ -1,4 +1,10 @@
+import 'dart:io';
+
+import 'package:flexiback/core/entities/image_entity.dart';
 import 'package:flexiback/core/exception/core_exception/core_error_failure.dart';
+import 'package:flexiback/core/exception/storage_exception/storage_error_mapper.dart';
+import 'package:flexiback/core/exception/storage_exception/storage_failure.dart';
+import 'package:flexiback/features/device/data/models/daily_progress_model.dart';
 import 'package:flexiback/features/device/data/models/device_model.dart';
 import 'package:flexiback/features/device/data/models/fulldata_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -63,7 +69,7 @@ class DeviceRemoteDatasource {
 
       // Dots list
       await supabase
-        .from("device_usage_times")
+        .from("device_usage_dots")
         .insert([
           downsampedData.toMapDots(user_id: userId)
         ]); 
@@ -73,6 +79,126 @@ class DeviceRemoteDatasource {
     } catch (e) {
       throw CoreFailure.unknown(e.toString());
     }
-    
   }
+
+  // Daily Progress 
+  Stream<List<DailyProgressModel>> getDailyProgress(String userId) {
+    try {
+      return supabase
+        .from("daily_progress")
+        .stream(primaryKey: ["id"])
+        .eq("user_id", userId)
+        .order("date_time", ascending: false)
+        .handleError((error) {
+          if (error is PostgrestException) {
+            throw CoreFailure.databaseError(error.message);
+          }
+          throw CoreFailure.unknown(error.toString());
+        }).map(
+          (data) => data.map(
+            (item) {
+              return DailyProgressModel.fromMap(item);
+            }  
+          ).toList()
+        );
+
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  Future<void> addDailyProgress(DailyProgressModel dailyProgress, ImageEntity image) async {
+    try {
+      final currentUser = supabase.auth.currentUser;
+      final userId = currentUser?.id;
+
+      if (userId == null) throw ProfileFailure.sessionExpired();
+
+      // 
+
+      final String? imgUrl = await addNewImage(image);
+
+      if (imgUrl != null) dailyProgress.img = imgUrl;
+
+      await supabase
+        .from("daily_progress")
+        .insert(dailyProgress.toMap(userId));
+
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } on StorageFailure {
+      rethrow; 
+    } on CoreFailure {
+      rethrow;
+    } catch (e) {
+      print("unknown error : ${e.toString()}");
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  // Upload Image 
+  Future<String?> addNewImage(ImageEntity? image) async {
+    if (image == null) return null;
+
+    try {
+      final bytes = await image.file!.readAsBytes();
+
+      final extension = switch (image.type) {
+        'image/png'  => 'png',
+        'image/webp' => 'webp',
+      _            => 'jpg',
+      };
+
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.$extension';
+
+      // upload
+      await supabase.storage
+        .from('daily_progress')
+        .uploadBinary(
+          fileName,
+          bytes,
+          fileOptions: FileOptions(
+            contentType: image.type ?? 'image/jpeg'
+          )
+        );
+
+      final url = supabase.storage.from('daily_progress').getPublicUrl(fileName);
+
+      return url;
+    }
+    on StorageException catch (e) {
+      throw StorageErrorMapper.fromStorageException(e);
+    }
+    on FileSystemException catch (e) {
+      throw StorageErrorMapper.fromFileSystemException(e);
+    }
+    catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  // Upload Image 
+  Future<void> deleteImage(String? oldImage) async {
+    try {
+      // remove old profile image
+      if (oldImage != null) {
+        final oldFileName = Uri.parse(oldImage).pathSegments.last;
+        await supabase.storage
+          .from('daily_progress')
+          .remove([oldFileName]);
+      }
+    }
+    on StorageException catch (e) {
+      throw StorageErrorMapper.fromStorageException(e);
+    }
+    on FileSystemException catch (e) {
+      throw StorageErrorMapper.fromFileSystemException(e);
+    }
+    catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
 }

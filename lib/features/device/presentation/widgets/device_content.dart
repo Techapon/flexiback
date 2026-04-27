@@ -19,7 +19,7 @@ class DeviceContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: EdgeInsets.symmetric(vertical: 16,horizontal: 8),
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColor.base1,
