@@ -34,6 +34,8 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
     super.dispose();
   }
 
+  String? connectingDeviceAddress;
+
   @override
   Widget build(BuildContext context) {
     final deviceProvider = context.watch<DeviceProvider>();
@@ -170,6 +172,8 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
                     return GestureDetector(
                       onTap: () async {
                         if (deviceProvider.isConnecting) return;
+                        connectingDeviceAddress = null;
+                        connectingDeviceAddress = deviceProvider.devices[index].address;
 
                         await deviceProvider.connect(deviceProvider.devices[index]);
 
@@ -215,7 +219,7 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      deviceProvider.devices[index].name ?? "Don't have ",
+                                      deviceProvider.devices[index].name ?? " - ",
                                       style: TextStyle(
                                         color: AppColor.black1,
                                         fontSize: 14,
@@ -247,7 +251,13 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
                                   end: Alignment.bottomCenter,
                                 ),
                               ),
-                              child: Icon(
+                              child: deviceProvider.isConnecting && connectingDeviceAddress == deviceProvider.devices[index].address
+                              ? SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: CircularProgressIndicator(color: AppColor.base1,),
+                              )
+                              : Icon(
                                 Icons.arrow_forward_ios_rounded,
                                 color: AppColor.base1,
                                 size: 14,

@@ -47,7 +47,7 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
   // Connection
   // -------------
   @override
-  Future<bool> connectDevice(DeviceEntity device) {
+  Future<void> connectDevice(DeviceEntity device) {
     return datasource.connect(
       DeviceModel.fromEntity(device).toBtDevice()
     );

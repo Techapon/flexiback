@@ -10,7 +10,7 @@ abstract class BluetoothRepository {
   Stream<List<DeviceEntity>> findDeivce();
 
   // connection
-  Future<bool> connectDevice(DeviceEntity device);
+  Future<void> connectDevice(DeviceEntity device);
   DeviceEntity getDeviceData();
 
   // state

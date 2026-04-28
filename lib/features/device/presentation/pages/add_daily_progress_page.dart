@@ -385,7 +385,7 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                         }
 
                         return SizedBox(
-                          height: 404,
+                          height: 410,
                           child: ListView.separated(
                             shrinkWrap: true,
                             scrollDirection: Axis.horizontal,

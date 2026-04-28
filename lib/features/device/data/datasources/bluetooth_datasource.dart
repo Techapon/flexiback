@@ -102,12 +102,13 @@ class BluetoothDatasource {
       print("Connected to ${_connectedDevice!.address}");
       
       return true;
-
+      
     } on TimeoutException {
       // state
       _stateController.add(BtConnectionState.error);
       throw DeviceFailure.timOut();
     } catch (e) {
+      print("I HERE: ${e.toString()}");
       // state
       _stateController.add(BtConnectionState.error);
       throw CoreFailure.unknown(e.toString());

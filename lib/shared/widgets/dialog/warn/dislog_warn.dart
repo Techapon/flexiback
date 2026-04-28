@@ -17,74 +17,79 @@ void showWarnDialog({
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24)
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 48,
-            left: 12,
-            right: 12,
-            bottom: 24,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 250
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColor.yellow1.withValues(alpha: 0.1),
-                ),
-                child: Icon(
-                  LucideIcons.info500,
-                  size: 55,
-                  color: AppColor.yellow1,
-                ),
-              ),
-
-              SizedBox(height: 24),
-
-              Text(
-                "important!",
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              SizedBox(height: 6),
-
-              Text(
-                message,
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              SizedBox(height: 24),
-
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColor.yellow2,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 48,
+              left: 12,
+              right: 12,
+              bottom: 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.yellow1.withValues(alpha: 0.1),
+                  ),
+                  child: Icon(
+                    LucideIcons.info500,
+                    size: 55,
+                    color: AppColor.yellow1,
                   ),
                 ),
-                onPressed: () {
-                  if (action != null) {
-                    action();
-                  } else {
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(actionText ?? "close", style: TextStyle(fontWeight: FontWeight.bold),),
-              ),
-        
-            ],
+          
+                SizedBox(height: 24),
+          
+                Text(
+                  "important!",
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+          
+                SizedBox(height: 6),
+          
+                Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+          
+                SizedBox(height: 24),
+          
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColor.yellow2,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (action != null) {
+                      action();
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text(actionText ?? "close", style: TextStyle(fontWeight: FontWeight.bold),),
+                ),
+          
+              ],
+            ),
           ),
         ),
       );

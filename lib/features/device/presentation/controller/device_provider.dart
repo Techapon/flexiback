@@ -161,7 +161,6 @@ class DeviceProvider extends ChangeNotifier {
   // ---------------
   Future<void> getState() async {
     try {
-      print("STATE WATCHING");
       _stateSub = stateStreamUsecase.call().listen(
         (data) {
         state = data;
@@ -198,8 +197,7 @@ class DeviceProvider extends ChangeNotifier {
     isConnecting = true;
     notifyListeners();
     try {
-      final result = await connectDeviceUsecase.call(device);
-
+      await connectDeviceUsecase.call(device);
     } catch (e) {
       error = e.toString();
       print("ERROR --- $error");

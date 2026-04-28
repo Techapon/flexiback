@@ -6,7 +6,7 @@ class ConnectDeviceUsecase {
 
   ConnectDeviceUsecase(this.repo);
 
-  Future<bool> call(DeviceEntity device) {
+  Future<void> call(DeviceEntity device) {
     return repo.connectDevice(device);
   }
 }
