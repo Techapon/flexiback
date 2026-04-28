@@ -11,3 +11,15 @@ Role getRole(String role) {
 
   return Role.General;
 }
+
+Role getOppositeRole(String role) {
+  final r = role.toLowerCase();
+
+  if (r == Role.General.entity) {
+    return Role.Therapist;
+  } else if (r == Role.Therapist.entity) {
+    return Role.General;
+  }
+
+  return Role.General;
+}

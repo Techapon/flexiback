@@ -1,4 +1,5 @@
 import '../../../../core/entities/image_entity.dart';
+import '../../../../core/enums/role.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../datasources/profile_remote_datasource.dart';
@@ -31,5 +32,4 @@ class ProfileRepositoryImpl implements ProfileRepository {
     profileRemoteDatasource.signout();
   }
 
-  
 }

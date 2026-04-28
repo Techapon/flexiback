@@ -2,7 +2,7 @@ import 'package:flexiback/features/auth/presentation/pages/login_page.dart';
 import 'package:flexiback/features/auth/presentation/pages/signup_page.dart';
 import 'package:flexiback/features/device/presentation/pages/add_daily_progress_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dart';
-import 'package:flexiback/features/zz/chat.dart';
+import 'package:flexiback/features/relation/presentation/pages/chat.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
 import 'package:flexiback/features/zz/trend.dart';

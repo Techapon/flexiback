@@ -78,6 +78,7 @@ class AuthRemoteDataSource {
         await supabase.from("profiles").insert({
           "id" : userId,
           "role" : role.entity,
+          "email" : email,
           "title" : null,
           "first_name" : null,
           "last_name" : null,

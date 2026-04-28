@@ -17,11 +17,7 @@ class ProfileModel extends ProfileEntity {
     required super.createdAt,
   });
 
-  factory ProfileModel.fromMap(
-    Map<String, dynamic> map,
-    String email,
-    DateTime createdAt
-  ) {
+  factory ProfileModel.fromMap(Map<String, dynamic> map) {
     return ProfileModel(
       id: map['id'],
       role: map['role'],
@@ -31,10 +27,12 @@ class ProfileModel extends ProfileEntity {
       lastName: map['last_name'],
       gender: map['gender'],
       age: map['age'],
-      email: email,
+      email: map['email'] ?? '',
       number: map['number'],
       updateAt: map['updated_at'],
-      createdAt: createdAt,
+      createdAt: map['create_at'] != null
+          ? DateTime.parse(map['create_at']).toLocal()
+          : null,
     );
   }
 

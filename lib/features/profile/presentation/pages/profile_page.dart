@@ -49,39 +49,6 @@ class ProfilePage extends StatelessWidget {
             spacing: 16,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // header
-              // Row(
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     Text(
-              //       "MY PROFILE",
-              //       style: GoogleFonts.paytoneOne(
-              //         fontSize: 26,
-              //         wordSpacing: 4,
-              //         foreground: Paint()..shader = LinearGradient(
-              //           colors: AppColor.mainGradientColrs
-              //         ).createShader(Rect.fromLTWH(0, 0, 100, 70))
-              //       ),
-              //     ),
-
-              //     GestureDetector(
-              //       onTap: () async {
-                      // profileProvider.signOut();
-              
-                      // Navigator.pushNamed(context, AppRoutes.login);
-                    // },
-              //       child: Padding(
-              //         padding: EdgeInsets.symmetric(horizontal: 8),
-              //         child: Icon(
-              //             LucideIcons.logOut500,
-              //             size: 24,
-              //             color: AppColor.main2,
-              //         ),
-              //       ),
-              //     )
-              //   ],
-              // ),
 
               ProfileImg(
                 imageProvider: profileProvider.profile!.img != null 

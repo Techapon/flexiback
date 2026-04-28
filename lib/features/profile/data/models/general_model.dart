@@ -40,7 +40,7 @@ class GeneralModel extends GeneralEntity {
       email: profileData.email,
       number: profileData.number,
       updateAt: profileData.updateAt,
-      createdAt: profileData.createdAt,
+      createdAt: profileData.createdAt!.toLocal(),
 
       weight: (generalData['weight'] as num?)?.toDouble(),
       height: (generalData['height'] as num?)?.toDouble(),
@@ -74,5 +74,25 @@ class GeneralModel extends GeneralEntity {
       'height': height,
       'pmh': pmh,
     };
+  }
+
+  GeneralEntity toEntity() {
+    return GeneralEntity(
+      id: id,
+      role: role,
+      img: img,
+      title: title,
+      firstName: firstName,
+      lastName: lastName,
+      gender: gender,
+      age: age,
+      email: email,
+      number: number,
+      updateAt: updateAt,
+      createdAt: createdAt,
+      weight: weight,
+      height: height,
+      pmh: pmh,
+    );
   }
 }

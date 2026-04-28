@@ -2,8 +2,9 @@ import 'package:flexiback/config/router/routes.dart';
 import 'package:flexiback/features/auth/presentation/controller/auth_provider.dart';
 import 'package:flexiback/features/device/presentation/controller/daily_progress_provider.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
-import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart' show ProfileProvider;
+import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/config/theme/app/app_theme.dart';
+import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -35,8 +36,12 @@ void main() async {
 
         ChangeNotifierProvider(
           create: (_) => DailyProgressProvider()
-        )
+        ),
 
+        ChangeNotifierProvider(
+          create: (_) => RelationProvider()
+        )
+        
       ],
       child: const MyApp(),
     )

@@ -38,7 +38,7 @@ class TherapistModel extends TherapistEntity {
       email: profileData.email,
       number: profileData.number,
       updateAt: profileData.updateAt,
-      createdAt: profileData.createdAt,
+      createdAt: profileData.createdAt!.toLocal(),
 
       specialty: therapistData["specialty"],
       affiliation: therapistData["affiliation"],
@@ -75,5 +75,26 @@ class TherapistModel extends TherapistEntity {
       'institution': institution,
       'experience': experience,
     };
+  }
+
+  TherapistEntity toEntity() {
+    return TherapistEntity(
+      id: id,
+      role: role,
+      img: img,
+      title: title,
+      firstName: firstName,
+      lastName: lastName,
+      gender: gender,
+      age: age,
+      email: email,
+      number: number,
+      updateAt: updateAt,
+      createdAt: createdAt,
+      specialty: specialty,
+      affiliation: affiliation,
+      institution: institution,
+      experience: experience,
+    );
   }
 }

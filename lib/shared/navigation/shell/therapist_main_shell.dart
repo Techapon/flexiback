@@ -1,4 +1,4 @@
-import 'package:flexiback/features/zz/chat.dart';
+import 'package:flexiback/features/relation/presentation/pages/chat.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';

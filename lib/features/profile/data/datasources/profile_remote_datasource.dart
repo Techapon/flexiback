@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/exception/core_exception/core_error_failure.dart';
 import '../../../../core/exception/storage_exception/storage_error_mapper.dart';
 import '../../../../core/exception/storage_exception/storage_failure.dart';
+import '../../../../core/mappers/get_role.dart';
 import '../../domain/entities/general_entity.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../../domain/entities/therapist_entity.dart';
@@ -28,14 +29,7 @@ class ProfileRemoteDatasource {
 
       final response = await supabase.from("profiles").select().eq("id", userId).single();
 
-      final email = currentUser?.email;
-      final createdAt = currentUser?.createdAt;
-
-      final profile = ProfileModel.fromMap(
-        response,
-        email!,
-        DateTime.parse(createdAt!),
-      );
+      final profile = ProfileModel.fromMap(response);
 
       if (profile.role == Role.General.entity) {
         return getGeneral(profile);
@@ -212,4 +206,5 @@ class ProfileRemoteDatasource {
       CoreFailure.network();
     }
   } 
+
 }

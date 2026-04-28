@@ -126,6 +126,7 @@ class _TherapistEditState extends State<TherapistEdit> {
                 );
 
                 if (profileProvider.error == null) {
+                  await profileProvider.getProfile();
                   showSuccessDialog(
                     context: context,
                     message: "Update profile success!!",
@@ -195,6 +196,7 @@ class _TherapistEditState extends State<TherapistEdit> {
                             keyboardType: TextInputType.emailAddress,
                             hint: "email address",
                             icon: LucideIcons.mail,
+                            readOnly: true,
             
                             onChanged: (value) {
                               therapistNewProfile!.email = value;
