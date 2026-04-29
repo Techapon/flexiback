@@ -11,6 +11,7 @@ class DowloadPreviewUsecase {
     try {
       final requestResult = await repo.sendRequest(BtRequest.DowloadPreview);
 
+      print("REQUEST -- ${requestResult}");
       if (requestResult) {
         yield* repo.dowloadPreview();
       }

@@ -26,7 +26,11 @@ class CoreFailure implements Exception {
 
   factory CoreFailure.unknown([String? debugMessage]) => CoreFailure(
         type: CoreErrorType.unknown,
-        message: 'Some thing went wrong. Please try again.',
+        message: debugMessage != null 
+          ? debugMessage.length >= 15 
+            ? 'Some thing went wrong. Please try again.' 
+            : debugMessage
+          : 'Some thing went wrong. Please try again.' ,
         debugMessage: debugMessage,
       );
 

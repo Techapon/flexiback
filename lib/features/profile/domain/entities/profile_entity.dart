@@ -47,7 +47,8 @@ class ProfileEntity {
     if (title == null && firstName == null && lastName == null) {
       return "Not yet named";
     }
-    return "$title ${ title!.endsWith('.') ? '' : '.' }$firstName $lastName";
+    final titleStr = title != null ? "${title!.endsWith('.') ? title : '$title.'}" : '';
+    return "$titleStr $firstName $lastName";
   } 
 
   String get getNumber {

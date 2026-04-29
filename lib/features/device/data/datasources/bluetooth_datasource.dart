@@ -43,7 +43,8 @@ class BluetoothDatasource {
   bool get isConnected => _connection?.isConnected ?? false;
   BluetoothDevice? get conntedDevice {
     if (!isConnected) return null;
-    _connectedDevice;
+    print("I HERE BIE :${_connectedDevice}");
+    return _connectedDevice;
   }
 
 
@@ -86,6 +87,8 @@ class BluetoothDatasource {
   Future<bool> connect(BluetoothDevice device) async{
     if (isConnected) await disconnect();
 
+    print("----- DEVICE ${device} -----");
+
     // state
     _stateController.add(BtConnectionState.connecting);
 
@@ -100,6 +103,8 @@ class BluetoothDatasource {
       _stateController.add(BtConnectionState.connected);
 
       print("Connected to ${_connectedDevice!.address}");
+      print("IS CONECTED ${isConnected}");
+      print("----- CON DEVICE ${_connectedDevice} -----");
       
       return true;
       
@@ -164,6 +169,7 @@ class BluetoothDatasource {
     _dowloadSub = _connection!.input!.listen(
       (Uint8List data) {
         _buffer += utf8.decode(data);
+        print(_buffer);
 
         while (_buffer.contains(BtResponse.newLine.entity)) {
           final idx = _buffer.indexOf(BtResponse.newLine.entity);

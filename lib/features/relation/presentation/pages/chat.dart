@@ -4,8 +4,12 @@ import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/mappers/get_role.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
+import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
+import 'package:flexiback/features/relation/domain/enums/relation_enums.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
+import 'package:flexiback/shared/widgets/dialog/comfirm/dialog_comfirm.dart';
+import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +26,9 @@ class _ChatPageState extends State<ChatPage> {
   
   final TextEditingController searchC = TextEditingController();
 
-  late Role userRole;
+  Role? userRole;
+
+  String? sendingUsersId;
 
   @override
   void initState() {
@@ -49,8 +55,10 @@ class _ChatPageState extends State<ChatPage> {
     final relationProvider = context.watch<RelationProvider>();
     final profileProvider = context.watch<ProfileProvider>();
 
-    if (!profileProvider.isLoading) userRole = profileProvider.role;
-    
+    if (!profileProvider.isLoading && profileProvider.profile != null) {
+      userRole = profileProvider.role;
+    }
+
     return Scaffold(
       appBar: Appbar1(
         title: "message"
@@ -68,8 +76,10 @@ class _ChatPageState extends State<ChatPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
-                onTap: () {
-                  relationProvider.searchUsers(getOppositeRole(userRole.entity));
+                onTap: () async {
+                  if (profileProvider.isLoading || userRole == null) return;
+                  relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                  relationProvider.getRequests();
                   setState(() {
                     searching = true;
                   });
@@ -149,9 +159,9 @@ class _ChatPageState extends State<ChatPage> {
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
                                   hintText: "Search your ${
-                                    profileProvider.isLoading
-                                    ? '...'
-                                    : getOppositeRole(userRole.entity) == Role.General ? 'Therapist' : 'Patient'
+                                    profileProvider.isLoading || userRole == null
+                                    ? '...' 
+                                    : getOppositeRole(userRole!.entity) == Role.General ? 'Therapist' : 'Patient'
                                   }",
                                   hintStyle: TextStyle(
                                     fontSize: 18,
@@ -160,7 +170,7 @@ class _ChatPageState extends State<ChatPage> {
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  
+                                  setState(() {});
                                 },
                                 style: TextStyle(
                                   fontSize: 18,
@@ -178,68 +188,77 @@ class _ChatPageState extends State<ChatPage> {
               ),
               
               if (searching)
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: !relationProvider.isLoading ? relationProvider.searchUsersList!.length : 20,
-                    separatorBuilder: (context, index) => SizedBox(height: 8,),
-                    itemBuilder: (context,index) {
-                      return Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: !relationProvider.isLoading ? AppColor.base1 : Colors.transparent,
-                          borderRadius: BorderRadius.circular(14)
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
+                Builder(builder: (context) {
+                  final filteredList = !relationProvider.isLoading && relationProvider.searchUsersList != null
+                    ? relationProvider.searchUsersList!.where((user) => 
+                        searchC.text.isEmpty || 
+                        user.email.toLowerCase().contains(searchC.text.toLowerCase())
+                      ).toList()
+                    : null;
+                  
+                  return Expanded(
+                    child: ListView.separated(
+                      itemCount: !relationProvider.isLoading ? filteredList?.length ?? 0 : 20,
+                      separatorBuilder: (context, index) => SizedBox(height: 8,),
+                      itemBuilder: (context,index) {
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: !relationProvider.isLoading ? AppColor.base1 : Colors.transparent,
+                            borderRadius: BorderRadius.circular(14)
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
 
-                            Row(
-                              spacing: 8,
-                              children: [
-                                Container(
-                                  clipBehavior: Clip.antiAlias,
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: !relationProvider.isLoading ? AppColor.base1 : AppColor.grey1,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: AppColor.grey1,
-                                      width: 1.5
+                              Row(
+                                spacing: 8,
+                                children: [
+                                  Container(
+                                    clipBehavior: Clip.antiAlias,
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: !relationProvider.isLoading ? AppColor.base1 : AppColor.grey1,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColor.grey1,
+                                        width: 1.5
+                                      ),
+                                      
+                                      image: !relationProvider.isLoading && filteredList != null
+                                      ? (filteredList[index].img != null)
+                                        ? DecorationImage(
+                                          image: NetworkImage(
+                                            filteredList[index].img!),
+                                            fit: BoxFit.cover
+                                        )
+                                        : null
+                                      : null
                                     ),
-
-                                    image: relationProvider.searchUsersList![index].img != null
-                                    ? DecorationImage(
-                                      image: NetworkImage(
-                                        relationProvider.searchUsersList![index].img!),
-                                        fit: BoxFit.cover
-                                    )
-                                    : null
+                                    child: !relationProvider.isLoading && filteredList != null
+                                    ? (filteredList[index].img == null)
+                                      ? Icon(
+                                        LucideIcons.image300,
+                                        color: AppColor.grey3,
+                                        size: 20,
+                                      )
+                                      : SizedBox.shrink()
+                                    : Icon(
+                                        LucideIcons.user300,
+                                        color: AppColor.grey3,
+                                        size: 20,
+                                      ),
                                   ),
-                                  child: !relationProvider.isLoading 
-                                  ? relationProvider.searchUsersList![index].img == null
-                                    ? Icon(
-                                      LucideIcons.image300,
-                                      color: AppColor.grey3,
-                                      size: 20,
-                                    )
-                                    : SizedBox.shrink()
-                                  : Icon(
-                                      LucideIcons.user300,
-                                      color: AppColor.grey3,
-                                      size: 20,
-                                    ),
-                                ),
 
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-
-                                    if (!relationProvider.isLoading) ...[
+                                    if (!relationProvider.isLoading && filteredList != null) ...[
                                       Text(
-                                        relationProvider.searchUsersList![index].fullname,
+                                        filteredList[index].fullname,
                                         style: TextStyle(
                                           color: AppColor.black1,
                                           fontSize: 14,
@@ -247,7 +266,7 @@ class _ChatPageState extends State<ChatPage> {
                                         ),
                                       ),
                                       Text(
-                                        relationProvider.searchUsersList![index].email,
+                                        filteredList[index].email,
                                         style: TextStyle(
                                           color: AppColor.grey3,
                                           fontSize: 12,
@@ -279,25 +298,106 @@ class _ChatPageState extends State<ChatPage> {
                               ],
                             ),
 
-                            if (!relationProvider.isLoading)
-                              IconButton(
-                                style: IconButton.styleFrom(
-                                  foregroundColor: AppColor.grey4
-                                ),
-                                onPressed: () {},
-                                icon: Icon(
-                                  LucideIcons.plus,
-                                  color: AppColor.black1,
-                                  size: 20,
-                                )
-                              )
+                            if (!relationProvider.isLoading && filteredList != null)
+                              () {
+                                final userId = filteredList[index].id;
+                                final Relation relation = relationProvider.getRelation(userId);
+
+                                return IconButton(
+                                  style: IconButton.styleFrom(
+                                    foregroundColor: AppColor.grey4
+                                  ),
+                                  onPressed: () async {
+                                    switch (relation) {
+                                      case (Relation.none) :
+                                        if (relationProvider.isRequesting || relationProvider.isLoading) return;
+                                        sendingUsersId = userId;
+
+                                        await relationProvider.sendRelationRequest(
+                                          userId,
+                                          userRole!
+                                        );
+
+                                        if (relationProvider.error != null) {
+                                          showErrorDialog(context: context, message: relationProvider.error!);
+                                        }
+                                        sendingUsersId = null;
+                                        relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                        relationProvider.getRequests();
+                                        break;
+
+                                      case (Relation.request) :
+                                        final RelationReqeuestEntity request = relationProvider.requestList!
+                                          .singleWhere(
+                                            (item) => item.recipientId == userId
+                                          );
+                                        
+                                        showComfirmDialog(
+                                          context: context,
+                                          title: "Delete request",
+                                          message: "Are you sure to cancel your request",
+                                          comfirm: "Yes, Cancel it",
+                                          cancel: "No, Keep it",
+                                          onConfirm: () async {
+                                            await relationProvider.deleteRequest(request.id).then((_) {
+                                                relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                                relationProvider.getRequests();
+                                              }
+                                            );
+                                          }
+                                        );
+
+                                        break;
+                                    }
+                                  },
+                                  icon: relationProvider.isRequesting && sendingUsersId == userId
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppColor.black1,
+                                        ),
+                                      )
+                                    : Row(
+                                      spacing: 4,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        
+                                        
+                                        Icon(
+                                          switch (relation) {
+                                            Relation.none => LucideIcons.plus,
+                                            Relation.request => LucideIcons.send,
+                                          },
+                                          color: AppColor.black1,
+                                          size: 20,
+                                        ),
+
+
+                                        Text(
+                                          switch (relation) {
+                                            Relation.none => '',
+                                            Relation.request => "Requested",
+                                          },
+                                          style: TextStyle(
+                                            color: AppColor.black1,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                );
+                              }()
 
                           ],
                         ),
                       );
                     }
                   )
-                ),
+                );
+              }),
 
               if (!searching)
                 Expanded(

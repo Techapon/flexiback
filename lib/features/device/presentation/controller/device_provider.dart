@@ -226,10 +226,14 @@ class DeviceProvider extends ChangeNotifier {
       },
       onError: (e) {
         _dataSub = null;
+        isLoadingData = false;
+        notifyListeners();
       });
       
     } catch (e) {
       error = e.toString();
+      isLoadingData = false;
+      notifyListeners();
     }
   }
 
@@ -304,7 +308,7 @@ class DeviceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> calcelFind() async {
+  Future<void> cancelFind() async {
     await cancelFindUsecase.call();
     notifyListeners();
   }

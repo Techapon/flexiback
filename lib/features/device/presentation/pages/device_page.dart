@@ -194,7 +194,6 @@ class _DevicePageState extends State<DevicePage> {
                             ),
                           ],
                         ),
-                        
                         // Find device button
                         if (!deviceProvider.isConnected)
                           GradientButton(
@@ -288,26 +287,33 @@ class _DevicePageState extends State<DevicePage> {
                               ? () async {
                                 await deviceProvider.disconnect();
                               }
-                              : () {
-                                // open previre data
+                              : () async {
+                                await deviceProvider.dowlaodPreview();
+                                // showDialog(
+                                //   context: context,
+                                //   builder: (context) {
+                                //     return PreviewComfirm();
+                                //   }
+                                // );
                               },
                             child: Row(
                               spacing: 6,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                  Icon(
-                                    deviceProvider.connectedDevice != null
-                                      ? LucideIcons.arrowBigDownDash
-                                      : Icons.warning_amber_rounded,
-                                    color: deviceProvider.connectedDevice != null
-                                      ? AppColor.black1
-                                      : AppColor.error,
-                                    size: 22,
-                                  ),
+                                  if (!deviceProvider.isLoadingData)
+                                    Icon(
+                                      deviceProvider.connectedDevice != null
+                                        ? LucideIcons.arrowBigDownDash
+                                        : Icons.warning_amber_rounded,
+                                      color: deviceProvider.connectedDevice != null
+                                        ? AppColor.black1
+                                        : AppColor.error,
+                                      size: 22,
+                                    ),
                           
                                 Text(
                                   deviceProvider.connectedDevice != null 
-                                    ? "Dowload usage data"
+                                    ? deviceProvider.isLoadingData ? "Loading Data" : "Dowload usage data"
                                     : "Click for reconncet",
                                   style: TextStyle(
                                     color:AppColor.black1,

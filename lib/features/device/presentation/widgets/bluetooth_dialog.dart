@@ -29,7 +29,7 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
   @override
   void dispose() {
     
-    _deviceProvider.calcelFind();
+    _deviceProvider.cancelFind();
 
     super.dispose();
   }
@@ -176,13 +176,16 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
                         connectingDeviceAddress = deviceProvider.devices[index].address;
 
                         await deviceProvider.connect(deviceProvider.devices[index]);
+                        print("-------------------------------------");
 
-                        if (deviceProvider.error == null) {
+                        if (deviceProvider.error != null) {
                           showErrorDialog(
                             context: context,
                             message: deviceProvider.error!
                           );
                         } else {
+                          deviceProvider.getDevice();
+                          Navigator.pop(context);
                           showSuccessDialog(
                             context: context,
                             message: "Connect to '${deviceProvider.devices[index].name}' successfully!"

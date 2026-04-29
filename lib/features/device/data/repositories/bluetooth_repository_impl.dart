@@ -55,7 +55,12 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
 
   @override
   DeviceEntity getDeviceData() {
-    return DeviceModel.fromBtDevice(datasource.conntedDevice!);
+    final device = datasource.conntedDevice;
+    if (device == null) {
+      throw BluetoothFailre.noConnection();
+    }
+    DeviceModel models = DeviceModel.fromBtDevice(device);
+    return models.toEntity();
   }
 
   // -------------
