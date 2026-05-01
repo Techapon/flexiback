@@ -1,10 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
+import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
 import 'package:flexiback/features/device/presentation/widgets/preview_box.dart';
 import 'package:flexiback/features/device/presentation/widgets/preview_percent_box.dart';
+import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class PreviewComfirm extends StatefulWidget {
   const PreviewComfirm({super.key});
@@ -14,8 +17,11 @@ class PreviewComfirm extends StatefulWidget {
 }
 
 class _PreviewComfirmState extends State<PreviewComfirm> {
+  
   @override
   Widget build(BuildContext context) {
+    final deviceProvider = context.watch<DeviceProvider>();
+    
     return Dialog(
       insetPadding: EdgeInsets.all(20),
       backgroundColor: AppColor.base1,
@@ -103,7 +109,7 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                "5",
+                                deviceProvider.previewData!.totalHour,
                                 style: GoogleFonts.paytoneOne(
                                   color: AppColor.base1,
                                   fontSize: 40,
@@ -127,7 +133,7 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                             spacing: 4,
                             children: [
                               Text(
-                                "20",
+                                deviceProvider.previewData!.totalminute,
                                 style: GoogleFonts.paytoneOne(
                                   color: AppColor.base1,
                                   fontSize: 40,
@@ -158,8 +164,10 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                       flex: 1,
                       child: PreviewBox(
                         color: AppColor.green1,
-                        title: "good psoture",
-                        time: "4:30",
+                        title: "good posture",
+
+                        time: deviceProvider.previewData!.goodTimeText,
+
                       )
                     ),
 
@@ -167,8 +175,10 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                       flex: 1,
                       child: PreviewBox(
                         color: AppColor.red1,
-                        title: "bad psoture",
-                        time: "0:50",
+                        title: "bad posture",
+
+                        time: deviceProvider.previewData!.badTimeText,
+
                       )
                     )
                   ],
@@ -191,13 +201,13 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                       sections: [
                         PieChartSectionData(
                           color: AppColor.green1,
-                          value: 85,
+                          value: deviceProvider.previewData!.goodPer,
                           radius: 17.5,
                           showTitle: false
                         ),
                         PieChartSectionData(
                           color: AppColor.grey1,
-                          value: 15,
+                          value: deviceProvider.previewData!.badPer,
                           radius: 17.5,
                           showTitle: false
                         )
@@ -210,7 +220,7 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "84%",
+                        deviceProvider.previewData!.goodPerText,
                         style: TextStyle(
                           color: AppColor.black1,
                           fontSize: 20,
@@ -238,19 +248,21 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                 PreviewPercentBox(
                   color: AppColor.green1,
                   title: "good posture",
-                  percent: 84,
+                  percent: int.parse(deviceProvider.previewData!.goodPerText),
                 ),
                 PreviewPercentBox(
                   color: AppColor.red1,
                   title: "bad posture",
-                  percent: 16,
+                  percent: int.parse(deviceProvider.previewData!.badPerText),
                 ),
               ],
             ),
 
             GradientButton(
               child: Text(
-                "Confirm Dowload",
+                !deviceProvider.isLoading 
+                  ? "Confirm Dowload"
+                  : "Loading ...",
                 style: TextStyle(
                   color: AppColor.base1,
                   fontSize: 18,
@@ -258,7 +270,17 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                 ),
               ),
               onTap: () {
-                // dowload full data
+                if (deviceProvider.isLoading) return;
+                print("Dowlaod full");
+
+                if (deviceProvider.error != null && deviceProvider.fulldata != null) {
+                  print("dowload success");
+                } else {
+                  showErrorDialog(
+                    context: context,
+                    message: deviceProvider?.error ?? "Data is empty,Please try again"
+                  );
+                }
               },
             )
 

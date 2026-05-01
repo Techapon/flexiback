@@ -12,4 +12,5 @@ class RelationReqeuestEntity {
     required this.requesterRole,
     required this.createAt,
   });
+
 }

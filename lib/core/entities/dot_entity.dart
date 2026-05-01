@@ -1,9 +1,11 @@
+import 'package:flexiback/core/enums/dot_status.dart';
+
 class DotEntity {
-  final double value;
+  final DotStatus status;
   final DateTime dateTime;
 
   DotEntity({
-    required this.value,
+    required this.status,
     required this.dateTime
   });
 }

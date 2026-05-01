@@ -7,6 +7,7 @@ import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_en
 abstract class RelationRepository {
   Future<List<ProfileEntity>> getTargetUserList(Role targetRole);
   Future<List<RelationReqeuestEntity>> getSenderRequest();
+  Future<List<RelationReqeuestEntity>> getIncomeRequest();
   Future<void> relationRequest(String targetUserId,Role requesterRole);
 
   Future<void> deleteRequest(String requestId);

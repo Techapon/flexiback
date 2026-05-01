@@ -38,6 +38,8 @@ class BluetoothDatasource {
     return _dataController!.stream;
   }
 
+  Stream<Uint8List>? _inputBroadcast;
+
   // Getters
   Stream<BtConnectionState> get stateStream => _stateController.stream;
   bool get isConnected => _connection?.isConnected ?? false;
@@ -97,6 +99,8 @@ class BluetoothDatasource {
                     .toAddress(device.address)
                     .timeout(const Duration(seconds: 15));
 
+      _inputBroadcast = _connection!.input!.asBroadcastStream();
+
       _connectedDevice = device;
 
       // state
@@ -130,7 +134,7 @@ class BluetoothDatasource {
 
     try {
       _connection!.output.add(
-        Uint8List.fromList(utf8.encode("$text\n"))
+        Uint8List.fromList(utf8.encode("$text"))
       );
 
       await _connection!.output.allSent;
@@ -146,9 +150,9 @@ class BluetoothDatasource {
     };
 
     try {
-      await sendString(request.entity);
+      final  reault = await sendString(request.method);
 
-      return true;
+      return reault;
     } catch (_) {
       rethrow;
     }
@@ -160,50 +164,88 @@ class BluetoothDatasource {
   StreamSubscription? _dowloadSub;
   String _buffer = '';
 
-  void startListening() {
-    
+  void startListening(BtRequest? request) {
+    print("Start Stream");
+
+    print("data con ; ${_dataController}");
+    print("data sub ; ${_dowloadSub}");
+
     if (_dataController == null || _dataController!.isClosed) {
       _dataController = StreamController<String>.broadcast();
     }
+    _buffer = ''; // reset buffer before each new listen session
+    int startIndex = 0;
+    int endIndex = 0;
 
-    _dowloadSub = _connection!.input!.listen(
+    _dowloadSub = _inputBroadcast!.listen(
       (Uint8List data) {
-        _buffer += utf8.decode(data);
-        print(_buffer);
-
-        while (_buffer.contains(BtResponse.newLine.entity)) {
-          final idx = _buffer.indexOf(BtResponse.newLine.entity);
-          final line = _buffer.substring(0, idx).trim();
-          _buffer = _buffer.substring(idx+1);
-          if (line.isNotEmpty) _dataController!.add(line); 
+        // _buffer += utf8.decode(data);
+        if (request == null) {
+          if (utf8.decode(data).trim() != '') {
+            
+            _dataController!.add(utf8.decode(data).trim()); 
+          }
         }
+        print("-- : ${utf8.decode(data)}");
 
-        if (_buffer.contains(BtResponse.end.entity)) {
-          final lastLine = _buffer.substring(0,_buffer.indexOf(BtResponse.end.entity)).trim();
-          if (lastLine.isNotEmpty) _dataController!.add(lastLine);
-          _stopListening(); 
+        if (request != null) {
+          _buffer += utf8.decode(data);
+          if (_buffer.contains(request.start!)) {
+            startIndex = _buffer.indexOf(request.start!);
+            // final line = _buffer.substring(0, idx).trim();
+            _buffer = _buffer.substring(startIndex + request.start!.length).trim();
+            // if (line.isNotEmpty) _dataController!.add(line); 
+            print("START Buffer : $_buffer");
+
+          }
+          if (_buffer.contains(request.end!)) {
+            endIndex = _buffer.indexOf(request.end!);
+            final result = _buffer.substring(0, endIndex).trim();
+
+            _buffer = '';
+            startIndex = 0;
+            endIndex = 0;
+
+            print("FINAL Buffet : $result");
+
+            if (result.isNotEmpty) {
+              _dataController!.add(result);
+            }
+            stopListening(); 
+          }
         }
+          // if (_buffer.contains(request.end)) {
+          //   // final lastLine = _buffer.substring(0,_buffer.indexOf(BtResponse.end.entity)).trim();
+          //   if (lastLine.isNotEmpty) _dataController!.add(lastLine);
+          //   stopListening(); 
+          // }
 
       },
       onDone: () {
+        print("DONE ------- ");
         _stateController.add(BtConnectionState.disconnected);
         _connectedDevice = null;
         _buffer = '';
+        stopListening();
       },
       onError: (e) {
+        print(e.toString());
         _stateController.add(BtConnectionState.error);
-        _stopListening();
+        stopListening();
       }
     );
   }
 
-  Future<void> _stopListening() async {
+
+  Future<void> stopListening() async {
     await _dowloadSub?.cancel();
     _dowloadSub = null;
 
     await _dataController?.close();
     _dataController = null;
     _buffer = '';
+
+    print("STOPED");
   }
 
 
@@ -247,7 +289,13 @@ class BluetoothDatasource {
     // state stream
     await _stateController.close;
 
+    _devices.clear();
+    await _findSub?.cancel();
+
     _connection?.dispose();
+    _connectedDevice = null;
+
+    
   }
 
 }

@@ -72,6 +72,11 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
   }
 
   @override
+  Future<bool> sendMethod(BtRequest method) {
+    return datasource.sendString(method.method);
+  }
+
+  @override
   Future<bool> uploadDeviceSetting(DeviceSettingEntity setting) {
     return datasource.sendString(
       DeviceSettingModel.fromEntity(setting).toJsonString()
@@ -83,18 +88,36 @@ class BluetoothRepositoryImpl implements BluetoothRepository {
   // -------------
   @override
   Stream<PreviewEntity> dowloadPreview() {
-    datasource.startListening();
+    datasource.startListening(BtRequest.DowloadPreview);
     return datasource.dataStream.map(
-      (data) => PreviewEntity(jsonString: data)
+      (data) { 
+        return PreviewEntity(jsonString: data); 
+      }
     );
   }
 
   @override
-  Stream<FullDataEntity> dowloadFullData() {
-    datasource.startListening();
+  Stream<FullDataEntity> dowloadFullData(preview) {
+    datasource.startListening(BtRequest.DowloadData);
     return datasource.dataStream.map(
-      (data) => FulldataModel.fromMap(jsonDecode(data)).toEntity()
+      (data) => FulldataModel.fromMap(
+        preview,
+        jsonDecode(data)
+      ).toEntity()
     );
+  }
+
+  @override
+  Stream<Map<String,dynamic>> realtimeData() {
+    datasource.startListening(null);
+    return datasource.dataStream.map(
+      (data) => jsonDecode(data) as Map<String, dynamic>
+    );
+  }
+
+  @override
+  Future<void> stopListening() {
+    return datasource.stopListening();
   }
 
   // -------------

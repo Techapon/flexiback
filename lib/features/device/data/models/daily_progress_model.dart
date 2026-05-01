@@ -10,10 +10,11 @@ class DailyProgressModel extends DailyProgressEntity {
   });
 
   factory DailyProgressModel.fromMap(Map<String,dynamic> map) {
+
     return DailyProgressModel(
       id : map["id"],
       img: map["image_src"],
-      straightScore: map["straight_score"],
+      straightScore: (map["straight_score"]).toDouble(),
       note: map["note"],
       dateTime: map["date_time"] != null
         ? DateTime.parse(map["date_time"]).toLocal()

@@ -8,8 +8,10 @@ import 'package:flexiback/features/device/domain/entities/device_setting_entity.
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
 import 'package:flexiback/features/device/domain/entities/preview_entity.dart';
 import 'package:flexiback/features/device/domain/enums/bt_connection_state.dart';
+import 'package:flexiback/features/device/domain/usecases/calibrate_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/cancel_find_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/connect_device_usecase.dart';
+import 'package:flexiback/features/device/domain/usecases/device_stream_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/disconnect_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/dispose_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/dowload_preview_usecase.dart';
@@ -17,7 +19,9 @@ import 'package:flexiback/features/device/domain/usecases/find_devices_usecase.d
 import 'package:flexiback/features/device/domain/usecases/get_device_setting_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/get_device_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/open_settings_usecase.dart';
+import 'package:flexiback/features/device/domain/usecases/reset_usecase%20copy.dart';
 import 'package:flexiback/features/device/domain/usecases/state_stream_usecase.dart';
+import 'package:flexiback/features/device/domain/usecases/stop_listening_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/upload_device_setting_usecase.dart';
 import 'package:flutter/material.dart';
 
@@ -47,6 +51,8 @@ class DeviceProvider extends ChangeNotifier {
     GetDeviceSettingUsecase(DeviceDbRepositoryImpl(DeviceRemoteDatasource()));
   final stateStreamUsecase = 
     StateStreamUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+  final deviceStreamUsecase =
+    DeviceStreamUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
 
   // Setting
   final openSettingsUsecase = 
@@ -62,6 +68,12 @@ class DeviceProvider extends ChangeNotifier {
       DeviceDbRepositoryImpl(DeviceRemoteDatasource())
     );
 
+  // Method
+  final calibrateUsecase = 
+    CalibrateUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+  final resetUsecase = 
+    ResetUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+
   // Dispose
   final disposeUsecase = 
     DisposeUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
@@ -69,6 +81,8 @@ class DeviceProvider extends ChangeNotifier {
     CancelFindUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
   final disconncetUsecase = 
     DisconnectUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
+  final stopListeningUsecase = 
+    StopListeningUsecase(BluetoothRepositoryImpl(BluetoothDatasource()));
 
   bool isLoading = false;
 
@@ -97,11 +111,15 @@ class DeviceProvider extends ChangeNotifier {
 
   // preview
   StreamSubscription? _devicesSub;
-  PreviewEntity? dataFromDevice;
+  PreviewEntity? previewData;
 
   // full data
-  StreamSubscription? _dataSub;
+  // StreamSubscription? _dataSub;
   FullDataEntity? fulldata;
+
+  // stream data
+  // StreamSubscription? _realimeSub;
+  Map<String,dynamic>? realTimeData;
 
   // Database
 
@@ -214,22 +232,14 @@ class DeviceProvider extends ChangeNotifier {
     isLoadingData = true;
     notifyListeners();
     try {
-      _dataSub = dowloadPreviewUsecase.call().listen(
-        (data) {
-          dataFromDevice = data;
-          notifyListeners();
-      },
-      onDone: () async {
-        await _dataSub?.cancel();
-        isLoadingData = false;
-        notifyListeners();
-      },
-      onError: (e) {
-        _dataSub = null;
-        isLoadingData = false;
-        notifyListeners();
-      });
-      
+      final streamData = dowloadPreviewUsecase.call();
+      await for (final data in streamData) {
+          previewData = data;
+      }
+
+      print("Preview : ${previewData.toString()}");
+      isLoadingData = false;
+      notifyListeners();
     } catch (e) {
       error = e.toString();
       isLoadingData = false;
@@ -245,7 +255,7 @@ class DeviceProvider extends ChangeNotifier {
     isLoadingData = true;
     notifyListeners();
     try {
-      final streamData = dowloadFullUsecase.call();
+      final streamData = dowloadFullUsecase.call(previewData!);
       await for (final data in streamData) {
         fulldata = data;
         notifyListeners();
@@ -259,6 +269,30 @@ class DeviceProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  // ---------------
+  // Realtime data
+  // ---------------
+  Future<void> getRealTimeData() async {
+    error = null;
+    isLoadingData = true;
+    notifyListeners();
+    try {
+      final streamData = deviceStreamUsecase.call();
+      await for (final data in streamData) {
+        realTimeData = data;
+        notifyListeners();
+      }
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      error = e.toString();
+      isLoading = false;
+      notifyListeners();
+    }
+    isLoading = false;
+    notifyListeners();
   }
 
   // ---------------
@@ -301,11 +335,35 @@ class DeviceProvider extends ChangeNotifier {
   }
 
   // ---------------
+  // Method
+  // ---------------
+  Future<void> calibrate() async {
+    await calibrateUsecase.call();
+    notifyListeners();
+  }
+
+  Future<void> reset() async {
+    await resetUsecase.call();
+    notifyListeners();
+  }
+
+
+  // ---------------
   // Dispose
   // ---------------
   Future<void> disposeBluetooth() async {
     await disposeUsecase.call();
+    _connectedDevice = null;
+    devices.clear();
+    deviceSetting = null;
+    _stateSub = null;
+    state = BtConnectionState.disconnected;
+    _devicesSub = null;
+    previewData = null;
+    fulldata = null;
+    realTimeData = null;
     notifyListeners();
+    print("bie");
   }
 
   Future<void> cancelFind() async {
@@ -315,6 +373,11 @@ class DeviceProvider extends ChangeNotifier {
 
   Future<void> disconnect() async {
     await disconncetUsecase.call();
+    notifyListeners();
+  }
+  Future<void> stopListening() async {
+    await stopListeningUsecase.call();
+    isLoadingData = false;
     notifyListeners();
   }
 }

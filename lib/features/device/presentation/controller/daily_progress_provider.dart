@@ -29,10 +29,6 @@ class DailyProgressProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _dailyProgressStream =  getDailyProgressUsecase.call(userId);
-      print("Stream is ${_dailyProgressStream == null}");
-      final _sub = _dailyProgressStream?.listen((data) {
-        print(data);
-      });
     } catch (e) {
       error = e.toString();
     }

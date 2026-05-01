@@ -1,5 +1,6 @@
 enum Relation {
   none,
-  request,
+  requested,
+  received,
   // freind
 }

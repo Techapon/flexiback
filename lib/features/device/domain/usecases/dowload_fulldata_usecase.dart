@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
+import 'package:flexiback/features/device/domain/entities/preview_entity.dart';
 import 'package:flexiback/features/device/domain/enums/bt_request.dart';
 import 'package:flexiback/features/device/domain/repositories/bluetooth_repository.dart';
+import 'package:flexiback/features/device/domain/services/on_off/on_off_donwsampling.dart';
 
 import '../repositories/device_db_repository.dart';
 import '../services/lttb/lttb_service.dart';
@@ -13,13 +15,13 @@ class DowloadFulldataUsecase {
 
   DowloadFulldataUsecase(this.btRepo,this.dbRepo);
 
-  Stream<FullDataEntity> call() async* {
+  Stream<FullDataEntity> call(PreviewEntity preview) async* {
     FullDataEntity? fulldata;
     try {
       final requestResult = await btRepo.sendRequest(BtRequest.DowloadData);
 
       if (requestResult) {
-        await for (final data in btRepo.dowloadFullData()) {
+        await for (final data in btRepo.dowloadFullData(preview)) {
           fulldata = data;
 
           print("coming Data : $fulldata");
@@ -28,11 +30,13 @@ class DowloadFulldataUsecase {
         }
 
         if (fulldata != null) {
-          final FullDataEntity? downSampedData =  LTTB.LTTBdownsamp(fulldata);
+          final FullDataEntity? downSampedData =  OnOffDonwsampling.dowSampling(fulldata);
 
-          if (downSampedData != null) {
-            await dbRepo.uploadDeviceUsage(downSampedData);
-          }
+          print(downSampedData?.dotList ?? "No data -/-/-/- ");
+
+          // if (downSampedData != null) {
+          //   await dbRepo.uploadDeviceUsage(downSampedData);
+          // }
 
         }
       }

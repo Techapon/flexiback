@@ -1,15 +1,30 @@
 enum BtRequest {
   DowloadPreview (
-    entity: "preview"
+    method: "p",
+    start: "<PREVIEW_START>",
+    end: "<PREVIEW_END>"
   ),
   DowloadData(
-    entity: "data"
+    method: '"f',
+    start: "<FULL_START>",
+    end: "<FULL_END>"
+  ),
+  Calibrate(
+    method: 'c'
+  ),
+  Reset(
+    method: 'r'
   );
   
-  final String entity;
+  final String method;
+  
+  final String? start;
+  final String? end;
 
   const BtRequest({
-    required this.entity
+    required this.method,
+    this.start,
+    this.end,
   });
 
 }

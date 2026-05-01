@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
+
 
 class PreviewEntity {
   final String jsonString;
@@ -13,10 +15,10 @@ class PreviewEntity {
   }) {
     data = jsonDecode(jsonString);
 
-    startAt = DateTime.parse(data["startAt"]); 
-    endAt = DateTime.parse(data["endAt"]); 
-    goodTime = Duration(seconds: data["goodTime"]);
-    badTime = Duration(seconds: data["badTime"]);
+    startAt = DateTime.parse(data["start_at"]); 
+    endAt = DateTime.parse(data["end_at"]); 
+    goodTime = Duration(seconds: data["summary"]["good"]);
+    badTime = Duration(seconds: data["summary"]["bad"]);
   }
 
   // Getters
@@ -24,11 +26,32 @@ class PreviewEntity {
   // text
   String get totalTimeText => (goodTime + badTime).inHours.toString();
   String get goodPerText => goodPer.toStringAsFixed(0);
-  String get badPerText => goodPer.toStringAsFixed(0);
+  String get badPerText => badPer.toStringAsFixed(0);
+  
+  String get goodTimeText => "${goodTime.inHours}:${(goodTime.inMinutes % 60).toString().padLeft(2, '0')}";
+  String get badTimeText => "${badTime.inHours}:${(badTime.inMinutes % 60).toString().padLeft(2, '0')}";
+
+
+  String get totalHour => total().inHours.toString();
+  String get totalminute => (total().inMinutes % 60).toString();
+
+  String get getDateTime {
+    final timeFormat = DateFormat('h:mm a');
+    final dateFormat = DateFormat('d/M/y');
+    return "Date from ${timeFormat.format(startAt).toLowerCase()} to ${timeFormat.format(endAt).toLowerCase()} on ${dateFormat.format(endAt)}.";
+  }
+
 
   // number
   double get goodPer => total().inMicroseconds != 0 ? (goodTime.inSeconds / total().inSeconds) * 100 : 0;
   double get badPer => total().inMicroseconds != 0 ? (badTime.inSeconds / total().inSeconds) * 100 : 0;
 
+  
+
   Duration total() => goodTime + badTime;
+
+  @override
+  String toString() {
+    return 'PreviewEntity(startAt: $startAt, endAt: $endAt, goodTime: $goodTime, badTime: $badTime)';
+  }
 }

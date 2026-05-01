@@ -35,7 +35,10 @@ class DeviceDbRepositoryImpl implements DeviceDBRepository {
   Stream<List<DailyProgressEntity>> getDailyProgress(String userId) {
     return datasource.getDailyProgress(userId).map(
       (data) => data.map(
-        (item) => item.toEntity()
+        (item) {
+          print(item);
+          return item.toEntity();
+        }
       ).toList()
     );
   } 

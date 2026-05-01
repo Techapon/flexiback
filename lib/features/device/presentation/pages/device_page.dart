@@ -6,8 +6,10 @@ import 'package:flexiback/features/device/presentation/controller/daily_progress
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/device_setter.dart';
 import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/features/device/presentation/widgets/method_btn.dart';
 import 'package:flexiback/features/device/presentation/widgets/preview_comfirm.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
+import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -246,6 +248,7 @@ class _DevicePageState extends State<DevicePage> {
                                         Navigator.pop(context);
                                       }
                                     );
+                                    
                                     break;
                                   
                                   default:
@@ -288,13 +291,22 @@ class _DevicePageState extends State<DevicePage> {
                                 await deviceProvider.disconnect();
                               }
                               : () async {
+                                if (deviceProvider.isLoadingData) return;
                                 await deviceProvider.dowlaodPreview();
-                                // showDialog(
-                                //   context: context,
-                                //   builder: (context) {
-                                //     return PreviewComfirm();
-                                //   }
-                                // );
+                                if (deviceProvider.error == null && deviceProvider.previewData != null) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return PreviewComfirm();
+                                    }
+                                  );
+                                } else {
+                                  showErrorDialog(
+                                    context: context,
+                                    message: deviceProvider?.error ?? "Data is empty,Please try again"
+                                  );
+                                }
+
                               },
                             child: Row(
                               spacing: 6,
@@ -313,7 +325,7 @@ class _DevicePageState extends State<DevicePage> {
                           
                                 Text(
                                   deviceProvider.connectedDevice != null 
-                                    ? deviceProvider.isLoadingData ? "Loading Data" : "Dowload usage data"
+                                    ? deviceProvider.isLoadingData ? "Loading Data ..." : "Dowload usage data"
                                     : "Click for reconncet",
                                   style: TextStyle(
                                     color:AppColor.black1,
@@ -328,6 +340,44 @@ class _DevicePageState extends State<DevicePage> {
                     )
                   ),
                 ),
+
+                if (deviceProvider.isConnected) ... [
+                  Row(
+                    children: [
+                      Opacity(
+                        opacity: deviceProvider.isLoadingData ? .2 :1,
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          alignment: WrapAlignment.start,
+                          children: [
+                            MethodBtn(
+                              title: "disconnect",
+                              onTap: () async {
+                                if (deviceProvider.isLoadingData) return;
+                        
+                                await deviceProvider.disposeBluetooth();
+                              }
+                            ),
+                        
+                            MethodBtn(
+                              title: "calibrate",
+                              onTap: () async {
+                                if (deviceProvider.isLoadingData) return;
+                        
+                                await deviceProvider.calibrate();
+                              }
+                            ),
+                        
+                            
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+
+                ],
+
              
                 // Usage
                 Container(

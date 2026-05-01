@@ -132,10 +132,33 @@ class RelationDatasources {
     }
   }
 
+  Future<List<RelationReqeuestEntity>> getIncomeRequest() async {
+    try {
+      final currentUser = supabase.auth.currentUser;
+      final userId = currentUser?.id;
+
+      if (userId == null) throw CoreFailure.unknown("User not authenticated");
+
+      final response = await supabase
+          .from("users_request")
+          .select()
+          .eq("recipient_id", userId);
+
+      // print
+
+      return response.map((request) => RelationReqeuestModel.fromMap(request).toEntity()).toList();
+
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
    Future<void> deleteRequest(String requestId) async {
     try {
 
-      final response = await supabase
+      await supabase
           .from("users_request")
           .delete()
           .eq("id", requestId);

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class DailyProgressEntity {
   final String? id;
   String? img;
-  int? straightScore;
+  double? straightScore;
   String? note;
   final DateTime? dateTime;
 

@@ -10,11 +10,17 @@ import 'package:flexiback/features/relation/domain/usecases/relation_request_use
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 import 'package:flutter/material.dart';
 
+import '../../domain/usecases/get_income_request_usecase.dart';
+
 class RelationProvider  extends ChangeNotifier {
   final getTargetUsersUsecase = 
     GetTargetUsersUsecase(RelationRepositoryImpl(RelationDatasources()));
+
   final getRequestUsecase = 
     GetRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
+  final getIncomeRequestUsecase = 
+    GetIncomeRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
+  
   final relationRequestUsecase = 
     RelationRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
   final deleteRequestUsecase = 
@@ -26,6 +32,7 @@ class RelationProvider  extends ChangeNotifier {
 
   List<ProfileEntity>? searchUsersList;
   List<RelationReqeuestEntity>? requestList;
+  List<RelationReqeuestEntity>? incomeList;
 
   Future<void> searchUsers(Role targetRole) async {
     error = null;
@@ -57,6 +64,7 @@ class RelationProvider  extends ChangeNotifier {
     notifyListeners();
   }
 
+  // get request
   Future<void> getRequests() async {
     error = null;
 
@@ -64,6 +72,21 @@ class RelationProvider  extends ChangeNotifier {
     notifyListeners();
     try {
       requestList = await getRequestUsecase.call();
+    } catch (e) {
+      error = e.toString();
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> getIncomeRequests() async {
+    error = null;
+
+    isLoading = true;
+    notifyListeners();
+    try {
+      incomeList = await getIncomeRequestUsecase.call();
     } catch (e) {
       error = e.toString();
     }
@@ -89,14 +112,18 @@ class RelationProvider  extends ChangeNotifier {
 
   // helper
   Relation getRelation(String userId) {
-    if (isUserRequested(userId)) return Relation.request;
-    // if ()
+    if (isUserRequested(userId)) return Relation.requested;
+    if (isUserReceived(userId)) return Relation.received;
     return Relation.none;
   }
 
-  // helper
   bool isUserRequested(String userId) {
     if (requestList == null) return false;
     return requestList!.any((request) => request.recipientId == userId);
+  }
+
+  bool isUserReceived(String userId) {
+    if (incomeList == null) return false;
+    return incomeList!.any((request) => request.requesterId == userId);
   }
 }

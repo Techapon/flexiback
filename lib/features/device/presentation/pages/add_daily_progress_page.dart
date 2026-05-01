@@ -3,6 +3,7 @@ import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/entities/image_entity.dart';
 import 'package:flexiback/features/device/domain/entities/daily_progress_entity.dart';
 import 'package:flexiback/features/device/presentation/controller/daily_progress_provider.dart';
+import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/daily_card_view.dart';
 import 'package:flexiback/features/device/presentation/widgets/daily_crad.dart';
 import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
@@ -32,8 +33,9 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
 
   String? errorText;
 
-  final TextEditingController straightScoreC = TextEditingController();
   final TextEditingController noteC = TextEditingController();
+
+  late DeviceProvider _deviceProvider;
 
   // picker Image
   Future<void> pickerImage() async {
@@ -48,12 +50,16 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
 
   @override
   void initState() {
-    straightScoreC.text = "20";
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final _deviceProvider = context.read<DeviceProvider>();
+    });
   }
 
   @override
   void dispose() {
+    _deviceProvider.stopListening();
     errorText = null;
     addImage = null;
     super.dispose();
@@ -62,7 +68,8 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
   @override
   Widget build(BuildContext context) {
     final dailyProgressProvider = context.watch<DailyProgressProvider>();
-
+    final deviceProvider = context.watch<DeviceProvider>();
+    
     return PopScope(
       canPop: !dailyProgressProvider.isLoading,
       child: Scaffold(
@@ -84,9 +91,6 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                     onTap: () {
                       if (addingDailyProgress) return;
                       addingDailyProgress = true;
-
-                      // for ชั่วคราว
-                      straightScoreC.text = "20";
                       
                       setState(() {});
                     },
@@ -234,6 +238,7 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                       spacing: 8,
                                       children: [
                                         Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           spacing: 8,
                                           children: [
                                             Text(
@@ -244,14 +249,44 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                                 fontWeight: FontWeight.bold
                                               ),
                                             ),
-                                            Text(
-                                              "20",
-                                              style: TextStyle(
-                                                color: AppColor.grey4,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold
+
+                                            if (deviceProvider.isLoadingData || deviceProvider.realTimeData != null) 
+                                              Text(
+                                                "${deviceProvider.realTimeData?["CH2"] ?? '0' }",
+                                                style: TextStyle(
+                                                  color: AppColor.grey4,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold
+                                                ),
                                               ),
-                                            )
+
+                                              TextButton(
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor: AppColor.base1,
+                                                  backgroundColor: AppColor.grey1,
+
+                                                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  minimumSize: Size.zero,
+                                      
+                                                ),
+                                                onPressed: () {
+                                                  if (!deviceProvider.isConnected) return;
+                                                  if (!deviceProvider.isLoadingData) {
+                                                    deviceProvider.getRealTimeData();
+                                                  } else {
+                                                    deviceProvider.stopListening();
+                                                  }
+                                                }, 
+                                                child: Text(
+                                                  !deviceProvider.isLoadingData ? "START" : 'STOP',
+                                                  style: TextStyle(
+                                                    color: AppColor.black1,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold
+                                                  ),
+                                                )
+                                              ),
                                           ],
                                         ),
                                         
@@ -299,8 +334,9 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                       ),
       
                                     GradientButton(
+                                      disable: !deviceProvider.isConnected,
                                       onTap: () async {
-                                        if (dailyProgressProvider.isLoading) return;
+                                        if (dailyProgressProvider.isLoading || !deviceProvider.isConnected) return;
                                         errorText = null;
                                         if (addImage == null) {
                                           errorText = "Please upload your image";
@@ -310,7 +346,7 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                         await dailyProgressProvider.addDailyProgress(
                                           DailyProgressEntity(
                                             img: "",
-                                            straightScore: int.parse(straightScoreC.text),
+                                            straightScore: deviceProvider.realTimeData?["CH2"]as double,
                                             note: noteC.text,
                                           ),
                                           addImage! 
@@ -325,9 +361,11 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                         }
                                       },
                                       child: Text(
-                                        dailyProgressProvider.isLoading
-                                          ? "Uploading..."
-                                          : "Add Daily Progress",
+                                        deviceProvider.isConnected
+                                          ? dailyProgressProvider.isLoading
+                                            ? "Uploading..."
+                                            : "Add Daily Progress"
+                                          : 'You need to connect to device',
                                         style: TextStyle(
                                           color:AppColor.base1,
                                           fontSize: 14,
@@ -350,7 +388,6 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                   onPressed: () {
                                     addingDailyProgress = false;
                                     addImage = null;
-                                    straightScoreC.text = "";
                                     noteC.text = "";
                                     setState(() {});
                                   },

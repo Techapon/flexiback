@@ -18,11 +18,18 @@ abstract class BluetoothRepository {
   
   // send
   Future<bool> sendRequest(BtRequest request);
+  Future<void> sendMethod(BtRequest method);
   Future<bool> uploadDeviceSetting(DeviceSettingEntity setting);
   
   // dowload 
   Stream<PreviewEntity> dowloadPreview();
-  Stream<FullDataEntity> dowloadFullData();
+  Stream<FullDataEntity> dowloadFullData(PreviewEntity preview);
+
+  // Realtime data
+  Stream<Map<String,dynamic>> realtimeData();
+
+  // stop
+  Future<void> stopListening();
 
   // dispose 
   Future<void> dispose();

@@ -59,11 +59,15 @@ class DeviceSettingModel {
         "type" : challengesType.entity,
       });
 
+      jsonString = "<set>$jsonString<setEnd>";
+
       return jsonString;
     } else {
       jsonString = jsonEncode(toMap());
+      jsonString = "<set>$jsonString<setEnd>";
       return jsonString;
     }
   }
 
 }
+

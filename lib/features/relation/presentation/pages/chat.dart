@@ -80,6 +80,7 @@ class _ChatPageState extends State<ChatPage> {
                   if (profileProvider.isLoading || userRole == null) return;
                   relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
                   relationProvider.getRequests();
+                  relationProvider.getIncomeRequests();
                   setState(() {
                     searching = true;
                   });
@@ -302,7 +303,6 @@ class _ChatPageState extends State<ChatPage> {
                               () {
                                 final userId = filteredList[index].id;
                                 final Relation relation = relationProvider.getRelation(userId);
-
                                 return IconButton(
                                   style: IconButton.styleFrom(
                                     foregroundColor: AppColor.grey4
@@ -324,9 +324,8 @@ class _ChatPageState extends State<ChatPage> {
                                         sendingUsersId = null;
                                         relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
                                         relationProvider.getRequests();
-                                        break;
 
-                                      case (Relation.request) :
+                                      case (Relation.requested) :
                                         final RelationReqeuestEntity request = relationProvider.requestList!
                                           .singleWhere(
                                             (item) => item.recipientId == userId
@@ -347,6 +346,28 @@ class _ChatPageState extends State<ChatPage> {
                                           }
                                         );
 
+                                      case (Relation.received) :
+                                        final RelationReqeuestEntity request = relationProvider.incomeList!
+                                          .singleWhere(
+                                            (item) {
+                                              return item.requesterId == userId;
+                                            } 
+                                          );
+
+                                        showComfirmDialog(
+                                          context: context,
+                                          title: "Appect request",
+                                          message: "Are you sure to appect this request",
+                                          comfirm: "Yes",
+                                          cancel: "No",
+                                          onConfirm: ()  {
+                                            // await relationProvider.deleteRequest(request.id).then((_) {
+                                            //     relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                            //     relationProvider.getRequests();
+                                            //   }
+                                            // );
+                                          }
+                                        );
                                         break;
                                     }
                                   },
@@ -368,7 +389,8 @@ class _ChatPageState extends State<ChatPage> {
                                         Icon(
                                           switch (relation) {
                                             Relation.none => LucideIcons.plus,
-                                            Relation.request => LucideIcons.send,
+                                            Relation.requested => LucideIcons.send,
+                                            Relation.received => LucideIcons.mailbox,
                                           },
                                           color: AppColor.black1,
                                           size: 20,
@@ -378,7 +400,8 @@ class _ChatPageState extends State<ChatPage> {
                                         Text(
                                           switch (relation) {
                                             Relation.none => '',
-                                            Relation.request => "Requested",
+                                            Relation.requested => "Requested",
+                                            Relation.received => "Recived",
                                           },
                                           style: TextStyle(
                                             color: AppColor.black1,

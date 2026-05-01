@@ -30,6 +30,11 @@ class RelationRepositoryImpl implements RelationRepository {
   }
 
   @override
+  Future<List<RelationReqeuestEntity>> getIncomeRequest() {
+    return datasource.getIncomeRequest();
+  }
+
+  @override
   Future<void> deleteRequest(String requestId) {
     return datasource.deleteRequest(requestId);
   }
