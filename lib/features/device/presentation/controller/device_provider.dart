@@ -260,13 +260,13 @@ class DeviceProvider extends ChangeNotifier {
         fulldata = data;
         notifyListeners();
       }
-      print(fulldata.toString());
+      print("Provider ${fulldata.toString()}");
 
-      isLoading = false;
+      isLoadingData = false;
       notifyListeners();
     } catch (e) {
       error = e.toString();
-      isLoading = false;
+      isLoadingData = false;
       notifyListeners();
     }
   }

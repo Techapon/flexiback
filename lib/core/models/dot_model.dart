@@ -18,11 +18,13 @@ class DotModel {
   }
 
   Map<String,dynamic> toMap({String? user_id}) {
+    final safeDateTime = (dateTime.year < 2000) ? DateTime.now() : dateTime;
     return {
       if (user_id != null ) "user_id" : user_id,
-      "status" : status,
-      "date_time": dateTime
+      "status" : status.entity,
+      "date_time": safeDateTime.toIso8601String()
     };
+
   }
 
   

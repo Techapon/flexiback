@@ -7,7 +7,6 @@ import 'package:flexiback/features/device/domain/repositories/bluetooth_reposito
 import 'package:flexiback/features/device/domain/services/on_off/on_off_donwsampling.dart';
 
 import '../repositories/device_db_repository.dart';
-import '../services/lttb/lttb_service.dart';
 
 class DowloadFulldataUsecase {
   BluetoothRepository btRepo;
@@ -20,23 +19,26 @@ class DowloadFulldataUsecase {
     try {
       final requestResult = await btRepo.sendRequest(BtRequest.DowloadData);
 
+
       if (requestResult) {
         await for (final data in btRepo.dowloadFullData(preview)) {
           fulldata = data;
 
-          print("coming Data : $fulldata");
-
           yield data;
         }
 
+
         if (fulldata != null) {
+          print("NOT NULL");
           final FullDataEntity? downSampedData =  OnOffDonwsampling.dowSampling(fulldata);
 
-          print(downSampedData?.dotList ?? "No data -/-/-/- ");
+          print(downSampedData?.dotList.length ?? "No data -/-/-/- ");
 
-          // if (downSampedData != null) {
-          //   await dbRepo.uploadDeviceUsage(downSampedData);
-          // }
+          if (downSampedData != null) {
+            await dbRepo.uploadDeviceUsage(downSampedData);
+          }
+
+        }else {
 
         }
       }

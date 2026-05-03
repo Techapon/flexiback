@@ -15,4 +15,8 @@ class FullDataEntity {
 
   Duration get totalTime => Duration(seconds:goodTime.inSeconds + badTime.inSeconds);
 
+  @override
+  String toString() {
+    return 'FullDataEntity(goodTime: $goodTime, badTime: $badTime, dateTime: $dateTime, dotCount: ${dotList.length})';
+  }
 }

@@ -17,22 +17,41 @@ class FulldataModel {
     required this.dotList
   });
 
-  factory FulldataModel.fromMap(PreviewEntity preview,Map<String,dynamic> json) {
-    final jsonFullData = json["logs"] as List<Map<String,dynamic>>;
+  factory FulldataModel.fromMap(PreviewEntity preview, Map<String, dynamic> json) {
+    final List logs = json["logs"] is List ? json["logs"] : [];
+    
     return FulldataModel(
       goodTime: preview.goodTime,
       badTime: preview.badTime,
       dateTime: preview.startAt.toLocal(),
-      dotList: (jsonFullData).map(
-        (dot) => DotModel(
-          status: (dot["a"] as List<double>).any((angle) => angle > 25)
-            ?  DotStatus.bad
-            : DotStatus.good,
-          dateTime: dot["t"]
-        )
-      ).toList()
+      dotList: logs.map((e) {
+        final dot = e as Map<String, dynamic>;
+        final List angles = dot["a"] is List ? dot["a"] : [];
+        
+        DateTime dotTime;
+        final t = dot["t"];
+        if (t is num) {
+          dotTime = DateTime.fromMillisecondsSinceEpoch(t.toInt());
+        } else if (t is String) {
+          dotTime = DateTime.tryParse(t) ?? DateTime.now();
+        } else {
+          dotTime = DateTime.now();
+        }
+
+        // Safety check for invalid dates from device
+        if (dotTime.year < 2000) dotTime = DateTime.now();
+
+        return DotModel(
+          status: angles.any((angle) => (angle as num) > 25)
+              ? DotStatus.bad
+              : DotStatus.good,
+          dateTime: dotTime,
+        );
+
+      }).toList(),
     );
   }
+
 
   factory FulldataModel.fromEntity(FullDataEntity entity ) {
     return FulldataModel(
@@ -48,17 +67,20 @@ class FulldataModel {
   Map<String,dynamic> toMapTime({required String user_id}) {
     return {
       "user_id" : user_id,
-      "good_time" : goodTime,
-      "bad_time" : badTime,
-      "date_time" : dateTime
+      "good_time" : goodTime.inSeconds,
+      "bad_time" : badTime.inSeconds,
+      "date_time" : dateTime.toIso8601String()
     };
   }
+
 
   List<Map<String,dynamic>> toMapDots({required String user_id}) {
     List<Map<String,dynamic>> dotListMap = [];
 
     for (int i = 0; i < dotList.length; i++) {
       final Map<String,dynamic> dot = dotList[i].toMap(user_id: user_id);
+
+      print(dot["date_time"]);
 
       dotListMap.add(dot);
     }

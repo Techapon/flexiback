@@ -5,7 +5,7 @@ enum BtRequest {
     end: "<PREVIEW_END>"
   ),
   DowloadData(
-    method: '"f',
+    method: "f",
     start: "<FULL_START>",
     end: "<FULL_END>"
   ),

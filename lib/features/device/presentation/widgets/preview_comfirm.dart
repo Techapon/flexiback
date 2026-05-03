@@ -260,7 +260,7 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
 
             GradientButton(
               child: Text(
-                !deviceProvider.isLoading 
+                !deviceProvider.isLoadingData 
                   ? "Confirm Dowload"
                   : "Loading ...",
                 style: TextStyle(
@@ -269,11 +269,12 @@ class _PreviewComfirmState extends State<PreviewComfirm> {
                   fontWeight: FontWeight.bold
                 ),
               ),
-              onTap: () {
-                if (deviceProvider.isLoading) return;
+              onTap: () async {
+                if (deviceProvider.isLoadingData) return;
                 print("Dowlaod full");
+                await deviceProvider.dowlaodFullData();
 
-                if (deviceProvider.error != null && deviceProvider.fulldata != null) {
+                if (deviceProvider.error == null && deviceProvider.fulldata != null) {
                   print("dowload success");
                 } else {
                   showErrorDialog(

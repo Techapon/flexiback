@@ -62,21 +62,29 @@ class DeviceRemoteDatasource {
 
       if (userId == null) throw ProfileFailure.sessionExpired();
 
+      print("-- |1| --");
+
       // Time usage
       await supabase
         .from("device_usage_times")
         .insert(downsampedData.toMapTime(user_id: userId));
 
+      print("-- |2| --");
+
       // Dots list
+      final dotsMap = downsampedData.toMapDots(user_id: userId);
+      print("Uploading Dots Count: ${dotsMap.length}");
       await supabase
         .from("device_usage_dots")
-        .insert([
-          downsampedData.toMapDots(user_id: userId)
-        ]); 
+        .insert(dotsMap); 
+
+      print("-- |3| --");
 
     } on PostgrestException catch(e) {
+      print(e.toString());
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
+      print(e.toString());
       throw CoreFailure.unknown(e.toString());
     }
   }

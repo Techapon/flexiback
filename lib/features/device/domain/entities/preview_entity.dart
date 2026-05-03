@@ -15,11 +15,21 @@ class PreviewEntity {
   }) {
     data = jsonDecode(jsonString);
 
-    startAt = DateTime.parse(data["start_at"]); 
-    endAt = DateTime.parse(data["end_at"]); 
+    startAt = _parseDate(data["start_at"]); 
+    endAt = _parseDate(data["end_at"]); 
     goodTime = Duration(seconds: data["summary"]["good"]);
     badTime = Duration(seconds: data["summary"]["bad"]);
   }
+
+  DateTime _parseDate(dynamic value) {
+    if (value == null || value == "N/A" || value == "") return DateTime.now();
+    try {
+      return DateTime.parse(value.toString());
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
 
   // Getters
 
