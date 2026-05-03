@@ -6,7 +6,7 @@ import 'package:flexiback/features/profile/data/models/therapist_model.dart';
 import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
-import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dart';
+import 'package:flexiback/features/relation/data/models/relation_model.dart';
 import 'package:flexiback/features/relation/data/models/relation_reqeuest_model.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -155,7 +155,7 @@ class RelationDatasources {
     }
   }
 
-   Future<void> deleteRequest(String requestId) async {
+  Future<void> deleteRequest(String requestId) async {
     try {
 
       await supabase
@@ -164,6 +164,42 @@ class RelationDatasources {
           .eq("id", requestId);
 
 
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  Future<void> acceptRequest(RelationModel relation) async {
+    try {
+      await supabase.from("relation").insert(relation.toMap());
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  Stream<List<RelationModel>> getRelations() {
+    final user = supabase.auth.currentUser;
+    if (user == null) return Stream.value([]);
+
+    return supabase
+        .from("relation")
+        .stream(primaryKey: ['id'])
+        .map((response) => response
+            .where((json) => json['general_id'] == user.id || json['therapist_id'] == user.id)
+            .map((json) => RelationModel.fromMap(json))
+            .toList());
+  }
+
+  Future<void> deleteRelation(String relationId) async {
+    try {
+      await supabase
+          .from("relation")
+          .delete()
+          .eq("id", relationId);
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {

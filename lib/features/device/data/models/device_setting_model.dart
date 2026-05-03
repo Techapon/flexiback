@@ -42,7 +42,7 @@ class DeviceSettingModel {
         return DeviceSettingEntity.normal();
 
       case DeviceChallengesType.custom:
-        return DeviceSettingEntity.custom(duration: Duration(seconds: duration ?? 0));
+        return DeviceSettingEntity.custom(duration: Duration(seconds: duration ?? DeviceChallengesType.custom.min!.inSeconds));
 
       case DeviceChallengesType.hard:
         return DeviceSettingEntity.hard();

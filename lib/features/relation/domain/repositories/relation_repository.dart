@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
+import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 
 abstract class RelationRepository {
@@ -10,5 +11,9 @@ abstract class RelationRepository {
   Future<List<RelationReqeuestEntity>> getIncomeRequest();
   Future<void> relationRequest(String targetUserId,Role requesterRole);
 
+  Future<void> acceptRequest(RelationReqeuestEntity request);
   Future<void> deleteRequest(String requestId);
+
+  Stream<List<RelationEntity>> getRelations(Role targetUser);
+  Future<void> deleteRelation(String relationId);
 }

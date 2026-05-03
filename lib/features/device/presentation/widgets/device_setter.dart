@@ -186,6 +186,8 @@ class _DeviceSetterState extends State<DeviceSetter> {
                         setting = DeviceSettingEntity.hard();
                         break;
                     }
+
+                    print(setting.toString());
       
                     await deviceProvider.updateDeviceSetting(setting);
       
@@ -194,18 +196,16 @@ class _DeviceSetterState extends State<DeviceSetter> {
                         context: context,
                         message: deviceProvider.error!
                       );
+                    } else {
+                      setState(() {
+                        successed = true;
+                      });
+                      Future.delayed(Duration(seconds: 3));
+
+                      setState(() {
+                        successed = false;
+                      });
                     }
-
-                    successed = true;
-
-                    setState(() {});
-                    Future.delayed(Duration(seconds: 3));
-
-                    successed = false;
-      
-                    // if (context.mounted) {
-                    //   Navigator.pop(context);
-                    // }
                   },
                   disable: !deviceProvider.isConnected,
                   child: Row(

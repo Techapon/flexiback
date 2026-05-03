@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/mappers/get_role.dart';
+import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
+import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 import 'package:flexiback/features/relation/domain/enums/relation_enums.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
@@ -55,13 +57,18 @@ class _ChatPageState extends State<ChatPage> {
     final relationProvider = context.watch<RelationProvider>();
     final profileProvider = context.watch<ProfileProvider>();
 
+
     if (!profileProvider.isLoading && profileProvider.profile != null) {
       userRole = profileProvider.role;
     }
 
     return Scaffold(
       appBar: Appbar1(
-        title: "message"
+        title: "message",
+        icon: LucideIcons.bellDot,
+        action: () {
+          
+        },
       ),
       backgroundColor: AppColor.base3,
       body: SafeArea(
@@ -162,7 +169,7 @@ class _ChatPageState extends State<ChatPage> {
                                   hintText: "Search your ${
                                     profileProvider.isLoading || userRole == null
                                     ? '...' 
-                                    : getOppositeRole(userRole!.entity) == Role.General ? 'Therapist' : 'Patient'
+                                    : getOppositeRole(userRole!.entity) == Role.General ? 'Patient' : 'Therapist'
                                   }",
                                   hintStyle: TextStyle(
                                     fontSize: 18,
@@ -360,15 +367,20 @@ class _ChatPageState extends State<ChatPage> {
                                           message: "Are you sure to appect this request",
                                           comfirm: "Yes",
                                           cancel: "No",
-                                          onConfirm: ()  {
-                                            // await relationProvider.deleteRequest(request.id).then((_) {
-                                            //     relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
-                                            //     relationProvider.getRequests();
-                                            //   }
-                                            // );
-                                          }
+                                          onConfirm: () async {
+                                            await relationProvider.acceptRequest(request).then((_) {
+                                                relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                                relationProvider.getRequests();
+                                              }
+                                            );
+                                          },
+
+                                          color: AppColor.success,
+                                          icon: LucideIcons.messageCircleCheck300
                                         );
-                                        break;
+                                        
+                                      case Relation.freind:
+                                        print("Go the Chat!!");
                                     }
                                   },
                                   icon: relationProvider.isRequesting && sendingUsersId == userId
@@ -391,6 +403,7 @@ class _ChatPageState extends State<ChatPage> {
                                             Relation.none => LucideIcons.plus,
                                             Relation.requested => LucideIcons.send,
                                             Relation.received => LucideIcons.mailbox,
+                                            Relation.freind => LucideIcons.messageCircleMore,
                                           },
                                           color: AppColor.black1,
                                           size: 20,
@@ -402,6 +415,7 @@ class _ChatPageState extends State<ChatPage> {
                                             Relation.none => '',
                                             Relation.requested => "Requested",
                                             Relation.received => "Recived",
+                                            Relation.freind => 'Chat',
                                           },
                                           style: TextStyle(
                                             color: AppColor.black1,
@@ -413,7 +427,6 @@ class _ChatPageState extends State<ChatPage> {
                                     )
                                 );
                               }()
-
                           ],
                         ),
                       );
@@ -443,6 +456,7 @@ class _ChatPageState extends State<ChatPage> {
                       Container(
                         margin: EdgeInsets.only(top: 20),
                         padding: EdgeInsets.all(24),
+                        height: double.infinity,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: AppColor.base1,
@@ -458,10 +472,78 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                           ],
                         ),
-                        child: Column(
-                          children: [
+                        child: StreamBuilder<List<RelationEntity>>(
+                          stream: relationProvider.relationsStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting && relationProvider.relations == null) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+
+                            final friends = snapshot.data ?? [];
                             
-                          ],
+                            if (friends.isEmpty) {
+                              return Center(
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(vertical: 14,horizontal: 14),
+                                    foregroundColor: AppColor.main2, 
+                                    side: BorderSide(
+                                      color: AppColor.main2, 
+                                      width: 2,  
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(22), 
+                                    ),
+                                  ),
+                                  onPressed: () async{
+                                    if (profileProvider.isLoading || userRole == null) return;
+                                    relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                    relationProvider.getRequests();
+                                    relationProvider.getIncomeRequests();
+                                    setState(() {
+                                      searching = true;
+                                    });
+                                  }, 
+                                  child: Row(
+                                      spacing: 4,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          LucideIcons.plus,
+                                          size: 18,
+                                        ),
+                                        Text(
+                                          "Add your ${
+                                            profileProvider.isLoading || userRole == null
+                                            ? '...' 
+                                            : getOppositeRole(userRole!.entity) == Role.General ? 'Patient' : 'Therapist'
+                                          }",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                ),
+                              );
+                            }
+
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: friends.length,
+                              itemBuilder: (context, index) {
+                                final friend = friends[index];
+                                return ListTile(
+                                  title: Text("Friend ID: ${friend.id}"),
+                                  subtitle: Text("Email : ${friend.userProfile?.fullname}"),
+                                  
+                                );
+                              },
+                            );
+                          },
                         ),
                       )
                     ],

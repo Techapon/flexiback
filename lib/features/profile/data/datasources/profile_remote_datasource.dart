@@ -20,10 +20,18 @@ import '../models/profile_model.dart';
 class ProfileRemoteDatasource {
   final supabase = Supabase.instance.client;
 
-  Future<ProfileEntity> getProfile() async {
+  Future<ProfileEntity> getProfile({String? userTargetId}) async {
     try {
-      final currentUser = supabase.auth.currentUser;
-      final userId = currentUser?.id;
+
+      final userId;
+
+      if (userTargetId != null) {
+        userId = userTargetId;
+      } else {
+        final currentUser = supabase.auth.currentUser;
+        userId = currentUser?.id;
+      }
+
 
       if (userId == null) throw ProfileFailure.sessionExpired();
 

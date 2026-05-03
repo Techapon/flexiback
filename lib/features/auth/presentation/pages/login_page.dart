@@ -120,7 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.pushNamed(
                               context,
                               AppRoutes.generalMainShell,
-                              arguments: authProvider.getUser.id
+                              arguments: authProvider.getUser.id,
+                              
                             );
                           } else if (userRole == Role.Therapist) {
                             Navigator.pushNamed(

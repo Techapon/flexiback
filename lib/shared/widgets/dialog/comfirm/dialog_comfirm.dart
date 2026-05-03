@@ -11,9 +11,10 @@ void showComfirmDialog({
   String? comfirm,
   String? cancel,
 
-  
-
   required Function onConfirm,
+
+  Color? color,
+  IconData? icon,
 }) {
   showDialog(
     context: context,
@@ -24,6 +25,8 @@ void showComfirmDialog({
         comfirm: comfirm,
         cancel: cancel,
         onConfirm: onConfirm,
+        color: color,
+        icon: icon,
       );
     },
   );
@@ -37,6 +40,9 @@ class ComfirmDialog extends StatefulWidget {
   final String? cancel;
 
   final Function onConfirm;
+
+  final  Color? color;
+  final IconData? icon;
   
   const ComfirmDialog({
     super.key,
@@ -47,6 +53,9 @@ class ComfirmDialog extends StatefulWidget {
     this.cancel,
 
     required this.onConfirm,
+
+    this.color,
+    this.icon
   });
 
   @override
@@ -78,15 +87,18 @@ class _ComfirmDialogState extends State<ComfirmDialog> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   
-                  Icon(
-                    LucideIcons.triangleAlert,
-                    size: 55,
-                    color: AppColor.error,
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Icon(
+                      widget.icon ?? LucideIcons.triangleAlert,
+                      size: 55,
+                      color: widget.color ??  AppColor.error,
+                    ),
                   ),
                   
                   
                   Column(
-                    spacing: 6,
+                    spacing: 2,
                     children: [
                       Text(
                         widget.title,
@@ -135,7 +147,7 @@ class _ComfirmDialogState extends State<ComfirmDialog> {
                           child: FilledButton(
                             style: FilledButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 12),
-                              backgroundColor: AppColor.error,
+                              backgroundColor: widget.color ?? AppColor.error,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),

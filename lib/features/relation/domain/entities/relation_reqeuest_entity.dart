@@ -13,4 +13,9 @@ class RelationReqeuestEntity {
     required this.createAt,
   });
 
+  @override
+  String toString() {
+    return "id : $id \n requester : $requesterId \n recipient : $recipientId \n requesterRole : $requesterRole";
+  }
+
 }

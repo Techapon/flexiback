@@ -35,4 +35,9 @@ class DeviceSettingEntity {
       duration: null
     );
   }
+
+  @override
+  String toString() {
+    return 'DeviceSettingEntity(challengesType: $challengesType, duration: $duration)';
+  }
 }

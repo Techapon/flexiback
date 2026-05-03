@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'package:flexiback/core/enums/role.dart';
+import 'package:flexiback/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/relation/data/datasources/relation_datasources.dart';
 import 'package:flexiback/features/relation/data/repositories/relation_repository_impl.dart';
+import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/domain/enums/relation_enums.dart';
+import 'package:flexiback/features/relation/domain/usecases/accept_request_usecase.dart';
+import 'package:flexiback/features/relation/domain/usecases/delete_relation_usecase.dart';
 import 'package:flexiback/features/relation/domain/usecases/delete_request_usecase.dart';
+import 'package:flexiback/features/relation/domain/usecases/get_relations_usecase.dart';
 import 'package:flexiback/features/relation/domain/usecases/get_target_users_usecase.dart';
 import 'package:flexiback/features/relation/domain/usecases/get_request_usecase.dart';
 import 'package:flexiback/features/relation/domain/usecases/relation_request_usecase.dart';
@@ -14,17 +20,59 @@ import '../../domain/usecases/get_income_request_usecase.dart';
 
 class RelationProvider  extends ChangeNotifier {
   final getTargetUsersUsecase = 
-    GetTargetUsersUsecase(RelationRepositoryImpl(RelationDatasources()));
+    GetTargetUsersUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
 
   final getRequestUsecase = 
-    GetRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
+    GetRequestUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
   final getIncomeRequestUsecase = 
-    GetIncomeRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
+    GetIncomeRequestUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
   
   final relationRequestUsecase = 
-    RelationRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
+    RelationRequestUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
   final deleteRequestUsecase = 
-    DeleteRequestUsecase(RelationRepositoryImpl(RelationDatasources()));
+    DeleteRequestUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
+  final acceptRequestUsecase =
+    AcceptRequestUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
+
+  final deleteRelationUsecase =
+    DeleteRelationUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
+
+  final getRelationsUsecase =
+    GetRelationsUsecase(RelationRepositoryImpl(
+      RelationDatasources(),
+      ProfileRemoteDatasource()
+    ));
+  
+  StreamSubscription<List<RelationEntity>>? _relationsSubscription;
+  Stream<List<RelationEntity>>? _relationsStream;
+  Stream<List<RelationEntity>>? get relationsStream => _relationsStream;
+
+  @override
+  void dispose() {
+    _relationsSubscription?.cancel();
+    super.dispose();
+  }
 
   bool isLoading = false;
   bool isRequesting = false;
@@ -33,6 +81,7 @@ class RelationProvider  extends ChangeNotifier {
   List<ProfileEntity>? searchUsersList;
   List<RelationReqeuestEntity>? requestList;
   List<RelationReqeuestEntity>? incomeList;
+  List<RelationEntity>? relations;
 
   Future<void> searchUsers(Role targetRole) async {
     error = null;
@@ -108,13 +157,64 @@ class RelationProvider  extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> acceptRequest(RelationReqeuestEntity request) async {
+    error = null;
+
+    notifyListeners();
+    try {
+      await acceptRequestUsecase.call(request);
+    } catch (e) {
+      error = e.toString();
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> getRelations(Role targetUser) async {
+    error = null;
+
+    isLoading = true;
+    notifyListeners();
+    
+    try {
+      _relationsStream =  getRelationsUsecase.call(targetUser);
+      _relationsSubscription?.cancel();
+      _relationsSubscription = _relationsStream!.listen((data) {
+        print("Provider init");
+        relations = data;
+        notifyListeners();
+      });
+    } catch (e) {
+      error = e.toString();
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> deleteRelation(String relationId) async {
+    error = null;
+    notifyListeners();
+    try {
+      await deleteRelationUsecase.call(relationId);
+    } catch (e) {
+      error = e.toString();
+    }
+    notifyListeners();
+  }
 
 
   // helper
   Relation getRelation(String userId) {
+    if (isFriend(userId)) return Relation.freind;
     if (isUserRequested(userId)) return Relation.requested;
     if (isUserReceived(userId)) return Relation.received;
     return Relation.none;
+  }
+
+  bool isFriend(String userId) {
+    if (relations == null) return false;
+    return relations!.any((rel) => rel.generalId == userId || rel.therapistId == userId);
   }
 
   bool isUserRequested(String userId) {

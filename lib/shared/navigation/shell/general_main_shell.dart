@@ -1,4 +1,6 @@
+import 'package:flexiback/core/mappers/get_role.dart';
 import 'package:flexiback/features/device/presentation/pages/device_page.dart';
+import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flexiback/features/relation/presentation/pages/chat.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
@@ -43,8 +45,10 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProfileProvider>().getProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final _profileProvider = context.read<ProfileProvider>();
+      await _profileProvider.getProfile();
+      context.read<RelationProvider>().getRelations(getOppositeRole(_profileProvider.role.entity));
     });
   }
 
