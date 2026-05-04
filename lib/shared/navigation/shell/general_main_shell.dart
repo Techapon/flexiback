@@ -1,7 +1,7 @@
 import 'package:flexiback/core/mappers/get_role.dart';
 import 'package:flexiback/features/device/presentation/pages/device_page.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
-import 'package:flexiback/features/relation/presentation/pages/chat.dart';
+import 'package:flexiback/features/relation/presentation/pages/chat_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
 import 'package:flexiback/features/zz/trend.dart';

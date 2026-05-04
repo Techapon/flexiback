@@ -6,7 +6,7 @@ import 'package:flexiback/features/device/presentation/controller/daily_progress
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/daily_card_view.dart';
 import 'package:flexiback/features/device/presentation/widgets/daily_crad.dart';
-import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/shared/helpers/pick_img.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/dialog/comfirm/dialog_comfirm.dart';

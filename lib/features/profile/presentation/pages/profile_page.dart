@@ -36,7 +36,7 @@ class ProfilePage extends StatelessWidget {
         action: () async {
           profileProvider.signOut();
               
-          Navigator.pushNamed(context, AppRoutes.login);
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
         },
       ),
       body: SafeArea(

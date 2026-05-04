@@ -68,10 +68,17 @@ class RelationProvider  extends ChangeNotifier {
   Stream<List<RelationEntity>>? _relationsStream;
   Stream<List<RelationEntity>>? get relationsStream => _relationsStream;
 
-  @override
-  void dispose() {
+  
+  void clearRelations() {
+    _relationsStream = null;
     _relationsSubscription?.cancel();
-    super.dispose();
+    relations = null;
+  }
+
+  void clearRequest() {
+    searchUsersList = null;
+    requestList = null;
+    incomeList = null;
   }
 
   bool isLoading = false;
@@ -173,13 +180,12 @@ class RelationProvider  extends ChangeNotifier {
   Future<void> getRelations(Role targetUser) async {
     error = null;
 
-    isLoading = true;
     notifyListeners();
     
     try {
       _relationsStream =  getRelationsUsecase.call(targetUser);
       _relationsSubscription?.cancel();
-      _relationsSubscription = _relationsStream!.listen((data) {
+      _relationsSubscription = _relationsStream?.listen((data) {
         print("Provider init");
         relations = data;
         notifyListeners();
@@ -188,7 +194,6 @@ class RelationProvider  extends ChangeNotifier {
       error = e.toString();
     }
 
-    isLoading = false;
     notifyListeners();
   }
 

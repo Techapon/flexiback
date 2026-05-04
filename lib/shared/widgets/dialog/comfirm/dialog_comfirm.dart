@@ -12,6 +12,7 @@ void showComfirmDialog({
   String? cancel,
 
   required Function onConfirm,
+  Function? onCancel,
 
   Color? color,
   IconData? icon,
@@ -25,6 +26,7 @@ void showComfirmDialog({
         comfirm: comfirm,
         cancel: cancel,
         onConfirm: onConfirm,
+        onCancel: onCancel,
         color: color,
         icon: icon,
       );
@@ -40,6 +42,7 @@ class ComfirmDialog extends StatefulWidget {
   final String? cancel;
 
   final Function onConfirm;
+  final Function? onCancel;
 
   final  Color? color;
   final IconData? icon;
@@ -53,6 +56,7 @@ class ComfirmDialog extends StatefulWidget {
     this.cancel,
 
     required this.onConfirm,
+    this.onCancel,
 
     this.color,
     this.icon
@@ -137,6 +141,14 @@ class _ComfirmDialogState extends State<ComfirmDialog> {
                             ),
                             onPressed: () {
                               if (isLoading) return;
+                              if (widget.onCancel != null) {
+                                setState(() {
+                                  isLoading = true;
+                                });
+
+                                widget.onCancel!();
+                              }
+
                               Navigator.pop(context);
                             },
                             child: Text("${widget.cancel ?? "Cancel"}", style: TextStyle(fontWeight: FontWeight.bold,color: AppColor.black1),),
@@ -156,8 +168,10 @@ class _ComfirmDialogState extends State<ComfirmDialog> {
                             onPressed: () async {
                               if (isLoading) return;
                   
-                              isLoading = true;
-                              setState(() {});
+                              
+                              setState(() {
+                                isLoading = true;
+                              });
                   
                               await widget.onConfirm();
                               Navigator.pop(context);

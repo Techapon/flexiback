@@ -5,7 +5,7 @@ import 'package:flexiback/config/router/routes.dart';
 import 'package:flexiback/features/device/presentation/controller/daily_progress_provider.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/device_setter.dart';
-import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/device/presentation/widgets/method_btn.dart';
 import 'package:flexiback/features/device/presentation/widgets/preview_comfirm.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';

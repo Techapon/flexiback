@@ -3,12 +3,15 @@ import 'dart:math' as math;
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/mappers/get_role.dart';
-import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 import 'package:flexiback/features/relation/domain/enums/relation_enums.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
+import 'package:flexiback/features/relation/presentation/widgets/general_chat_card.dart';
+import 'package:flexiback/features/relation/presentation/widgets/noti.dart';
+import 'package:flexiback/features/relation/presentation/widgets/therapist_chat_card.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/dialog/comfirm/dialog_comfirm.dart';
 import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
@@ -32,26 +35,20 @@ class _ChatPageState extends State<ChatPage> {
 
   String? sendingUsersId;
 
-  @override
-  void initState() {
-    super.initState();
+  late RelationProvider _relationProvider;
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   final profileProvider = context.read<ProfileProvider>();
-      
-    //   if (profileProvider.profile != null) {
-    //     userRole = profileProvider.role;
-    //   } else {
-    //     profileProvider.getProfile().then((_) {
-    //       if (profileProvider.profile != null) {
-    //         userRole = profileProvider.role;
-    //         setState(() {});
-    //       }
-    //     });
-    //   }
-    // });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _relationProvider = context.read<RelationProvider>();
   }
 
+  @override
+  void dispose() {
+    _relationProvider.clearRelations();
+    searchC.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final relationProvider = context.watch<RelationProvider>();
@@ -65,9 +62,13 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: Appbar1(
         title: "message",
-        icon: LucideIcons.bellDot,
+        icon: profileProvider.isLoading || userRole == null ? null : LucideIcons.bellDot,
         action: () {
-          
+          if (profileProvider.isLoading || userRole == null) return;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder : (context) => Noti(userRole: userRole!))
+          );
         },
       ),
       backgroundColor: AppColor.base3,
@@ -198,7 +199,7 @@ class _ChatPageState extends State<ChatPage> {
               if (searching)
                 Builder(builder: (context) {
                   final filteredList = !relationProvider.isLoading && relationProvider.searchUsersList != null
-                    ? relationProvider.searchUsersList!.where((user) => 
+                    ? relationProvider.searchUsersList?.where((user) => 
                         searchC.text.isEmpty || 
                         user.email.toLowerCase().contains(searchC.text.toLowerCase())
                       ).toList()
@@ -366,9 +367,16 @@ class _ChatPageState extends State<ChatPage> {
                                           title: "Appect request",
                                           message: "Are you sure to appect this request",
                                           comfirm: "Yes",
-                                          cancel: "No",
+                                          cancel: "No, Delete it",
                                           onConfirm: () async {
                                             await relationProvider.acceptRequest(request).then((_) {
+                                                relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                                relationProvider.getRequests();
+                                              }
+                                            );
+                                          },
+                                          onCancel: () async {
+                                            await relationProvider.deleteRequest(request.id).then((_) {
                                                 relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
                                                 relationProvider.getRequests();
                                               }
@@ -455,7 +463,7 @@ class _ChatPageState extends State<ChatPage> {
                   
                       Container(
                         margin: EdgeInsets.only(top: 20),
-                        padding: EdgeInsets.all(24),
+                        padding: EdgeInsets.all(32),
                         height: double.infinity,
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -472,60 +480,55 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                           ],
                         ),
-                        child: StreamBuilder<List<RelationEntity>>(
-                          stream: relationProvider.relationsStream,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting && relationProvider.relations == null) {
+                        child: Builder(
+                          builder: (context) {
+                            final friends = relationProvider.relations;
+
+                            if (friends == null) {
                               return Center(child: CircularProgressIndicator());
                             }
 
-                            final friends = snapshot.data ?? [];
-                            
                             if (friends.isEmpty) {
                               return Center(
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(vertical: 14,horizontal: 14),
-                                    foregroundColor: AppColor.main2, 
+                                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+                                    foregroundColor: AppColor.main2,
                                     side: BorderSide(
-                                      color: AppColor.main2, 
-                                      width: 2,  
+                                      color: AppColor.main2,
+                                      width: 2,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(22), 
+                                      borderRadius: BorderRadius.circular(22),
                                     ),
                                   ),
-                                  onPressed: () async{
+                                  onPressed: () async {
                                     if (profileProvider.isLoading || userRole == null) return;
-                                    relationProvider.searchUsers(getOppositeRole(userRole!.entity),);
+                                    relationProvider.searchUsers(getOppositeRole(userRole!.entity));
                                     relationProvider.getRequests();
                                     relationProvider.getIncomeRequests();
                                     setState(() {
                                       searching = true;
                                     });
-                                  }, 
+                                  },
                                   child: Row(
-                                      spacing: 4,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          LucideIcons.plus,
-                                          size: 18,
+                                    spacing: 4,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.plus,
+                                        size: 18,
+                                      ),
+                                      Text(
+                                        "Add your ${profileProvider.isLoading || userRole == null ? '...' : getOppositeRole(userRole!.entity) == Role.General ? 'Patient' : 'Therapist'}",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        Text(
-                                          "Add your ${
-                                            profileProvider.isLoading || userRole == null
-                                            ? '...' 
-                                            : getOppositeRole(userRole!.entity) == Role.General ? 'Patient' : 'Therapist'
-                                          }",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold
-                                          ),
-                                        )
-                                      ],
-                                    )
+                                      )
+                                    ],
+                                  ),
                                 ),
                               );
                             }
@@ -536,11 +539,12 @@ class _ChatPageState extends State<ChatPage> {
                               itemCount: friends.length,
                               itemBuilder: (context, index) {
                                 final friend = friends[index];
-                                return ListTile(
-                                  title: Text("Friend ID: ${friend.id}"),
-                                  subtitle: Text("Email : ${friend.userProfile?.fullname}"),
-                                  
-                                );
+                                if (getRole(friend.userProfile!.role) == Role.Therapist) {
+                                  return ThrapistUserChatCard(freinds: friend);
+                                } else if (getRole(friend.userProfile!.role) == Role.General) {
+                                  return GeneralChatCard(freinds: friend,);
+                                }
+                                return SizedBox.shrink();
                               },
                             );
                           },

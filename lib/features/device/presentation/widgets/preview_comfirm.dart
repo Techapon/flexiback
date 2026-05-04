@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
-import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/device/presentation/widgets/preview_box.dart';
 import 'package:flexiback/features/device/presentation/widgets/preview_percent_box.dart';
 import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';

@@ -1,4 +1,6 @@
-import 'package:flexiback/features/relation/presentation/pages/chat.dart';
+import 'package:flexiback/core/mappers/get_role.dart';
+import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
+import 'package:flexiback/features/relation/presentation/pages/chat_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +27,10 @@ class _TherapistMainShellState extends State<TherapistMainShell> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ProfileProvider>().getProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final _profileProvider = context.read<ProfileProvider>();
+      await _profileProvider.getProfile();
+      context.read<RelationProvider>().getRelations(getOppositeRole(_profileProvider.role.entity));
     });
   }
 

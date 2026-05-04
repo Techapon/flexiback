@@ -14,16 +14,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class RelationDatasources {
   final supabase = Supabase.instance.client;
 
-  Future<List<ProfileEntity>> getTargetUserList(Role targetRole, {String? email}) async {
+  Future<List<ProfileEntity>> getTargetUserList(Role targetRole) async {
     try {
       var query = supabase
         .from("profiles")
         .select()
         .eq("role", targetRole.entity);
-      
-      if (email != null && email.isNotEmpty) {
-        query = query.ilike("email", "%$email%");
-      }
       
       final response = await query;
 

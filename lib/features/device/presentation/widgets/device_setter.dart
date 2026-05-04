@@ -3,7 +3,7 @@ import 'package:flexiback/core/constants/flexiback.dart';
 import 'package:flexiback/features/device/domain/entities/device_setting_entity.dart';
 import 'package:flexiback/features/device/domain/enums/device_challenges_type.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
-import 'package:flexiback/features/device/presentation/widgets/gradient_button.dart';
+import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
 import 'package:flexiback/shared/widgets/form/dropdown.dart';
 import 'package:flexiback/shared/widgets/form/pill_field.dart';
