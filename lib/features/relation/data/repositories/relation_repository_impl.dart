@@ -3,11 +3,14 @@ import 'package:flexiback/core/mappers/get_role.dart';
 import 'package:flexiback/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/relation/data/datasources/relation_datasources.dart';
+import 'package:flexiback/features/relation/data/models/message_model.dart';
 import 'package:flexiback/features/relation/data/models/relation_reqeuest_model.dart';
+import 'package:flexiback/features/relation/domain/entities/message_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/data/models/relation_model.dart';
 import 'package:flexiback/features/relation/domain/repositories/relation_repository.dart';
+import 'package:flutter/material.dart';
 
 class RelationRepositoryImpl implements RelationRepository {
   final RelationDatasources datasource;
@@ -92,11 +95,36 @@ class RelationRepositoryImpl implements RelationRepository {
         );
         return fullRelation;
       }
+
+    );
+  }
+  @override
+  Future<void> deleteRelation(String relationId) {
+    return datasource.deleteRelation(relationId);
+  }
+
+
+  // Chat
+  @override
+  Stream<List<MessageEntity>> getRealtimeChat(String targetUser) {
+    return datasource.getRealtimeChat(targetUser).map(
+      (messages) {
+        final finalMessage = (
+          messages.map(
+            (mess) {
+              mess.isMine = datasource.isMine(mess.sender!);
+              return mess.toEntity();
+            }
+          ).toList()
+        );
+        return finalMessage;
+      }
     );
   }
 
   @override
-  Future<void> deleteRelation(String relationId) {
-    return datasource.deleteRelation(relationId);
+  Future<void> sendMessage(MessageEntity message) async {
+    final messageModel = MessageModel.fromEntity(message);
+    await datasource.sendMessage(messageModel);
   }
 }

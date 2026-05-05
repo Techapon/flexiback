@@ -1,12 +1,14 @@
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/utils/text_uppercase.dart';
-import 'package:flexiback/features/relation/presentation/widgets/message.dart';
+import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
+import 'package:flexiback/features/relation/presentation/pages/message.dart';
 import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:provider/provider.dart';
 
 class GeneralChatCard extends StatelessWidget {
   final RelationEntity freinds;
@@ -17,7 +19,10 @@ class GeneralChatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final relationProvider = context.watch<RelationProvider>(); 
+
     final profile = freinds.userProfile! as GeneralEntity;
+    
     return Column(
       spacing: 16,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,10 +133,12 @@ class GeneralChatCard extends StatelessWidget {
           ),
           child: GradientButton(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Message(freinds: freinds,))
-              );
+                relationProvider.getChat(profile.id);
+                print(profile.id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Message(freinds: freinds,))
+                );
             },
             borderRadius: 28,
             paddingV: 14,

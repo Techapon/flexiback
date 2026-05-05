@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/mappers/get_role.dart';
+import 'package:flexiback/features/relation/presentation/pages/noti.dart';
 import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
@@ -10,7 +11,6 @@ import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_en
 import 'package:flexiback/features/relation/domain/enums/relation_enums.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flexiback/features/relation/presentation/widgets/general_chat_card.dart';
-import 'package:flexiback/features/relation/presentation/widgets/noti.dart';
 import 'package:flexiback/features/relation/presentation/widgets/therapist_chat_card.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/dialog/comfirm/dialog_comfirm.dart';
@@ -38,17 +38,23 @@ class _ChatPageState extends State<ChatPage> {
   late RelationProvider _relationProvider;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _relationProvider = context.read<RelationProvider>();
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _relationProvider = context.read<RelationProvider>();
+      }
+    });
   }
 
   @override
   void dispose() {
     _relationProvider.clearRelations();
+    _relationProvider.clearChat();
     searchC.dispose();
     super.dispose();
   }
+  
   @override
   Widget build(BuildContext context) {
     final relationProvider = context.watch<RelationProvider>();

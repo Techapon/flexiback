@@ -53,13 +53,17 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final _deviceProvider = context.read<DeviceProvider>();
+      if (mounted) {
+        _deviceProvider = context.read<DeviceProvider>();
+      }
     });
   }
 
   @override
   void dispose() {
-    _deviceProvider.stopListening();
+    if (_deviceProvider.runtimeType.toString() != 'late DeviceProvider') {
+      _deviceProvider.stopListening();
+    }
     errorText = null;
     addImage = null;
     super.dispose();

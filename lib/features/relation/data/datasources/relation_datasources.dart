@@ -6,6 +6,7 @@ import 'package:flexiback/features/profile/data/models/therapist_model.dart';
 import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
+import 'package:flexiback/features/relation/data/models/message_model.dart';
 import 'package:flexiback/features/relation/data/models/relation_model.dart';
 import 'package:flexiback/features/relation/data/models/relation_reqeuest_model.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
@@ -197,6 +198,59 @@ class RelationDatasources {
           .delete()
           .eq("id", relationId);
     } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  // Chat
+  Stream<List<MessageModel>> getRealtimeChat(String targetUser) {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return Stream.value([]);
+
+      return supabase
+          .from("message")
+          .stream(primaryKey: ['id'])
+          .order("created_at", ascending: true)
+          .map((response) => response
+              .where((json) => 
+              (json['sender_id'] == user.id || json['recipient_id'] == user.id) || 
+              (json['sender_id'] == targetUser || json['recipient_id'] == targetUser))
+              .map((json) => MessageModel.fromMap(json,))
+              .toList());
+      
+    } on PostgrestException catch (e) {
+      print("Error : ${e.toString}");
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      print("Error : ${e.toString}");
+      throw CoreFailure.unknown(e.toString());
+    }
+
+  }
+
+  bool isMine(String checkId) {
+    final currentUser = supabase.auth.currentUser;
+    final userId = currentUser?.id;
+
+    if (userId == null) throw CoreFailure.unknown("User not authenticated");
+
+    return (checkId == userId) ? true : false;
+  }
+
+  Future<void> sendMessage(MessageModel message) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw CoreFailure.unknown("User not authenticated");
+
+    try {
+      final messageData = message.toMap();
+      messageData['sender_id'] = user.id;
+      
+      await supabase.from("message").insert(messageData);
+    } on PostgrestException catch (e) {
+      print("Error : ${e.toString()}");
       throw CoreFailure.databaseError(e.message);
     } catch (e) {
       throw CoreFailure.unknown(e.toString());

@@ -5,6 +5,8 @@ import 'package:flexiback/features/profile/domain/entities/profile_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 
+import '../entities/message_entity.dart';
+
 abstract class RelationRepository {
   Future<List<ProfileEntity>> getTargetUserList(Role targetRole);
   Future<List<RelationReqeuestEntity>> getSenderRequest();
@@ -16,4 +18,8 @@ abstract class RelationRepository {
 
   Stream<List<RelationEntity>> getRelations(Role targetUser);
   Future<void> deleteRelation(String relationId);
+
+  // Chat
+  Stream<List<MessageEntity>> getRealtimeChat(String targetUser);
+  Future<void> sendMessage(MessageEntity message);
 }
