@@ -8,6 +8,7 @@ import 'package:flexiback/features/device/domain/entities/device_setting_entity.
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
 import 'package:flexiback/features/device/domain/entities/preview_entity.dart';
 import 'package:flexiback/features/device/domain/enums/bt_connection_state.dart';
+import 'package:flexiback/features/device/domain/services/straight_score/sc_calculation.dart';
 import 'package:flexiback/features/device/domain/usecases/calibrate_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/cancel_find_usecase.dart';
 import 'package:flexiback/features/device/domain/usecases/connect_device_usecase.dart';
@@ -95,6 +96,8 @@ class DeviceProvider extends ChangeNotifier {
   // getter
   bool get isConnected => state == BtConnectionState.connected;
   DeviceEntity? get connectedDevice => _connectedDevice;
+
+  double? get sc => SCCalculation(realTimeData);
 
   String? error;
   BluetoothFailre? failre;

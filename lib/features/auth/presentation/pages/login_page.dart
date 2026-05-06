@@ -117,14 +117,14 @@ class _LoginPageState extends State<LoginPage> {
                         if (authProvider.isLoggedIn) {
                           Role userRole = authProvider.getUser.role;
                           if (userRole == Role.General) {
-                            Navigator.pushNamed(
+                            Navigator.pushReplacementNamed(
                               context,
                               AppRoutes.generalMainShell,
                               arguments: authProvider.getUser.id,
                               
                             );
                           } else if (userRole == Role.Therapist) {
-                            Navigator.pushNamed(
+                            Navigator.pushReplacementNamed(
                               context,
                               AppRoutes.therapistMainShell,
                             );

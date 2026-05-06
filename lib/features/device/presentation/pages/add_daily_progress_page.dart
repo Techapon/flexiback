@@ -6,6 +6,7 @@ import 'package:flexiback/features/device/presentation/controller/daily_progress
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/daily_card_view.dart';
 import 'package:flexiback/features/device/presentation/widgets/daily_crad.dart';
+import 'package:flexiback/shared/widgets/dialog/info/dailog_info.dart';
 import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/shared/helpers/pick_img.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
@@ -16,6 +17,7 @@ import 'package:flexiback/shared/widgets/dialog/warn/dislog_warn.dart';
 import 'package:flexiback/shared/widgets/form/edit_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -93,10 +95,24 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
               
                   GestureDetector(
                     onTap: () {
-                      if (addingDailyProgress) return;
-                      addingDailyProgress = true;
+                      if (dailyProgressProvider.dailyProgressList == null) return;
+                      bool isAdded = dailyProgressProvider.dailyProgressList!.any((pose) {
+                        return DateFormat("dd/MM/yyyy").format(pose.dateTime!) == DateFormat("dd/MM/yyyy").format(DateTime.now());
+                      });
+                      print(isAdded);
+
+                      if (isAdded) {
+                        showInfoDialog(
+                          context: context, 
+                          title: "notice!",
+                          message: "Your already added your progress for today.Come back next day keep going🔥"
+                        );
+                        return;
+                      }
                       
-                      setState(() {});
+                      setState(() {
+                        addingDailyProgress = true;
+                      });
                     },
                     child: DottedBorder(
                         color: !addingDailyProgress ? AppColor.grey2 : Colors.transparent,    
@@ -256,7 +272,7 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
 
                                             if (deviceProvider.isLoadingData || deviceProvider.realTimeData != null) 
                                               Text(
-                                                "${deviceProvider.realTimeData?["CH2"] ?? '0' }",
+                                                "${deviceProvider.sc ?? 'wait'}",
                                                 style: TextStyle(
                                                   color: AppColor.grey4,
                                                   fontSize: 16,
@@ -350,7 +366,7 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                                         await dailyProgressProvider.addDailyProgress(
                                           DailyProgressEntity(
                                             img: "",
-                                            straightScore: deviceProvider.realTimeData?["CH2"]as double,
+                                            straightScore: deviceProvider.sc as double,
                                             note: noteC.text,
                                           ),
                                           addImage! 

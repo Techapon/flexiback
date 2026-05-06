@@ -25,7 +25,7 @@ class GeneralMainShell extends StatefulWidget {
 }
 
 class _GeneralMainShellState extends State<GeneralMainShell> {
-  int _currentindex = 3;
+  int _currentindex = 2;
 
   List<Widget> get _pages => [
     TherapyPage(),

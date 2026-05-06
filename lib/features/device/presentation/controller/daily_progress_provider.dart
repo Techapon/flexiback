@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flexiback/core/entities/image_entity.dart';
 import 'package:flexiback/features/device/data/datasources/device_remote_datasource.dart';
 import 'package:flexiback/features/device/data/repositories/device_db_repository_impl.dart';
@@ -18,23 +19,34 @@ class DailyProgressProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
 
+  List<DailyProgressEntity>? dailyProgressList;
   Stream<List<DailyProgressEntity>>? _dailyProgressStream;
+  StreamSubscription<List<DailyProgressEntity>>? _subscription;
 
   Stream<List<DailyProgressEntity>>? get dailyStream => _dailyProgressStream;
 
-  Future<void> getDailyProgress(String userId) async {
+  void getDailyProgress(String userId) {
     error = null;
-
-    isLoading = true;
     notifyListeners();
-    try {
-      _dailyProgressStream =  getDailyProgressUsecase.call(userId);
-    } catch (e) {
-      error = e.toString();
-    }
 
-    isLoading = false;
-    notifyListeners();
+    _subscription?.cancel();
+    _dailyProgressStream = getDailyProgressUsecase.call(userId);
+    _subscription = _dailyProgressStream!.listen(
+      (data) {
+        dailyProgressList = data;
+      },
+      onError: (e) {
+        error = e.toString();
+        isLoading = false;
+        notifyListeners();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   Future<void> addDailyProgress(DailyProgressEntity dailyProgress,ImageEntity image) async {
