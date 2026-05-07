@@ -99,7 +99,6 @@ class _AddDailyProgressPageState extends State<AddDailyProgressPage> {
                       bool isAdded = dailyProgressProvider.dailyProgressList!.any((pose) {
                         return DateFormat("dd/MM/yyyy").format(pose.dateTime!) == DateFormat("dd/MM/yyyy").format(DateTime.now());
                       });
-                      print(isAdded);
 
                       if (isAdded) {
                         showInfoDialog(

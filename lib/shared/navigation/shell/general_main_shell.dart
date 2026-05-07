@@ -4,7 +4,7 @@ import 'package:flexiback/features/relation/presentation/controller/relation_pro
 import 'package:flexiback/features/relation/presentation/pages/chat_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
-import 'package:flexiback/features/zz/trend.dart';
+import 'package:flexiback/features/trend/presentation/pages/trend_page.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -37,7 +37,9 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
       },
       userId: widget.userId,
     ),
-    TrendPage(),
+    TrendPage(
+      userId: widget.userId,
+    ),
     ChatPage(),
     ProfilePage(),
   ];

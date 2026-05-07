@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/mappers/get_role.dart';
+import 'package:flexiback/features/relation/presentation/pages/message.dart';
 import 'package:flexiback/features/relation/presentation/pages/noti.dart';
 import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
@@ -394,7 +395,15 @@ class _ChatPageState extends State<ChatPage> {
                                         );
                                         
                                       case Relation.freind:
-                                        print("Go the Chat!!");
+                                        final freind = relationProvider.relations!.singleWhere(
+                                          (relation) => relation.generalId == userId || relation.therapistId == userId
+                                        );
+
+                                        relationProvider.getChat(freind.userProfile!.id);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => Message(freinds: freind,))
+                                        );
                                     }
                                   },
                                   icon: relationProvider.isRequesting && sendingUsersId == userId

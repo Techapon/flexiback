@@ -5,7 +5,7 @@ import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dar
 import 'package:flexiback/features/relation/presentation/pages/chat_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
 import 'package:flexiback/features/zz/therapy.dart';
-import 'package:flexiback/features/zz/trend.dart';
+import 'package:flexiback/features/trend/presentation/pages/trend_page.dart';
 import 'package:flexiback/shared/navigation/shell/general_main_shell.dart';
 import 'package:flutter/material.dart';
 

@@ -87,7 +87,6 @@ class RelationRepositoryImpl implements RelationRepository {
                 targetUserId = r.therapistId;
             }
 
-            print("Target ID : ${targetUserId}");
             
             r.userProfile = await profileDatasource.getProfile(userTargetId: targetUserId);
             return r.toEntity();

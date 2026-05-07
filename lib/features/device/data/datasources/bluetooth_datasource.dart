@@ -45,7 +45,6 @@ class BluetoothDatasource {
   bool get isConnected => _connection?.isConnected ?? false;
   BluetoothDevice? get conntedDevice {
     if (!isConnected) return null;
-    print("I HERE BIE :${_connectedDevice}");
     return _connectedDevice;
   }
 
@@ -117,7 +116,6 @@ class BluetoothDatasource {
       _stateController.add(BtConnectionState.error);
       throw DeviceFailure.timOut();
     } catch (e) {
-      print("I HERE: ${e.toString()}");
       // state
       _stateController.add(BtConnectionState.error);
       throw CoreFailure.unknown(e.toString());

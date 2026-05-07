@@ -2,6 +2,11 @@ import 'dart:ui';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flexiback/config/router/routes.dart';
+// import 'package:flexiback/features/device/data/datasources/device_remote_datasource.dart';
+// import 'package:flexiback/features/device/data/repositories/device_db_repository_impl.dart';
+// import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
+// import 'package:flexiback/features/device/domain/services/on_off/on_off_donwsampling.dart';
+// import 'package:flexiback/features/device/domain/services/simulator/full_data_sim.dart';
 import 'package:flexiback/features/device/presentation/controller/daily_progress_provider.dart';
 import 'package:flexiback/features/device/presentation/controller/device_provider.dart';
 import 'package:flexiback/features/device/presentation/widgets/device_setter.dart';
@@ -43,6 +48,8 @@ class _DevicePageState extends State<DevicePage> {
   void initState() {
     super.initState();
 
+   
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _deviceProvider = context.read<DeviceProvider>();
       _deviceProvider.getState();
@@ -64,6 +71,17 @@ class _DevicePageState extends State<DevicePage> {
   @override
   Widget build(BuildContext context) {
     final deviceProvider = context.watch<DeviceProvider>();
+     
+    // final fData = generateMockDotData(hours: 0,minutes: 7,gPer: .3);
+    // print(fData.toString());
+
+    // final dowsmpled = OnOffDonwsampling.dowSampling(fData);
+
+    // print("Dowsampled Data \n ${dowsmpled.toString()}");
+
+    // final ds = DeviceDbRepositoryImpl(DeviceRemoteDatasource());
+
+    // ds.uploadDeviceUsage(dowsmpled!);
 
     return  Scaffold(
       appBar: Appbar1(

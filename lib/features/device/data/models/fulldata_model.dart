@@ -80,8 +80,6 @@ class FulldataModel {
     for (int i = 0; i < dotList.length; i++) {
       final Map<String,dynamic> dot = dotList[i].toMap(user_id: user_id);
 
-      print(dot["date_time"]);
-
       dotListMap.add(dot);
     }
 

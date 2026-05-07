@@ -204,7 +204,6 @@ class RelationProvider  extends ChangeNotifier {
     try {
       _relationsSubscription?.cancel();
       _relationsSubscription = getRelationsUsecase.call(targetUser).listen((data) {
-        print("Provider init");
         relations = data;
         notifyListeners();
       });

@@ -221,7 +221,6 @@ class DeviceProvider extends ChangeNotifier {
       await connectDeviceUsecase.call(device);
     } catch (e) {
       error = e.toString();
-      print("ERROR --- $error");
     }
     isConnecting = false;
     notifyListeners();
@@ -263,7 +262,6 @@ class DeviceProvider extends ChangeNotifier {
         fulldata = data;
         notifyListeners();
       }
-      print("Provider ${fulldata.toString()}");
 
       isLoadingData = false;
       notifyListeners();
@@ -366,7 +364,6 @@ class DeviceProvider extends ChangeNotifier {
     fulldata = null;
     realTimeData = null;
     notifyListeners();
-    print("bie");
   }
 
   Future<void> cancelFind() async {

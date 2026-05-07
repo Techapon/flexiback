@@ -133,7 +133,6 @@ class ThrapistUserChatCard extends StatelessWidget {
             child: GradientButton(
               onTap: () {
                 relationProvider.getChat(profile.id);
-                print(profile.id);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Message(freinds: freinds,))

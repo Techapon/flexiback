@@ -133,12 +133,11 @@ class GeneralChatCard extends StatelessWidget {
           ),
           child: GradientButton(
             onTap: () {
-                relationProvider.getChat(profile.id);
-                print(profile.id);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Message(freinds: freinds,))
-                );
+              relationProvider.getChat(profile.id);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Message(freinds: freinds,))
+              );
             },
             borderRadius: 28,
             paddingV: 14,

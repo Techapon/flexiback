@@ -186,9 +186,7 @@ class _DeviceSetterState extends State<DeviceSetter> {
                         setting = DeviceSettingEntity.hard();
                         break;
                     }
-
-                    print(setting.toString());
-      
+    
                     await deviceProvider.updateDeviceSetting(setting);
       
                     if (deviceProvider.error != null) {

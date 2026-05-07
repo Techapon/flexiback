@@ -29,7 +29,6 @@ class DeviceModel extends DeviceEntity {
   }
 
   DeviceEntity toEntity() {
-    // print("NAME : $name \n ADD : $address");
     return DeviceEntity(
       name: name,
       address: address,

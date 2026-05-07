@@ -8,4 +8,7 @@ class DotEntity {
     required this.status,
     required this.dateTime
   });
+
+  @override
+  String toString() => '${dateTime.toIso8601String()} : ${status.entity}';
 }

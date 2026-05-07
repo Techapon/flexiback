@@ -9,7 +9,6 @@ class OnOffDonwsampling {
     
     if (rawData.isEmpty) return null;
 
-    // เริ่มต้นด้วยจุดแรก
     final List<DotEntity> downsampledData = [rawData.first];
 
     for (int i = 1; i < rawData.length; i++) {
@@ -19,7 +18,7 @@ class OnOffDonwsampling {
       if (currentDot.status != lastAddedDot.status) {
         downsampledData.add(DotEntity(
           status: lastAddedDot.status,
-          dateTime: currentDot.dateTime,
+          dateTime: currentDot.dateTime.subtract(Duration(microseconds: 1)),
         ));
         
         downsampledData.add(currentDot);

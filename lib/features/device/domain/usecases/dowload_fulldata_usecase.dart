@@ -26,13 +26,9 @@ class DowloadFulldataUsecase {
 
           yield data;
         }
-
-
         if (fulldata != null) {
-          print("NOT NULL");
           final FullDataEntity? downSampedData =  OnOffDonwsampling.dowSampling(fulldata);
 
-          print(downSampedData?.dotList.length ?? "No data -/-/-/- ");
 
           if (downSampedData != null) {
             await dbRepo.uploadDeviceUsage(downSampedData);

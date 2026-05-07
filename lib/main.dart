@@ -5,6 +5,7 @@ import 'package:flexiback/features/device/presentation/controller/device_provide
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/config/theme/app/app_theme.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
+import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,10 @@ void main() async {
 
         ChangeNotifierProvider(
           create: (_) => RelationProvider()
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => TrendProvider()
         )
         
       ],

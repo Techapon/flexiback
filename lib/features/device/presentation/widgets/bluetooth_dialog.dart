@@ -176,7 +176,6 @@ class _BluetoothDialogState extends State<BluetoothDialog> {
                         connectingDeviceAddress = deviceProvider.devices[index].address;
 
                         await deviceProvider.connect(deviceProvider.devices[index]);
-                        print("-------------------------------------");
 
                         if (deviceProvider.error != null) {
                           showErrorDialog(
