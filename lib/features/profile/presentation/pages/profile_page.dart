@@ -22,7 +22,10 @@ class ProfilePage extends StatelessWidget {
     final profileProvider = context.watch<ProfileProvider>();
 
     if (profileProvider.isLoading) {
-      return LoadingStatus(text: "Loading Profile ...",);
+      return Scaffold(
+        backgroundColor: AppColor.base1,
+        body: LoadingStatus(text: "Updating Profile ...",)
+      );
     }
 
     if (profileProvider.profile == null) {

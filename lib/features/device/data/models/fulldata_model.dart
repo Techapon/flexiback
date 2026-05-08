@@ -69,7 +69,7 @@ class FulldataModel {
       "user_id" : user_id,
       "good_time" : goodTime.inSeconds,
       "bad_time" : badTime.inSeconds,
-      "date_time" : dateTime.toIso8601String()
+      "date_time" : dateTime.toUtc().toIso8601String()
     };
   }
 

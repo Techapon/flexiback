@@ -22,7 +22,7 @@ class DotModel {
     return {
       if (user_id != null ) "user_id" : user_id,
       "status" : status.entity,
-      "date_time": safeDateTime.toIso8601String()
+      "date_time": safeDateTime.toUtc().toIso8601String()
     };
 
   }

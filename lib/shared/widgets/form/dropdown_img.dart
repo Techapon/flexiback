@@ -1,43 +1,53 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flexiback/core/entities/image_text_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../config/theme/colors/app_color.dart';
 
-class Custom_Dropdown extends StatefulWidget {
+class CustomDropdownImage extends StatefulWidget {
   final ValueNotifier<String?> valueListenable_title;
-  final List<String> List_items;
+  final List<ImageTextEntity> listItem;
   final Function(String) onChanged;
-  const Custom_Dropdown({
+  const CustomDropdownImage({
     super.key, 
     required this.valueListenable_title, 
-    required this.List_items,
+    required this.listItem,
     required this.onChanged
   });
 
   @override
-  State<Custom_Dropdown> createState() => _Custom_DropdownState();
+  State<CustomDropdownImage> createState() => _CustomDropdownImageState();
 }
 
-class _Custom_DropdownState extends State<Custom_Dropdown> {
+class _CustomDropdownImageState extends State<CustomDropdownImage> {
   @override
   Widget build(BuildContext context) {
     return  DropdownButtonHideUnderline(
       child: DropdownButton2<String>(
         isExpanded: true,
         valueListenable: widget.valueListenable_title,
-        items: widget.List_items
-          .map((String item) => DropdownItem<String>(
-                value: item,
+        items: widget.listItem
+          .map((ImageTextEntity item) => DropdownItem<String>(
+                value: item.text,
                 height: 40,
-                child: Text(
-                  item,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColor.black1,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    Image.asset(
+                      "${item.path}",
+                      height: 20,
+                    ),
+                    Text(
+                      "${item.decorate}${item.text}",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.black1,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ))
           .toList(),
@@ -88,8 +98,3 @@ class _Custom_DropdownState extends State<Custom_Dropdown> {
     );
   }
 }
-
-
-
-
-

@@ -13,7 +13,7 @@ import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/dialog/comfirm/dialog_comfirm.dart';
 import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
 import 'package:flexiback/shared/widgets/dialog/success/dialog_success.dart';
-import 'package:flexiback/shared/widgets/dialog/warn/dislog_warn.dart';
+import 'package:flexiback/shared/widgets/dialog/warn/dialog_warn.dart';
 import 'package:flexiback/shared/widgets/form/edit_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

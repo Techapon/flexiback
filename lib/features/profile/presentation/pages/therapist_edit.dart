@@ -82,7 +82,10 @@ class _TherapistEditState extends State<TherapistEdit> {
     final profileProvider = context.watch<ProfileProvider>();
 
     if (profileProvider.isLoading || therapistNewProfile == null) {
-      return LoadingStatus(text: "Updating Profile ...",);
+      return Scaffold(
+        backgroundColor: AppColor.base1,
+        body: LoadingStatus(text: "Updating Profile ...",)
+      );
     }
 
     if (profileProvider.profile == null) {

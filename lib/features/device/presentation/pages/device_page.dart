@@ -23,7 +23,7 @@ import 'package:provider/provider.dart';
 import '../../../../config/theme/colors/app_color.dart';
 import '../../../../core/exception/bluetooth_exception/bluetooth_error_type.dart';
 import '../../../../shared/navigation/items/geneeral_items.dart';
-import '../../../../shared/widgets/dialog/warn/dislog_warn.dart';
+import '../../../../shared/widgets/dialog/warn/dialog_warn.dart';
 import '../widgets/bluetooth_dialog.dart';
 import '../widgets/device_content.dart';
 
@@ -48,8 +48,6 @@ class _DevicePageState extends State<DevicePage> {
   void initState() {
     super.initState();
 
-   
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _deviceProvider = context.read<DeviceProvider>();
       _deviceProvider.getState();
@@ -72,7 +70,7 @@ class _DevicePageState extends State<DevicePage> {
   Widget build(BuildContext context) {
     final deviceProvider = context.watch<DeviceProvider>();
      
-    // final fData = generateMockDotData(hours: 0,minutes: 7,gPer: .3);
+    // final fData = generateMockDotData(hours: 4,minutes: 7,gPer: .3);
     // print(fData.toString());
 
     // final dowsmpled = OnOffDonwsampling.dowSampling(fData);

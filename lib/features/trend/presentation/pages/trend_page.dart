@@ -3,8 +3,10 @@ import 'dart:ui';
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/utils/text_from_percent.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
+import 'package:flexiback/features/trend/presentation/pages/graph_trend.dart';
 import 'package:flexiback/features/trend/presentation/widgets/percent_box.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
+import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -38,19 +40,13 @@ class _TrendPageState extends State<TrendPage> {
 
   @override
   void dispose() {
-    _trendProvider.dispose();
+    _trendProvider.disposeProvi();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final TrendProvider trendProvider = context.watch<TrendProvider>();
-
-  //   final _dates = <DateTime>[
-  //   DateTime(2026,05,5),
-  //   DateTime(2026,05,8),
-  //   DateTime(2026,05,29),
-  // ];
 
     return Scaffold(
       appBar: Appbar1(
@@ -63,8 +59,11 @@ class _TrendPageState extends State<TrendPage> {
           builder: (context, snapshot) {
       
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(),
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.75,
+                child: Center(
+                  child: LoadingStatus(text: "Loading Overview Data..."),
+                ),
               );
             }
       
@@ -219,7 +218,12 @@ class _TrendPageState extends State<TrendPage> {
                                     minimumSize: Size.zero,
                                     padding: EdgeInsets.symmetric(vertical: 4,horizontal: 24),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId,lastedtDay: last,fromCalendar: false,))
+                                    );
+                                  },
                                   child: ShaderMask(
                                     blendMode: BlendMode.srcIn, 
                                     shaderCallback: (Rect bounds) {
@@ -364,7 +368,11 @@ class _TrendPageState extends State<TrendPage> {
                     onDaySelected:(selectedDay, focusedDay) {
                       bool isInSelected = _usageDates.any((dayinList) => isSameDay(dayinList, selectedDay));
                   
-                      isInSelected ? print(selectedDay) : null;
+                      trendProvider.getFullDataUsage(widget.userId!, selectedDay);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => GraphTrend(userId: null,lastedtDay: null,fromCalendar: true,))
+                      );
                     },
 
                     headerStyle: HeaderStyle(
