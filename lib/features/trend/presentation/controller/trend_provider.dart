@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flexiback/core/entities/calendar_entity.dart';
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
 import 'package:flexiback/features/trend/data/datasources/trend_remote_datasource.dart';
 import 'package:flexiback/features/trend/data/repositories/trend_repository_impl.dart';
@@ -35,6 +36,9 @@ class TrendProvider extends ChangeNotifier {
 
   FullDataEntity? fullData;
 
+  // calandar
+  CalendarEntity? deviceUsageCalendar;
+
   void getOverviewData(String userId) {
     error = null;
     isLoading = true;
@@ -44,6 +48,8 @@ class TrendProvider extends ChangeNotifier {
     _overviewStream = getOverviewUsecase.call(userId);
     _subscription = _overviewStream!.listen(
       (list) {
+        deviceUsageCalendar = CalendarEntity.fromUsageDates(list.map((item) => item.dateTime).toList());
+
         deviceOverviewList = list;
         final totalGood = list.fold(
           0.0,
@@ -75,7 +81,6 @@ class TrendProvider extends ChangeNotifier {
     error = null;
     isLoading = true;
     notifyListeners();
-    print("Getting..");
 
     try {
       fullData = await getFullDataUsageUsecase.call(userId, dateTime);

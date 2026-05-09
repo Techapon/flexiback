@@ -5,6 +5,7 @@ import 'package:flexiback/core/utils/text_from_percent.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flexiback/features/trend/presentation/pages/graph_trend.dart';
 import 'package:flexiback/features/trend/presentation/widgets/percent_box.dart';
+import 'package:flexiback/features/trend/presentation/widgets/table_calendar.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
@@ -129,24 +130,7 @@ class _TrendPageState extends State<TrendPage> {
               );
             }
 
-            List<DateTime?> _usageDates = trendProvider.deviceOverviewList!.map(
-              (overview) => overview.dateTime
-            ).toList();
-            
-            late DateTime first;
-            late DateTime focus;
-            late DateTime last;
-
-            if (_usageDates.isNotEmpty) {
-              _usageDates.sort((a,b) => a!.compareTo(b!));
-              first = _usageDates.first!;
-              focus = _usageDates.last!;
-              last = _usageDates.last!;
-            } else {
-              first = DateTime(DateTime.now().year,DateTime.now().month,1);
-              focus = DateTime(DateTime.now().year,DateTime.now().month,1);
-              last = DateTime(DateTime.now().year,DateTime.now().month,30);
-            }
+            final deviceUsageCalendar = trendProvider.deviceUsageCalendar!;
       
             return Column(
               spacing: 16,
@@ -221,7 +205,7 @@ class _TrendPageState extends State<TrendPage> {
                                   onPressed: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId,lastedtDay: last,fromCalendar: false,))
+                                      MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId,lastedtDay: deviceUsageCalendar.last,fromCalendar: false,))
                                     );
                                   },
                                   child: ShaderMask(
@@ -356,77 +340,21 @@ class _TrendPageState extends State<TrendPage> {
                       )
                     ]
                   ),
-                  child: TableCalendar(
-                    firstDay: first,
-                    lastDay: last,
-                    focusedDay: focus,
-                  
-                    selectedDayPredicate: (day) {
-                      return _usageDates.any((dayinList) => isSameDay(dayinList, day));
-                    },
-                  
-                    onDaySelected:(selectedDay, focusedDay) {
-                      bool isInSelected = _usageDates.any((dayinList) => isSameDay(dayinList, selectedDay));
+                  child: Calendar(
+                    userId: widget.userId!,
+                    first: deviceUsageCalendar.first,
+                    focus: deviceUsageCalendar.focus, 
+                    last: deviceUsageCalendar.last, 
+                    usageDates: deviceUsageCalendar.usageDates, 
+                    ontap: (selectedDay,focusDay) {
+                      bool isInSelected = deviceUsageCalendar.usageDates.any((dayinList) => isSameDay(dayinList, selectedDay));
                   
                       trendProvider.getFullDataUsage(widget.userId!, selectedDay);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => GraphTrend(userId: null,lastedtDay: null,fromCalendar: true,))
+                        MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId!,lastedtDay: null,fromCalendar: true,))
                       );
-                    },
-
-                    headerStyle: HeaderStyle(
-                      formatButtonVisible: false, 
-                      titleCentered: false,
-                      headerMargin: EdgeInsets.zero,
-                      titleTextStyle: TextStyle(color: AppColor.grey4, fontSize: 16, fontWeight: FontWeight.bold),
-                      leftChevronIcon: Icon(Icons.arrow_back_ios, color: AppColor.grey4, size: 14),
-                      rightChevronIcon: Icon(Icons.arrow_forward_ios, color: AppColor.grey4, size: 14),
-                      decoration: BoxDecoration(
-                        color: AppColor.base1,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                      ),
-                    ),
-                  
-                    calendarStyle: CalendarStyle(
-                      outsideDaysVisible: false,
-                      defaultTextStyle: TextStyle(color: AppColor.black1,fontWeight: FontWeight.bold,fontSize: 14),
-
-                      todayTextStyle: TextStyle(color: AppColor.black1,fontWeight: FontWeight.bold,fontSize: 14),
-                      todayDecoration: BoxDecoration(
-                        color: AppColor.main2.withOpacity(0),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: AppColor.main2,
-                          width: 1.5
-                        )
-                      ),
-                      selectedDecoration: BoxDecoration(
-                        color: AppColor.main2,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-
-                      weekendTextStyle:TextStyle(color: AppColor.black1,fontWeight: FontWeight.bold,fontSize: 14),
-                    ),
-
-                    calendarBuilders: CalendarBuilders(
-                      dowBuilder: (context, day) {
-                        final text = DateFormat.E('en_US').format(day).substring(0,1); 
-
-                        return Center(
-                          child: Text(
-                            text,
-                            style: TextStyle(
-                              color: AppColor.grey4,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    
+                    }
                   ),
                 ),
 

@@ -3,9 +3,11 @@ import 'package:flexiback/core/entities/image_text_entity.dart';
 import 'package:flexiback/features/trend/domain/enums/record_type.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flexiback/features/trend/presentation/widgets/detail_box.dart';
+import 'package:flexiback/features/trend/presentation/widgets/graph/bar_chart/bar_chart.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/on_off/on_of_graph.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/pie/custom_pie_chart.dart';
 import 'package:flexiback/features/trend/presentation/widgets/info_box.dart';
+import 'package:flexiback/features/trend/presentation/widgets/table_calendar.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:lucide_icons_flutter/test_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../shared/widgets/form/dropdown_img.dart';
 
@@ -60,8 +63,6 @@ class _GraphTrendState extends State<GraphTrend> {
   @override
   Widget build(BuildContext context) {
     final TrendProvider trendProvider = context.watch<TrendProvider>();
-
-    
     
     return Scaffold(
       appBar: Appbar1(title: "trend"),
@@ -150,7 +151,56 @@ class _GraphTrendState extends State<GraphTrend> {
                           Padding(
                             padding: EdgeInsets.only(top: 3),
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                switch (recordTypeSelected) {
+                                  case RecordType.deviceUsage:
+                                    final deviceUsageCalendar = trendProvider.deviceUsageCalendar!;
+
+                                    showDialog(
+                                      context: context, 
+                                      builder: (context) {
+                                        return Dialog(
+                                          insetPadding: EdgeInsets.symmetric(horizontal: 16),
+                                          backgroundColor: Colors.transparent,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  maxWidth: 400
+                                                ),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: AppColor.base2,
+                                                    borderRadius: BorderRadius.circular(24),
+                                                  ),
+                                                  child: Calendar(
+                                                    userId: widget.userId!,
+                                                    first: deviceUsageCalendar.first,
+                                                    focus: deviceUsageCalendar.focus, 
+                                                    last: deviceUsageCalendar.last, 
+                                                    usageDates: deviceUsageCalendar.usageDates, 
+                                                    ontap: (selectedDay,focusDay) {
+                                                      bool isInSelected = deviceUsageCalendar.usageDates.any((dayinList) => isSameDay(dayinList, selectedDay));
+
+                                                      if (isInSelected) {
+                                                        trendProvider.getFullDataUsage(widget.userId!, selectedDay);
+                                                        Navigator.pop(context);
+                                                      }
+                                                    }
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    );
+                                    
+                                  case RecordType.dailyProgress:
+                             
+                                }
+                              },
                               child: ShaderMask(
                                 blendMode: BlendMode.srcIn, 
                                 shaderCallback: (Rect bounds) {
@@ -167,6 +217,8 @@ class _GraphTrendState extends State<GraphTrend> {
                             ),
                           )
                         ] 
+
+
                       ],
                     ),
 
@@ -234,15 +286,16 @@ class _GraphTrendState extends State<GraphTrend> {
                                 )
                               ],
                             ),
-                          ),
-
-                          
+                          ),                          
                         ],
                       )
                     ],
 
                     if (recordTypeSelected == RecordType.dailyProgress) ...[
-                      
+                      AspectRatio(
+                        aspectRatio: 1.5,
+                        child: SimpleBarChart()
+                      )
                     ]
                   ]
 

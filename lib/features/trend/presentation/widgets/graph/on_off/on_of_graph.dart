@@ -172,6 +172,13 @@ class _OnOfGraphState extends State<OnOfGraph> {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
+            getTooltipColor: (spot) {
+              // print(spot.spotIndex);
+              // return AppColor.success.withOpacity(.4);
+              return dots[spot.spotIndex].status == DotStatus.good
+                ? AppColor.success.withOpacity(.8)
+                : AppColor.error.withOpacity(.8);
+            },
             getTooltipItems: (items) {
               return items.map(
                 (spot) {
@@ -183,7 +190,8 @@ class _OnOfGraphState extends State<OnOfGraph> {
                   return LineTooltipItem(
                       "$status\n${DateFormat('HH:mm').format(dateTime)}",
                       TextStyle(
-                        color: AppColor.black1
+                        color: AppColor.black1,
+                        fontWeight: FontWeight.bold
                       )
                   );
                 }
