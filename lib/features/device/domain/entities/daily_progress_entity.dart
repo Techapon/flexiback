@@ -17,6 +17,9 @@ class DailyProgressEntity {
   });
 
   // Getter
-  String? get formattedDate => (dateTime != null) ? DateFormat("dd/MM/yyyy").format(dateTime!) : null;
+  String? get formattedDate => (dateTime != null) ? DateFormat("dd / MM / yy").format(dateTime!) : null;
   String? get getNote => note == null || note == "" ? null : note;
+
+  @override
+  String toString() => "score : $straightScore, date : $dateTime";
 }

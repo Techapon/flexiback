@@ -2,9 +2,6 @@ enum ChartPeriod {
   day(
     entity: "Day"
   ),
-  week(
-    entity: "Week"
-  ),
   month(
     entity: "Month"
   );

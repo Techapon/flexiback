@@ -1,6 +1,7 @@
 import 'package:flexiback/core/enums/dot_status.dart';
 import 'package:flexiback/core/exception/core_exception/core_error_failure.dart';
 import 'package:flexiback/core/models/dot_model.dart';
+import 'package:flexiback/features/device/data/models/daily_progress_model.dart';
 import 'package:flexiback/features/device/data/models/fulldata_model.dart';
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
 import 'package:flexiback/features/trend/data/models/overview_model.dart';
@@ -68,6 +69,22 @@ class TrendRemoteDatasource {
       );
 
       return model.toEntity();
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  Future<List<DailyProgressModel>> getDailyProgress(String userId) async {
+    try {
+      final response = await supabase
+        .from("daily_progress")
+        .select()
+        .eq("user_id", userId)
+        .order("date_time", ascending: true);
+
+      return (response as List).map((item) => DailyProgressModel.fromMap(item)).toList();
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {

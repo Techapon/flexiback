@@ -49,6 +49,7 @@ class _OnOfGraphState extends State<OnOfGraph> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
       child: ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: screenWidth,
@@ -119,6 +120,7 @@ class _OnOfGraphState extends State<OnOfGraph> {
           sideTitles: SideTitles(
             showTitles: true,
             interval: 1,
+            reservedSize: 32,
             getTitlesWidget: (double value, TitleMeta meta) {
               const style = TextStyle(
                 fontWeight: FontWeight.bold,
@@ -132,7 +134,6 @@ class _OnOfGraphState extends State<OnOfGraph> {
 
               return Text(text, style: style, textAlign: TextAlign.left);
             },
-            reservedSize: 32,
           ),
         ),
       ),

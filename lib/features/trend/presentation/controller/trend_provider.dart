@@ -5,6 +5,8 @@ import 'package:flexiback/features/device/domain/entities/full_data_entity.dart'
 import 'package:flexiback/features/trend/data/datasources/trend_remote_datasource.dart';
 import 'package:flexiback/features/trend/data/repositories/trend_repository_impl.dart';
 import 'package:flexiback/features/trend/domain/entities/overview_entity.dart';
+import 'package:flexiback/features/device/domain/entities/daily_progress_entity.dart';
+import 'package:flexiback/features/trend/domain/usecases/get_daily_progress_trend_usecase.dart';
 import 'package:flexiback/features/trend/domain/usecases/get_full_data_usage_usecase.dart';
 import 'package:flexiback/features/trend/domain/usecases/get_overview_usecase.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +18,15 @@ class TrendProvider extends ChangeNotifier {
     overviewData = null;
     deviceOverviewList?.clear();
     fullData = null;
+    dailyProgressList?.clear();
   }
 
   final getOverviewUsecase =
     GetOverviewUsecase(TrendRepositoryImpl(TrendRemoteDatasource()));
   final getFullDataUsageUsecase =
     GetFullDataUsageUsecase(TrendRepositoryImpl(TrendRemoteDatasource()));
+  final getDailyProgressTrendUsecase =
+    GetDailyProgressTrendUsecase(TrendRepositoryImpl(TrendRemoteDatasource()));
 
   bool isLoading = false;
   String? error;
@@ -34,7 +39,11 @@ class TrendProvider extends ChangeNotifier {
   OverviewEntity? overviewData;
   List<OverviewEntity>? deviceOverviewList;
 
+  // Full data
   FullDataEntity? fullData;
+
+  // Daily Progress
+  List<DailyProgressEntity>? dailyProgressList;
 
   // calandar
   CalendarEntity? deviceUsageCalendar;
@@ -85,6 +94,21 @@ class TrendProvider extends ChangeNotifier {
     try {
       fullData = await getFullDataUsageUsecase.call(userId, dateTime);
       print('FullData Summary: goodTime=${fullData?.goodTime}, badTime=${fullData?.badTime}, totalTime=${fullData?.totalTime}, date=${fullData?.dateTime}, dots=${fullData?.dotList.length}');
+    } catch (e) {
+      error = e.toString();
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> getDailyProgress(String userId) async {
+    error = null;
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      dailyProgressList = await getDailyProgressTrendUsecase.call(userId);
     } catch (e) {
       error = e.toString();
     }

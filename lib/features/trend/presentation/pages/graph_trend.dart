@@ -1,6 +1,12 @@
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/entities/image_text_entity.dart';
+import 'package:flexiback/core/utils/month_getter.dart';
+import 'package:flexiback/core/utils/week_getter.dart';
+import 'package:flexiback/features/trend/domain/enums/chart_period.dart';
 import 'package:flexiback/features/trend/domain/enums/record_type.dart';
+import 'package:flexiback/features/trend/domain/service/charts/aggegate_daily_progress.dart';
+import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_day.dart';
+import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_month.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flexiback/features/trend/presentation/widgets/detail_box.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/bar_chart/bar_chart.dart';
@@ -9,9 +15,11 @@ import 'package:flexiback/features/trend/presentation/widgets/graph/pie/custom_p
 import 'package:flexiback/features/trend/presentation/widgets/info_box.dart';
 import 'package:flexiback/features/trend/presentation/widgets/table_calendar.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
+import 'package:flexiback/shared/widgets/form/dropdown.dart';
 import 'package:flexiback/shared/widgets/status/loading/loading_status.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:lucide_icons_flutter/test_icons.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +52,17 @@ class _GraphTrendState extends State<GraphTrend> {
 
   RecordType recordTypeSelected = RecordType.deviceUsage;
 
+
+  // Daily
+  late ValueNotifier<String?> valueListenable_dailyPeroid;
+
+  List<String> dailyPeroid = [
+    ChartPeriod.day.entity,
+    ChartPeriod.month.entity
+  ];
+
+  ChartPeriod dailyPeroidSelected = ChartPeriod.day;
+
   late final TrendProvider _trendProvider;
 
   @override
@@ -51,8 +70,10 @@ class _GraphTrendState extends State<GraphTrend> {
     super.initState();
 
     valueListenable_recordType = ValueNotifier(recordType[0].text);
+    valueListenable_dailyPeroid = ValueNotifier(dailyPeroid[0]);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _trendProvider = context.read<TrendProvider>();
+      _trendProvider.getDailyProgress(widget.userId!);
 
       if (_trendProvider.fullData == null && widget.fromCalendar != true) {
         _trendProvider.getFullDataUsage(widget.userId!, widget.lastedtDay!);
@@ -198,7 +219,6 @@ class _GraphTrendState extends State<GraphTrend> {
                                     );
                                     
                                   case RecordType.dailyProgress:
-                             
                                 }
                               },
                               child: ShaderMask(
@@ -216,9 +236,9 @@ class _GraphTrendState extends State<GraphTrend> {
                               ),
                             ),
                           )
-                        ] 
-
-
+                        ] else if (true) ... [
+                          
+                        ]
                       ],
                     ),
 
@@ -290,16 +310,101 @@ class _GraphTrendState extends State<GraphTrend> {
                         ],
                       )
                     ],
+                    
+                    if (recordTypeSelected == RecordType.dailyProgress)
+                      (){
+                        final rawData = dailyPeroidSelected == ChartPeriod.day
+                          ? fillTheGapDay(trendProvider.dailyProgressList!)
+                          : fillTheGapMonth(aggegateDailyProgressMonth(trendProvider.dailyProgressList!));
+                        String Function(List<(DateTime, double)>, int) botTitle1 = dailyPeroidSelected == ChartPeriod.day
+                          ? (data, index) => "${weekGetter(data[index].$1.weekday)}."
+                          : (data, index) => "${monthGetter(data[index].$1.month)}.";
+                        String botTitle2 = dailyPeroidSelected == ChartPeriod.day
+                          ? "d/M/yy"
+                          : "yyyy";
+                    
+                        return Column(
+                          spacing: 16,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              trendProvider.dailyProgressList != null
+                                ? "${rawData.first.formattedDate} - ${rawData.last.formattedDate}"
+                                : '. . .',
+                              style: TextStyle(
+                                color: AppColor.grey3,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
 
-                    if (recordTypeSelected == RecordType.dailyProgress) ...[
-                      AspectRatio(
-                        aspectRatio: 1.5,
-                        child: SimpleBarChart()
-                      )
-                    ]
+                            Container(
+                              child: AspectRatio(
+                                aspectRatio: 1.5,
+                                child: SimpleBarChart(
+                                  rawData: rawData,
+                                  bottomTitle: (data,index) {
+                                    return Column(
+                                      children: [
+                                        Text(
+                                          "${botTitle1(data,index)}",
+                                          style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),
+                                        ),
+                                        Text(
+                                          DateFormat("$botTitle2").format(data[index].$1),
+                                          style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                )
+                              ),
+                            ),
+
+                            Container(
+                              // color: AppColor.grey2,
+                              child: Column(
+                                children: [
+                                  IntrinsicHeight(
+                                    child: Row(
+                                      spacing: 8,
+                                      children: [
+                                        IntrinsicWidth(
+                                          child: Custom_Dropdown(
+                                            valueListenable_title: valueListenable_dailyPeroid,
+                                            List_items: dailyPeroid,
+                                            onChanged: (vale) {
+                                              setState(() {
+                                                dailyPeroidSelected = ChartPeriod.fromEntity(vale);
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            height: double.infinity,
+                                            padding: EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: AppColor.base3,
+                                              border: Border.all(
+                                                color: AppColor.grey2,
+                                                width: 1.5
+                                              ),
+                                              borderRadius: BorderRadius.circular(8)
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        );
+
+                      }()
                   ]
-
-
                 ],
               ),
             )

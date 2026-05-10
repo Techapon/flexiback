@@ -1,3 +1,4 @@
+import 'package:flexiback/features/device/domain/entities/daily_progress_entity.dart';
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
 import 'package:flexiback/features/trend/data/datasources/trend_remote_datasource.dart';
 import 'package:flexiback/features/trend/domain/entities/overview_entity.dart';
@@ -18,5 +19,11 @@ class TrendRepositoryImpl implements TrendRepository {
   @override
   Future<FullDataEntity> getFullDataUsage(String userId, DateTime dateTime) {
     return datasource.getFullDataUsage(userId, dateTime);
+  }
+
+  @override
+  Future<List<DailyProgressEntity>> getDailyProgress(String userId) async {
+    final models = await datasource.getDailyProgress(userId);
+    return models.map((model) => model.toEntity()).toList();
   }
 }
