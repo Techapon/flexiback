@@ -9,6 +9,7 @@ import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_day.
 import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_month.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flexiback/features/trend/presentation/widgets/detail_box.dart';
+import 'package:flexiback/features/trend/presentation/widgets/detail_score_bar.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/bar_chart/bar_chart.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/on_off/on_of_graph.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/pie/custom_pie_chart.dart';
@@ -64,6 +65,9 @@ class _GraphTrendState extends State<GraphTrend> {
   ChartPeriod dailyPeroidSelected = ChartPeriod.day;
 
   late final TrendProvider _trendProvider;
+
+  // Logic
+  int dailyBarTouchCurrentIndex = 0;
 
   @override
   void initState() {
@@ -316,20 +320,30 @@ class _GraphTrendState extends State<GraphTrend> {
                         final rawData = dailyPeroidSelected == ChartPeriod.day
                           ? fillTheGapDay(trendProvider.dailyProgressList!)
                           : fillTheGapMonth(aggegateDailyProgressMonth(trendProvider.dailyProgressList!));
+
                         String Function(List<(DateTime, double)>, int) botTitle1 = dailyPeroidSelected == ChartPeriod.day
                           ? (data, index) => "${weekGetter(data[index].$1.weekday)}."
                           : (data, index) => "${monthGetter(data[index].$1.month)}.";
+
                         String botTitle2 = dailyPeroidSelected == ChartPeriod.day
                           ? "d/M/yy"
                           : "yyyy";
-                    
+
+                        String Function(DateTime) dateFormat = dailyPeroidSelected == ChartPeriod.day
+                          ? (date) => DateFormat("dd / MM / yy").format(date)
+                          : (date) => DateFormat("MM / yy").format(date);
+
+                        String Function(DateTime) dateFormatDetail = dailyPeroidSelected == ChartPeriod.day
+                          ? (date) => DateFormat("d/M/yy").format(date)
+                          : (date) => DateFormat("M/yy").format(date);
+                                            
                         return Column(
                           spacing: 16,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               trendProvider.dailyProgressList != null
-                                ? "${rawData.first.formattedDate} - ${rawData.last.formattedDate}"
+                                ? "${dateFormat(rawData.first.dateTime!)} - ${dateFormat(rawData.last.dateTime!)}"
                                 : '. . .',
                               style: TextStyle(
                                 color: AppColor.grey3,
@@ -357,6 +371,11 @@ class _GraphTrendState extends State<GraphTrend> {
                                       ],
                                     );
                                   },
+                                  onTapBar: (index) {
+                                    setState(() {
+                                      dailyBarTouchCurrentIndex = index;
+                                    });
+                                  },
                                 )
                               ),
                             ),
@@ -375,24 +394,18 @@ class _GraphTrendState extends State<GraphTrend> {
                                             List_items: dailyPeroid,
                                             onChanged: (vale) {
                                               setState(() {
+                                                dailyBarTouchCurrentIndex = 0;
                                                 dailyPeroidSelected = ChartPeriod.fromEntity(vale);
                                               });
                                             },
                                           ),
                                         ),
                                         Expanded(
-                                          child: Container(
-                                            height: double.infinity,
-                                            padding: EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              color: AppColor.base3,
-                                              border: Border.all(
-                                                color: AppColor.grey2,
-                                                width: 1.5
-                                              ),
-                                              borderRadius: BorderRadius.circular(8)
-                                            ),
-                                          ),
+                                          child: DetailScoreBar(
+                                            rawData: rawData,
+                                            currentIndex: dailyBarTouchCurrentIndex,
+                                            dateFormated: (date) => dateFormatDetail(date),
+                                          )
                                         )
                                       ],
                                     ),

@@ -9,10 +9,12 @@ import '../../../../../device/domain/entities/daily_progress_entity.dart';
 class SimpleBarChart extends StatefulWidget {
   List<DailyProgressEntity> rawData;
   Widget Function(List<(DateTime, double)> data,int index) bottomTitle;
+  Function(int index) onTapBar;
   SimpleBarChart({
     super.key, 
     required this.rawData,
-    required this.bottomTitle
+    required this.bottomTitle,
+    required this.onTapBar
   });
 
   @override
@@ -20,9 +22,6 @@ class SimpleBarChart extends StatefulWidget {
 }
 
 class _SimpleBarChartState extends State<SimpleBarChart> {
-  // int touchedIndex = -1;
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -76,21 +75,24 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
               // ── 2. Tooltip เมื่อกด ──
               barTouchData: BarTouchData(
                 touchCallback: (event, response) {
-                  // setState(() {
-                  //   if (response?.spot == null || !event.isInterestedForInteractions) {
-                  //     touchedIndex = -1;
-                  //   } else {
-                  //     touchedIndex = response!.spot!.touchedBarGroupIndex;
-                  //   }
-                  // });
+                  setState(() {
+                    if (response?.spot == null || !event.isInterestedForInteractions) {
+                      
+                    } else {
+                      if (data[response!.spot!.touchedBarGroupIndex].$2 == 0) return;
+                      widget.onTapBar(response!.spot!.touchedBarGroupIndex);
+                    }
+                  });
                 },
                 touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (_) => Colors.blueGrey,
-                  getTooltipItem: (group, index, rod,_) => BarTooltipItem(
+                  getTooltipColor: (_) => AppColor.main2.withOpacity(.8),
+                  getTooltipItem: (group, index, rod,_) => data[index].$2 != 0
+                  ? BarTooltipItem(
                     // '${data[group.x]}\n${(rod.toY).toStringAsFixed(1)}',
-                    'score : ${data[index].$2}',
-                    const TextStyle(color: Colors.white),
-                  ),
+                    'score : ${data[index].$2.toStringAsFixed(1)}',
+                    TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                  )
+                  :null,
                 ),
               ),
               
@@ -111,18 +113,6 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
               
                       return SideTitleWidget(
                         meta: meta,
-                        // child: Column(
-                        //   children: [
-                        //     Text(
-                        //       "${weekGetter(data[index].$1.weekday)[0]}.",
-                        //       style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),
-                        //     ),
-                        //     Text(
-                        //       DateFormat("dd/MM").format(data[index].$1),
-                        //       style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),
-                        //     ),
-                        //   ],
-                        // ),
                         child: child,
                       );
                     }
