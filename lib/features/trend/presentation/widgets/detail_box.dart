@@ -7,11 +7,13 @@ class DetailBox extends StatelessWidget {
   final String title;
   final String content;
   final IconData icon;
+  final Color? contentColor;
   const DetailBox({
     super.key, 
     required this.title, 
     required this.content, 
-    required this.icon
+    required this.icon,
+    this.contentColor
   });
 
   @override
@@ -51,7 +53,7 @@ class DetailBox extends StatelessWidget {
             Text(
               content,
               style: TextStyle(
-                color: AppColor.grey4,
+                color: contentColor ?? AppColor.grey4,
                 fontSize: 14,
                 fontWeight: FontWeight.bold
               ),

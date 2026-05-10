@@ -3,22 +3,22 @@ import 'package:flexiback/features/device/domain/entities/daily_progress_entity.
 import 'package:flutter/material.dart';
 
 class DetailScoreBar extends StatelessWidget {
-  final List<DailyProgressEntity> rawData;
-  final int currentIndex;
+  final DailyProgressEntity currentData;
   final String Function(DateTime date) dateFormated;
   const DetailScoreBar({
     super.key, 
-    required this.rawData,
-    required this.currentIndex,
+    // required this.rawData,
+    // required this.currentIndex,
+    required this.currentData,
     required this.dateFormated
   });
 
   @override
   Widget build(BuildContext context) {
-    (double,DateTime) currentData = currentIndex == 0 
-      ? (rawData.first.straightScore ?? .0,rawData.first.dateTime!)
-      : (rawData[currentIndex].straightScore ?? .0,rawData[currentIndex].dateTime!);
-    print("$currentIndex : ${currentData}");
+    // (double,DateTime) currentData = currentIndex == 0 
+    //   ? (rawData.first.straightScore ?? .0,rawData.first.dateTime!)
+    //   : (rawData[currentIndex].straightScore ?? .0,rawData[currentIndex].dateTime!);
+    // print("$currentIndex : ${currentData}");
 
     return Container(
       height: double.infinity,
@@ -45,7 +45,7 @@ class DetailScoreBar extends StatelessWidget {
                 ),
               ),
               Text(
-                "${currentData.$1.toStringAsFixed(1)}",
+                "${currentData.straightScore?.toStringAsFixed(1)}",
                 style: TextStyle(
                   color: AppColor.black1,
                   fontSize: 18,
@@ -65,7 +65,7 @@ class DetailScoreBar extends StatelessWidget {
                 ),
               ),
               Text(
-                "${dateFormated(currentData.$2)}",
+                "${dateFormated(currentData.dateTime!)}",
                 style: TextStyle(
                   color: AppColor.black1,
                   fontSize: 18,
