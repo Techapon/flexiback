@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
-
 class PreviewEntity {
   final String jsonString;
   late final Map<String,dynamic> data;

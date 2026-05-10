@@ -5,10 +5,17 @@ import 'package:flexiback/core/utils/week_getter.dart';
 import 'package:flexiback/features/device/domain/entities/daily_progress_entity.dart';
 import 'package:flexiback/features/trend/domain/enums/chart_period.dart';
 import 'package:flexiback/features/trend/domain/enums/record_type.dart';
+import 'package:flexiback/features/trend/domain/enums/usage_view_mode.dart';
 import 'package:flexiback/features/trend/domain/service/charts/aggegate_daily_progress.dart';
 import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_day.dart';
 import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_month.dart';
 import 'package:flexiback/features/trend/domain/service/charts/divide_month.dart';
+import 'package:flexiback/features/trend/domain/service/charts/aggregate_device_usage_day.dart';
+import 'package:flexiback/features/trend/domain/service/charts/aggregate_device_usage_month.dart';
+import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_device_usage_day.dart';
+import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_device_usage_month.dart';
+import 'package:flexiback/features/trend/presentation/widgets/date_bar.dart';
+import 'package:flexiback/features/trend/presentation/widgets/graph/bar_chart/stacked_bar_chart.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flexiback/features/trend/presentation/widgets/daily_card_hozi.dart';
 import 'package:flexiback/features/trend/presentation/widgets/detail_box.dart';
@@ -30,6 +37,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../shared/widgets/form/dropdown_img.dart';
+import '../../domain/entities/overview_entity.dart';
 
 class GraphTrend extends StatefulWidget {
   final String? userId;
@@ -56,6 +64,18 @@ class _GraphTrendState extends State<GraphTrend> {
 
   RecordType recordTypeSelected = RecordType.deviceUsage;
 
+  // Device Usage Mode
+  UsageViewMode usageViewMode = UsageViewMode.result;
+
+  // Device Usage Trend
+  late ValueNotifier<String?> valueListenable_usagePeriod;
+  List<String> usagePeriod = [
+    ChartPeriod.day.entity,
+    ChartPeriod.month.entity
+  ];
+  ChartPeriod usagePeriodSelected = ChartPeriod.day;
+  int usageBarTouchCurrentIndex = 0;
+
 
   // Daily
   late ValueNotifier<String?> valueListenable_dailyPeroid;
@@ -77,6 +97,7 @@ class _GraphTrendState extends State<GraphTrend> {
     super.initState();
 
     valueListenable_recordType = ValueNotifier(recordType[0].text);
+    valueListenable_usagePeriod = ValueNotifier(usagePeriod[0]);
     valueListenable_dailyPeroid = ValueNotifier(dailyPeroid[0]);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _trendProvider = context.read<TrendProvider>();
@@ -125,6 +146,7 @@ class _GraphTrendState extends State<GraphTrend> {
                         ),
                       )
                     ] else ... [
+                      // Head title
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -210,76 +232,317 @@ class _GraphTrendState extends State<GraphTrend> {
                         ],
                       ),
 
+                      // Uage View Radio
                       if (recordTypeSelected == RecordType.deviceUsage) ...[
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              spacing: 16,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  trendProvider.fullData != null
-                                    ? "${trendProvider.fullData!.formattedDate}"
-                                    : '. . .',
-                                  style: TextStyle(
-                                    color: AppColor.grey3,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold
+                        if (usageViewMode == UsageViewMode.result) ...[
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                spacing: 16,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    trendProvider.fullData != null
+                                      ? "${trendProvider.fullData!.formattedDate}"
+                                      : '. . .',
+                                    style: TextStyle(
+                                      color: AppColor.grey3,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold
+                                    ),
                                   ),
-                                ),
 
-                                Container(
-                                  child: AspectRatio(
-                                    aspectRatio: 1.5,
-                                    child: OnOfGraph(fullData: trendProvider.fullData!,)
-                                  )
-                                ),
-                                
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
-                                  child: Column(
-                                    spacing: 16,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            spacing: 32,
-                                            children: [
-                                              infoBox(title: "Good",color: AppColor.success,sub: "${trendProvider.fullData!.goodTimeFormatted} h. - ${trendProvider.fullData!.goodPercentage}%",),
-                                              infoBox(title: "Bad",color: AppColor.error,sub: "${trendProvider.fullData!.badTimeFormatted} h. - ${trendProvider.fullData!.badPercentage}%",),
-                                            ],
-                                          ),
-                                          CustomPieChart(
-                                            gPer: trendProvider.fullData!.goodPercentage,
-                                          )
-                                        ],
-                                      ),
+                                  Container(
+                                    child: AspectRatio(
+                                      aspectRatio: 1.5,
+                                      child: OnOfGraph(fullData: trendProvider.fullData!,)
+                                    )
+                                  ),
+                                  
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+                                    child: Column(
+                                      spacing: 16,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              spacing: 32,
+                                              children: [
+                                                infoBox(title: "Good",color: AppColor.success,sub: "${trendProvider.fullData!.goodTimeFormatted} h. - ${trendProvider.fullData!.goodPercentage}%",),
+                                                infoBox(title: "Bad",color: AppColor.error,sub: "${trendProvider.fullData!.badTimeFormatted} h. - ${trendProvider.fullData!.badPercentage}%",),
+                                              ],
+                                            ),
+                                            CustomPieChart(
+                                              gPer: trendProvider.fullData!.goodPercentage,
+                                            )
+                                          ],
+                                        ),
 
-                                      Column(
+                                        Column(
+                                          spacing: 16,
+                                          children: [
+                                            DetailBox(
+                                              title: 'Period',
+                                              content: '${trendProvider.fullData!.startAt} to ${trendProvider.fullData!.endAt}',
+                                              icon: LucideIcons.clock8,
+                                            ),
+
+                                            DetailBox(
+                                              title: 'Total Usage',
+                                              content: '${trendProvider.fullData!.totalTimeFormatted} h.',
+                                              icon: LucideIcons.hourglass,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),                          
+                                ],
+                              ),
+                            ),
+                          )
+                        ] else if (usageViewMode == UsageViewMode.trend) ...[
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                spacing: 16,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  Builder(
+                                    builder: (context) {
+                                      final rawOverview = trendProvider.deviceOverviewList ?? [];
+                                      final aggregatedByDay = aggregateDeviceUsageDay(rawOverview);
+
+                                      String Function(List<OverviewEntity>, int) botTitle1 = usagePeriodSelected == ChartPeriod.day
+                                        ? (data, index) => "${weekGetter(data[index].dateTime!.weekday)}."
+                                        : (data, index) => "${monthGetter(data[index].dateTime!.month)}.";
+
+                                      String botTitle2 = usagePeriodSelected == ChartPeriod.day
+                                        ? "d/M/yy"
+                                        : "yyyy";
+                                      
+                                      List<OverviewEntity> chartData = [];
+                                      if (usagePeriodSelected == ChartPeriod.day) {
+                                        chartData = fillTheGapDeviceUsageDay(aggregatedByDay);
+                                      } else if (usagePeriodSelected == ChartPeriod.month) {
+                                        final aggregatedByMonth = aggregateDeviceUsageMonth(aggregatedByDay);
+                                        chartData = fillTheGapDeviceUsageMonth(aggregatedByMonth);
+                                      }
+
+                                      String Function(DateTime) dateFormatDetail = usagePeriodSelected == ChartPeriod.day
+                                        ? (date) => "${weekGetter(date.weekday)}. ${DateFormat("d / M / yyyy").format(date)}"
+                                        : (date) => "${monthGetter(date.month)}. ${DateFormat("yyyy").format(date)}";
+
+                                      final currentUsageBarData = chartData[usageBarTouchCurrentIndex];
+
+                                      final int originCurrentIndex = aggregatedByDay.indexWhere(
+                                      (e) => e.dateTime != null && currentUsageBarData.dateTime != null &&
+                                            e.dateTime!.year == currentUsageBarData.dateTime!.year &&
+                                            e.dateTime!.month == currentUsageBarData.dateTime!.month &&
+                                            e.dateTime!.day == currentUsageBarData.dateTime!.day
+                                      );
+
+                                      final OverviewEntity? currentOriginData = originCurrentIndex != -1 ? aggregatedByDay[originCurrentIndex] : null;
+
+                                      final Duration? change = (originCurrentIndex <= 0 || currentOriginData?.totalGoodTime == null)
+                                        ? null
+                                        : Duration(seconds: (currentOriginData!.totalGoodTime! - aggregatedByDay[originCurrentIndex-1].totalGoodTime!).toInt());
+                                        
+                                      final double? changePercent = (change == null || currentOriginData?.totalGoodTime == null || currentOriginData!.totalGoodTime == 0)
+                                        ? null
+                                        : currentOriginData.goodPercentage! - aggregatedByDay[originCurrentIndex-1].goodPercentage!;
+
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         spacing: 16,
                                         children: [
-                                          DetailBox(
-                                            title: 'Period',
-                                            content: '${trendProvider.fullData!.startAt} to ${trendProvider.fullData!.endAt}',
-                                            icon: LucideIcons.clock8,
+                                          Text(
+                                            "${DateFormat("dd / MM / yy").format(chartData.first.dateTime!)} - ${DateFormat("dd / MM / yy").format(chartData.last.dateTime!)}",
+                                            style: TextStyle(
+                                              color: AppColor.grey3,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold
+                                            ),
+                                          ),
+                                          
+                                          Container(
+                                            child: AspectRatio(
+                                              aspectRatio: 1.5,
+                                              child: StackedBarChart(
+                                                rawData: chartData,
+                                                bottomTitle: (data, index) {
+                                                  // final date = data[index].dateTime!;
+                                                  // String title = '';
+                                                  // if (usagePeriodSelected == ChartPeriod.day) {
+                                                  //   title = weekGetter(date.weekday);
+                                                  // } else {
+                                                  //   title = monthGetter(date.month);
+                                                  // }
+
+                                                  return Column(
+                                                    children: [
+                                                      Text(
+                                                        "${botTitle1(data,index)}",
+                                                        style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),
+                                                      ),
+                                                      Text(
+                                                        DateFormat("$botTitle2").format(data[index].dateTime!),
+                                                        style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                                onTapBar: (index) {
+                                                  setState(() {
+                                                    usageBarTouchCurrentIndex = index;
+                                                  });
+                                                },
+                                              )
+                                            )
+                                          ),
+                                          
+                                          IntrinsicHeight(
+                                            child: Row(
+                                              spacing: 8,
+                                              children: [
+                                                IntrinsicWidth(
+                                                  child: Custom_Dropdown(
+                                                    valueListenable_title: valueListenable_usagePeriod,
+                                                    List_items: usagePeriod,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        usagePeriodSelected = ChartPeriod.fromEntity(value);
+                                                        usageBarTouchCurrentIndex = 0; // reset
+                                                      });
+                                                    }
+                                                  ),
+                                                ),
+                                            
+                                                Expanded(
+                                                  child: DateBar(title: "On ",date: "${dateFormatDetail(currentUsageBarData.dateTime!)}",)
+                                                )
+                                              ],
+                                            ),
                                           ),
 
-                                          DetailBox(
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 16),
+                                            child: Column(
+                                              spacing: 16,
+                                              children: [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    spacing: 8,
+                                                    children: [
+                                                      infoBox(title: "Good",color: AppColor.success,sub: "${currentUsageBarData.goodTimeFormatted} h. - ${currentUsageBarData.goodPercentage?.toStringAsFixed(1)}%",),
+                                                      infoBox(title: "Bad",color: AppColor.error,sub: "${currentUsageBarData.badTimeFormatted} h. - ${currentUsageBarData.badPercentage?.toStringAsFixed(1)}%",),
+                                                    ],
+                                                  ),
+
+                                                  DetailBox(
+                                                    icon: change != null 
+                                                      ? change.inSeconds > 0 ? LucideIcons.trendingUp : LucideIcons.trendingDown
+                                                      : LucideIcons.minus,
+                                                    title: "Change",
+                                                    content: change == null 
+                                                      ? '--' 
+                                                      : "${change.inHours}.${(change.inMinutes % 60).toString().padLeft(2,'0')} hour, ${changePercent!.toStringAsFixed(2)}% change",
+                                                    contentColor: change != null 
+                                                      ? change.inSeconds > 0 ? AppColor.green1 : AppColor.red1
+                                                      : null,
+                                                  ),
+                                                  DetailBox(
                                             title: 'Total Usage',
-                                            content: '${trendProvider.fullData!.totalTimeFormatted} h.',
+                                            content: '${currentUsageBarData.totalTimeFormatted} h.',
                                             icon: LucideIcons.hourglass,
                                           ),
+                                              ],
+                                            ),
+                                          )
+                                          // Detail placeholder for User
+                                          // Padding(
+                                          //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          //   child: Center(
+                                          //     child: Text(
+                                          //       "Selected: ${DateFormat("dd/MM/yyyy").format(chartData[usageBarTouchCurrentIndex].dateTime!)}\n"
+                                          //       "Good: ${chartData[usageBarTouchCurrentIndex].totalTimeFormatted} h. (${chartData[usageBarTouchCurrentIndex].goodPercentage}%)\n"
+                                          //       "Bad: ${chartData[usageBarTouchCurrentIndex].badPercentage}%\n"
+                                          //       "(* เตรียมพื้นที่ให้ผู้ใช้เพิ่ม List detail *)",
+                                          //       textAlign: TextAlign.center,
+                                          //       style: TextStyle(color: AppColor.main1, fontWeight: FontWeight.bold),
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                ),                          
-                              ],
+                                      );
+                                    }
+                                  )
+                                  ,
+                                  
+                                
+                                ],
+                              ),
                             ),
+                          )
+                        ],
+
+                        Container(
+                          padding: EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColor.base2,
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        )
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => usageViewMode = UsageViewMode.result),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: usageViewMode == UsageViewMode.result ? AppColor.main2 : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Result",
+                                        style: TextStyle(
+                                          color: usageViewMode == UsageViewMode.result ? Colors.white : AppColor.grey3,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => usageViewMode = UsageViewMode.trend),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: usageViewMode == UsageViewMode.trend ? AppColor.main2 : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Trend",
+                                        style: TextStyle(
+                                          color: usageViewMode == UsageViewMode.trend ? Colors.white : AppColor.grey3,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                       
                       if (recordTypeSelected == RecordType.dailyProgress)
@@ -322,7 +585,7 @@ class _GraphTrendState extends State<GraphTrend> {
                             ? null
                             : change / currentOriginData.straightScore!;
 
-                          // Group originData by month for the month view list
+                          // Month
                           final Map<String, List<DailyProgressEntity>> monthlyGroups = divideMonth(originData);
                           final String selectedMonthKey = curentData.dateTime != null
                             ? "${curentData.dateTime!.year}-${curentData.dateTime!.month.toString().padLeft(2, '0')}"
@@ -347,6 +610,7 @@ class _GraphTrendState extends State<GraphTrend> {
                           
                                 Expanded(
                                   child: SingleChildScrollView(
+                                    clipBehavior: Clip.none,
                                     child: Column(
                                       spacing: 16,
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,10 +717,10 @@ class _GraphTrendState extends State<GraphTrend> {
                               ],
                             ),
                           );
-
                         }()
+                    
                     ]
-                  ],
+                  ]
                 ),
               ),
             ),

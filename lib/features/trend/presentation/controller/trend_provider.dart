@@ -58,8 +58,11 @@ class TrendProvider extends ChangeNotifier {
     _subscription = _overviewStream!.listen(
       (list) {
         deviceUsageCalendar = CalendarEntity.fromUsageDates(list.map((item) => item.dateTime).toList());
+        deviceUsageCalendar?.usageDates.sort((a, b) => a!.compareTo(b!));
 
         deviceOverviewList = list;
+        deviceOverviewList?.sort((a, b) => a.dateTime!.compareTo(b.dateTime!));
+
         final totalGood = list.fold(
           0.0,
           (sum, e) => sum + (e.totalGoodTime ?? 0)
@@ -93,7 +96,7 @@ class TrendProvider extends ChangeNotifier {
 
     try {
       fullData = await getFullDataUsageUsecase.call(userId, dateTime);
-      print('FullData Summary: goodTime=${fullData?.goodTime}, badTime=${fullData?.badTime}, totalTime=${fullData?.totalTime}, date=${fullData?.dateTime}, dots=${fullData?.dotList.length}');
+      // print('FullData Summary: goodTime=${fullData?.goodTime}, badTime=${fullData?.badTime}, totalTime=${fullData?.totalTime}, date=${fullData?.dateTime}, dots=${fullData?.dotList.length}');
     } catch (e) {
       error = e.toString();
     }

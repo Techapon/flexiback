@@ -16,6 +16,7 @@ class OverviewEntity {
   factory OverviewEntity.fromComputed({
     required double totalGoodTime,
     required double totalBadTime,
+    DateTime? dateTime,
   }) {
     final total = totalGoodTime + totalBadTime;
     final goodPercentage = total > 0 ? ((totalGoodTime / total) * 100).toDouble() : 0.0;
@@ -26,6 +27,7 @@ class OverviewEntity {
       totalBadTime: totalBadTime,
       goodPercentage: goodPercentage,
       badPercentage: badPercentage,
+      dateTime: dateTime,
     );
   }
 
@@ -42,6 +44,18 @@ class OverviewEntity {
   String get totalTimeFormatted {
     return "${totalHours.toString().padLeft(2, '0')}:${totalMinutes.toString().padLeft(2, '0')}";
   }
+
+  // G & B
+
+  String get goodTimeFormatted {
+    print(totalGoodTime);
+    return "${(totalGoodTime!.toInt() ~/ 3600).toString().padLeft(2, '0')}:${((totalGoodTime!.toInt() % 3600) ~/ 60).toString().padLeft(2, '0')}";
+  }
+
+  String get badTimeFormatted {
+    return "${(totalBadTime!.toInt() ~/ 3600).toString().padLeft(2, '0')}:${((totalBadTime!.toInt() % 3600) ~/ 60).toString().padLeft(2, '0')}";
+  }
+
 
   @override
   String toString() {

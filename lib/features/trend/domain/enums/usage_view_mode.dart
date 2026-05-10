@@ -1,0 +1,1 @@
+enum UsageViewMode { result, trend }

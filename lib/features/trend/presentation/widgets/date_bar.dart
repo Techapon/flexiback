@@ -2,15 +2,13 @@ import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/features/device/domain/entities/daily_progress_entity.dart';
 import 'package:flutter/material.dart';
 
-class DetailScoreBar extends StatelessWidget {
-  final DailyProgressEntity currentData;
-  final String Function(DateTime date) dateFormated;
-  const DetailScoreBar({
+class DateBar extends StatelessWidget {
+  final String title;
+  final String date;
+  const DateBar({
     super.key, 
-    // required this.rawData,
-    // required this.currentIndex,
-    required this.currentData,
-    required this.dateFormated
+    required this.title, 
+    required this.date, 
   });
 
   @override
@@ -34,10 +32,30 @@ class DetailScoreBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Row(
+          //   children: [
+          //     Text(
+          //       "Score ",
+          //       style: TextStyle(
+          //         color: AppColor.grey4,
+          //         fontWeight: FontWeight.bold,
+          //         fontSize: 14
+          //       ),
+          //     ),
+          //     Text(
+          //       "${currentData.straightScore?.toStringAsFixed(1)}",
+          //       style: TextStyle(
+          //         color: AppColor.black1,
+          //         fontSize: 18,
+          //         fontWeight: FontWeight.bold
+          //       ),
+          //     ),
+          //   ],
+          // ),
           Row(
             children: [
               Text(
-                "Score ",
+                "$title",
                 style: TextStyle(
                   color: AppColor.grey4,
                   fontWeight: FontWeight.bold,
@@ -45,27 +63,7 @@ class DetailScoreBar extends StatelessWidget {
                 ),
               ),
               Text(
-                "${currentData.straightScore?.toStringAsFixed(1)}",
-                style: TextStyle(
-                  color: AppColor.black1,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                ", On ",
-                style: TextStyle(
-                  color: AppColor.grey4,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14
-                ),
-              ),
-              Text(
-                "${dateFormated(currentData.dateTime!)}",
+                "$date",
                 style: TextStyle(
                   color: AppColor.black1,
                   fontSize: 18,

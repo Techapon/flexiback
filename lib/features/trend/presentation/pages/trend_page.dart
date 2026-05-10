@@ -131,7 +131,7 @@ class _TrendPageState extends State<TrendPage> {
             }
 
             final deviceUsageCalendar = trendProvider.deviceUsageCalendar!;
-      
+
             return Column(
               spacing: 16,
               children: [
@@ -348,7 +348,8 @@ class _TrendPageState extends State<TrendPage> {
                     usageDates: deviceUsageCalendar.usageDates, 
                     ontap: (selectedDay,focusDay) {
                       bool isInSelected = deviceUsageCalendar.usageDates.any((dayinList) => isSameDay(dayinList, selectedDay));
-                  
+                      
+                      if (!isInSelected) return;
                       trendProvider.getFullDataUsage(widget.userId!, selectedDay);
                       Navigator.push(
                         context,
