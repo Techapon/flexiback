@@ -22,11 +22,15 @@ class OverviewModel {
   }
 
   OverviewEntity toEntity() {
+    final totalTime = goodTime! + badTime!;
+    final goodPer = (goodTime! / totalTime)*100;
+    final badPer = (badTime! / totalTime)*100;
+
     return OverviewEntity(
       totalGoodTime: goodTime,
       totalBadTime: badTime,
-      goodPercentage: null,
-      badPercentage: null,
+      goodPercentage: goodPer,
+      badPercentage: badPer,
       dateTime: dateTime
     );
   }

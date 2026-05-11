@@ -11,6 +11,8 @@ import 'package:flexiback/features/trend/domain/usecases/get_full_data_usage_use
 import 'package:flexiback/features/trend/domain/usecases/get_overview_usecase.dart';
 import 'package:flutter/material.dart';
 
+import '../../domain/service/charts/aggregate_device_usage_day.dart';
+
 class TrendProvider extends ChangeNotifier {
 
   void disposeProvi() {
@@ -60,8 +62,9 @@ class TrendProvider extends ChangeNotifier {
         deviceUsageCalendar = CalendarEntity.fromUsageDates(list.map((item) => item.dateTime).toList());
         deviceUsageCalendar?.usageDates.sort((a, b) => a!.compareTo(b!));
 
-        deviceOverviewList = list;
-        deviceOverviewList?.sort((a, b) => a.dateTime!.compareTo(b.dateTime!));
+        final List<OverviewEntity>?  rawDeviceOverview = list;
+        rawDeviceOverview?.sort((a, b) => a.dateTime!.compareTo(b.dateTime!));
+        deviceOverviewList = aggregateDeviceUsageDay(rawDeviceOverview ?? []);
 
         final totalGood = list.fold(
           0.0,

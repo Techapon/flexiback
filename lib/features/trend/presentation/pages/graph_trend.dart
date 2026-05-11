@@ -165,11 +165,9 @@ class _GraphTrendState extends State<GraphTrend> {
                               padding: EdgeInsets.only(top: 3),
                               child: GestureDetector(
                                 onTap: () {
-                                  switch (recordTypeSelected) {
-                                    case RecordType.deviceUsage:
-                                      final deviceUsageCalendar = trendProvider.deviceUsageCalendar!;
+                                  final deviceUsageCalendar = trendProvider.deviceUsageCalendar!;
 
-                                      showDialog(
+                                  showDialog(
                                         context: context, 
                                         builder: (context) {
                                           return Dialog(
@@ -209,9 +207,6 @@ class _GraphTrendState extends State<GraphTrend> {
                                           );
                                         }
                                       );
-                                      
-                                    case RecordType.dailyProgress:
-                                  }
                                 },
                                 child: ShaderMask(
                                   blendMode: BlendMode.srcIn, 
@@ -315,8 +310,7 @@ class _GraphTrendState extends State<GraphTrend> {
 
                                   Builder(
                                     builder: (context) {
-                                      final rawOverview = trendProvider.deviceOverviewList ?? [];
-                                      final aggregatedByDay = aggregateDeviceUsageDay(rawOverview);
+                                      final aggregatedByDay = trendProvider.deviceOverviewList ?? [];
 
                                       String Function(List<OverviewEntity>, int) botTitle1 = usagePeriodSelected == ChartPeriod.day
                                         ? (data, index) => "${weekGetter(data[index].dateTime!.weekday)}."

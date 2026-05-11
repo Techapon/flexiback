@@ -24,6 +24,7 @@ import '../../../../config/theme/colors/app_color.dart';
 import '../../../../core/exception/bluetooth_exception/bluetooth_error_type.dart';
 import '../../../../shared/navigation/items/geneeral_items.dart';
 import '../../../../shared/widgets/dialog/warn/dialog_warn.dart';
+import '../../../trend/presentation/controller/trend_provider.dart';
 import '../widgets/bluetooth_dialog.dart';
 import '../widgets/device_content.dart';
 
@@ -69,6 +70,8 @@ class _DevicePageState extends State<DevicePage> {
   @override
   Widget build(BuildContext context) {
     final deviceProvider = context.watch<DeviceProvider>();
+
+    final TrendProvider trendProvider = context.watch<TrendProvider>();
      
     // final fData = generateMockDotData(hours: 4,minutes: 7,gPer: .3);
     // print(fData.toString());
@@ -432,11 +435,64 @@ class _DevicePageState extends State<DevicePage> {
                             ),
                           ),
             
-                          Text(
-                            "you have no device usage...",
-                            style: TextStyle(
-                              color: AppColor.grey3
+                          Padding(
+                            padding: EdgeInsets.only(right: 64),
+                            child: Text(
+                              trendProvider.deviceOverviewList == null 
+                                ? "Loading your usage data..." 
+                                : trendProvider.deviceOverviewList!.isEmpty
+                                  ? "You have no device usage..."
+                                  : "Your lastest day usage of the device. Total ${trendProvider.deviceOverviewList?.last.totalTimeFormatted} hours",
+                              style: TextStyle(
+                                color: AppColor.grey3
+                              ),
                             ),
+                          ),
+
+                          Row(
+                            spacing: 4,
+                            children: [
+                              Text(
+                                "Good posture",
+                                style: TextStyle(
+                                  color: AppColor.grey3
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 1,horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColor.success,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text("${trendProvider.deviceOverviewList?.last.goodPercentage?.toStringAsFixed(0)}%",style: TextStyle(color: AppColor.base1,fontWeight: FontWeight.bold),),
+                              ),
+                              Text(
+                                "and",
+                                style: TextStyle(
+                                  color: AppColor.grey3
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Row(
+                            spacing: 4,
+                            children: [
+                              Text(
+                                "Bad posture",
+                                style: TextStyle(
+                                  color: AppColor.grey3
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 1,horizontal: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColor.error,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text("${trendProvider.deviceOverviewList?.last.badPercentage?.toStringAsFixed(0)}%",style: TextStyle(color: AppColor.base1,fontWeight: FontWeight.bold),),
+                              ),
+                            ],
                           ),
             
                           Row(
