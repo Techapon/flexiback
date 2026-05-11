@@ -78,10 +78,12 @@ class _DailyCardViewState extends State<DailyCardView> {
                             fit: BoxFit.fitHeight,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
+                                width: 200,
                                 color: AppColor.grey2,
                                 child: Icon(
                                   Icons.broken_image,
                                   color: AppColor.grey3,
+                                  size: 38,
                                 ),
                               );
                             },

@@ -51,6 +51,7 @@ class DailyCard extends StatelessWidget {
                   fit: BoxFit.fitHeight,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
+                      width: 100,
                       color: AppColor.grey2,
                       child: Icon(
                         Icons.broken_image,
