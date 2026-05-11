@@ -307,6 +307,7 @@ class _GraphTrendState extends State<GraphTrend> {
                         ] else if (usageViewMode == UsageViewMode.trend) ...[
                           Expanded(
                             child: SingleChildScrollView(
+                              clipBehavior: Clip.antiAlias,
                               child: Column(
                                 spacing: 16,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -610,7 +611,7 @@ class _GraphTrendState extends State<GraphTrend> {
                           
                                 Expanded(
                                   child: SingleChildScrollView(
-                                    clipBehavior: Clip.none,
+                                    // clipBehavior: Clip.none,
                                     child: Column(
                                       spacing: 16,
                                       crossAxisAlignment: CrossAxisAlignment.start,
