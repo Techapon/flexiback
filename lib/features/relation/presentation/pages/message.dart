@@ -282,19 +282,28 @@ class _MessageState extends State<Message> {
                             );
                           }
 
-                          return ListView.separated(
+                          return ListView.builder(
                             controller: _scrollController,
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: chatList.length,
-                            separatorBuilder: (context, index) => const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final message = chatList[index];
+
+                              final bool isBeforeMessageMine = index == 0 
+                                ? false
+                                : chatList[index -1].isMine!;
                               
                               if (message.isMine!) {
-                                return TextBoxSender(text: message.content);
+                                return Padding(
+                                  padding: EdgeInsets.only(top: isBeforeMessageMine ? 2 : 8),
+                                  child: TextBoxSender(text: message.content),
+                                );
                               } else {
-                                return TextBoxTalker(text: message.content);
+                                return Padding(
+                                  padding: EdgeInsets.only(top: !isBeforeMessageMine ? 2 : 8),
+                                  child: TextBoxTalker(text: message.content)
+                                );
                               }
                             }, 
                           );
