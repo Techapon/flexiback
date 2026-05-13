@@ -578,7 +578,7 @@ class _GraphTrendState extends State<GraphTrend> {
                             : currentOriginData!.straightScore! - originData[originCurrentIndex-1].straightScore!;
                           final double? changePercent = (change == null || currentOriginData?.straightScore == null || currentOriginData!.straightScore == 0)
                             ? null
-                            : change / currentOriginData.straightScore!;
+                            : (change / currentOriginData.straightScore!)*100;
 
                           // Month
                           final Map<String, List<DailyProgressEntity>> monthlyGroups = divideMonth(originData);
