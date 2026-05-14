@@ -11,7 +11,7 @@ import '../widgets/hud_widget.dart';
 
 
 // ══════════════════════════════════════════════════════════════════
-//  Lobby Screen — กดปุ่มก่อนค่อยเริ่ม
+//  Lobby Screen
 // ══════════════════════════════════════════════════════════════════
 class TherapyLobbyScreen extends StatelessWidget {
   const TherapyLobbyScreen({super.key});
@@ -40,8 +40,6 @@ class TherapyLobbyScreen extends StatelessWidget {
                 style: TextStyle(color: Color(0xFFAFB9EB), fontSize: 16),
               ),
               const SizedBox(height: 64),
-
-              // stage list
               ...List.generate(3, (i) {
                 final names = TherapyProvider.stageNames;
                 return Padding(
@@ -57,22 +55,27 @@ class TherapyLobbyScreen extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text('${i + 1}',
-                            style: const TextStyle(color: AiAppColors.teal, fontWeight: FontWeight.bold)),
+                            style: const TextStyle(
+                              color: AiAppColors.teal,
+                              fontWeight: FontWeight.bold,
+                            )),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Text(names[i],
-                        style: const TextStyle(color: Color(0xFFCDD2E6), fontSize: 15)),
+                        style: const TextStyle(
+                          color: Color(0xFFCDD2E6), fontSize: 15,
+                        )),
                     ],
                   ),
                 );
               }),
-
               const SizedBox(height: 64),
-
-              // START button
               GestureDetector(
                 onTap: () {
+                  // reset provider ก่อนเริ่ม session ใหม่
+                  context.read<TherapyProvider>().reset();
+                  context.read<StageProvider>().setStage(1);
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const TherapyScreen()),
                   );
@@ -103,38 +106,22 @@ class TherapyLobbyScreen extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  TherapyScreen — Router หลักระหว่าง stage
-// ══════════════════════════════════════════════════════════════════
 
-class TherapyScreen extends StatelessWidget {
+// ══════════════════════════════════════════════════════════════════
+//  TherapyScreen — Router หลัก ไม่สร้าง Provider ซ้ำ
+// ══════════════════════════════════════════════════════════════════
+class TherapyScreen extends StatefulWidget {
   const TherapyScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TherapyProvider()),
-        ChangeNotifierProvider(create: (_) => StageProvider()),
-      ],
-      child: const _TherapyBody(),
-    );
-  }
+  State<TherapyScreen> createState() => _TherapyScreenState();
 }
 
-class _TherapyBody extends StatefulWidget {
-  const _TherapyBody();
-
-  @override
-  State<_TherapyBody> createState() => _TherapyBodyState();
-}
-
-class _TherapyBodyState extends State<_TherapyBody> {
-  int _lastStage = 0; // track เพื่อ force rebuild
-
+class _TherapyScreenState extends State<TherapyScreen> {
   @override
   void initState() {
     super.initState();
+    // startSession หลัง frame แรก render เสร็จ
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TherapyProvider>().startSession();
     });
@@ -144,34 +131,29 @@ class _TherapyBodyState extends State<_TherapyBody> {
   Widget build(BuildContext context) {
     final therapy = context.watch<TherapyProvider>();
 
-    // force rebuild camera เมื่อ stage เปลี่ยน
-    if (therapy.currentStage != _lastStage) {
-      _lastStage = therapy.currentStage;
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: switch (therapy.status) {
-        SessionStatus.idle => const Center(child: CircularProgressIndicator()),
+        SessionStatus.idle =>
+          const Center(child: CircularProgressIndicator()),
 
         SessionStatus.waiting ||
         SessionStatus.playing ||
         SessionStatus.stageDone =>
-          // Key บังคับ Flutter dispose + recreate widget เมื่อ stage เปลี่ยน
-          // ทำให้กล้องและ StageProvider reinit ใหม่ทุกครั้ง
-          _buildStageScreen(therapy.currentStage,
-              key: ValueKey('stage_${therapy.currentStage}')),
+          // ValueKey บังคับ dispose+recreate เมื่อ stage เปลี่ยน
+          // ทำให้กล้อง reinit และ StageProvider.setStage() ถูกเรียกใหม่
+          _buildStageScreen(
+            therapy.currentStage,
+            key: ValueKey('stage_${therapy.currentStage}'),
+          ),
 
-        SessionStatus.completed => Scaffold(
-            backgroundColor: Colors.black,
-            body: Stack(
-              children: [
-                FinalScreenOverlay(
-                  scores: therapy.scores,
-                  onExit: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
+        SessionStatus.completed => Stack(
+            children: [
+              FinalScreenOverlay(
+                scores: therapy.scores,
+                onExit: () => Navigator.of(context).pop(),
+              ),
+            ],
           ),
 
         SessionStatus.quit => const SizedBox.shrink(),

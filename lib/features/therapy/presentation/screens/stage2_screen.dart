@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flexiback/features/therapy/presentation/screens/virtual_bg_painter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:provider/provider.dart';
@@ -80,23 +81,53 @@ class _Stage2ScreenState extends State<Stage2Screen> {
     }
   }
 
-  InputImage? _toInputImage(CameraImage img) {
-    try {
-      final format = InputImageFormatValue.fromRawValue(img.format.raw);
-      if (format == null) return null;
-      return InputImage.fromBytes(
-        bytes: img.planes.first.bytes,
-        metadata: InputImageMetadata(
-          size: Size(img.width.toDouble(), img.height.toDouble()),
-          rotation: InputImageRotation.rotation90deg,
-          format: format,
-          bytesPerRow: img.planes.first.bytesPerRow,
-        ),
-      );
-    } catch (_) {
-      return null;
+InputImage? _toInputImage(CameraImage img) {
+  try {
+    final int width  = img.width;
+    final int height = img.height;
+
+    final yPlane = img.planes[0];
+    final uPlane = img.planes[1];
+    final vPlane = img.planes[2];
+
+    // NV21 size = Y + VU
+    final nv21 = Uint8List(width * height * 3 ~/ 2);
+
+    // copy Y row by row (ตาม rowStride จริง)
+    int dstIndex = 0;
+    for (int row = 0; row < height; row++) {
+      final srcStart = row * yPlane.bytesPerRow;
+      nv21.setRange(dstIndex, dstIndex + width, yPlane.bytes, srcStart);
+      dstIndex += width;
     }
+
+    // interleave VU row by row
+    final uvHeight = height ~/ 2;
+    final uvWidth  = width  ~/ 2;
+    for (int row = 0; row < uvHeight; row++) {
+      for (int col = 0; col < uvWidth; col++) {
+        final vIdx = row * vPlane.bytesPerRow + col * vPlane.bytesPerPixel!;
+        final uIdx = row * uPlane.bytesPerRow + col * uPlane.bytesPerPixel!;
+        nv21[dstIndex++] = vPlane.bytes[vIdx];
+        nv21[dstIndex++] = uPlane.bytes[uIdx];
+      }
+    }
+
+    return InputImage.fromBytes(
+      bytes: nv21,
+      metadata: InputImageMetadata(
+        size: Size(width.toDouble(), height.toDouble()),
+        rotation: InputImageRotation.rotation90deg,
+        format: InputImageFormat.nv21,
+        bytesPerRow: width,
+      ),
+    );
+  } catch (e) {
+    print('❌ toInputImage error: $e');
+    return null;
   }
+}
+
 
   @override
   void dispose() {

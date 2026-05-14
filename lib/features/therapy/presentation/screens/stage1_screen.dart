@@ -11,6 +11,7 @@ import '../providers/therapy_provider.dart';
 import '../providers/stage_provider.dart';
 import '../widgets/hud_widget.dart';
 import '../widgets/pose_painter.dart';
+import 'package:flutter/foundation.dart';
 
 /// Stage 1 — Cat-Cow Mobilisation
 /// Python: run_stage1() — skeleton + zone lines + direction cue
@@ -68,33 +69,65 @@ class _Stage1ScreenState extends State<Stage1Screen> {
   }
 
   Future<void> _onFrame(CameraImage img) async {
-    if (_busy) return;
-    _busy = true;
-    try {
-      final inputImage = _toInputImage(img);
-      if (inputImage == null) return;
-      final poses = await _detector!.processImage(inputImage);
-      if (!mounted) return;
-      context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
-    } finally {
-      _busy = false;
-    }
+  if (_busy) return;
+  _busy = true;
+  try {
+    final inputImage = _toInputImage(img);
+    print('📷 format: ${img.format.raw}, planes: ${img.planes.length}, size: ${img.width}x${img.height}');
+    if (inputImage == null) { print('❌ inputImage null'); return; }
+    
+    final poses = await _detector!.processImage(inputImage);
+    print('🦴 poses: ${poses.length}');
+    if (!mounted) return;
+    context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
+  } finally {
+    _busy = false;
   }
+}
 
   InputImage? _toInputImage(CameraImage img) {
     try {
-      final format = InputImageFormatValue.fromRawValue(img.format.raw);
-      if (format == null) return null;
+      final int width  = img.width;
+      final int height = img.height;
+
+      final yPlane = img.planes[0];
+      final uPlane = img.planes[1];
+      final vPlane = img.planes[2];
+
+      // NV21 size = Y + VU
+      final nv21 = Uint8List(width * height * 3 ~/ 2);
+
+      // copy Y row by row (ตาม rowStride จริง)
+      int dstIndex = 0;
+      for (int row = 0; row < height; row++) {
+        final srcStart = row * yPlane.bytesPerRow;
+        nv21.setRange(dstIndex, dstIndex + width, yPlane.bytes, srcStart);
+        dstIndex += width;
+      }
+
+      // interleave VU row by row
+      final uvHeight = height ~/ 2;
+      final uvWidth  = width  ~/ 2;
+      for (int row = 0; row < uvHeight; row++) {
+        for (int col = 0; col < uvWidth; col++) {
+          final vIdx = row * vPlane.bytesPerRow + col * vPlane.bytesPerPixel!;
+          final uIdx = row * uPlane.bytesPerRow + col * uPlane.bytesPerPixel!;
+          nv21[dstIndex++] = vPlane.bytes[vIdx];
+          nv21[dstIndex++] = uPlane.bytes[uIdx];
+        }
+      }
+
       return InputImage.fromBytes(
-        bytes: img.planes.first.bytes,
+        bytes: nv21,
         metadata: InputImageMetadata(
-          size: Size(img.width.toDouble(), img.height.toDouble()),
+          size: Size(width.toDouble(), height.toDouble()),
           rotation: InputImageRotation.rotation90deg,
-          format: format,
-          bytesPerRow: img.planes.first.bytesPerRow,
+          format: InputImageFormat.nv21,
+          bytesPerRow: width,
         ),
       );
-    } catch (_) {
+    } catch (e) {
+      print('❌ toInputImage error: $e');
       return null;
     }
   }
@@ -121,6 +154,8 @@ class _Stage1ScreenState extends State<Stage1Screen> {
 
     final size = MediaQuery.of(context).size;
 
+    
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -137,6 +172,7 @@ class _Stage1ScreenState extends State<Stage1Screen> {
 
           // ── Skeleton ─────────────────────────────────
           if (stage.currentPose != null)
+          
             CustomPaint(
               painter: PosePainter(
                 pose: stage.currentPose!,
