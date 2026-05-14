@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 import '../../domain/enums/bt_connection_state.dart';
-import '../../domain/enums/bt_response.dart';
 
 class BluetoothDatasource {
   

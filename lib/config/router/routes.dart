@@ -4,7 +4,7 @@ import 'package:flexiback/features/device/presentation/pages/add_daily_progress_
 import 'package:flexiback/features/profile/presentation/pages/therapist_edit.dart';
 import 'package:flexiback/features/relation/presentation/pages/chat_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
-import 'package:flexiback/features/zz/therapy.dart';
+import 'package:flexiback/features/therapy/presentation/screens/therapy_screen.dart';
 import 'package:flexiback/features/trend/presentation/pages/trend_page.dart';
 import 'package:flexiback/shared/navigation/shell/general_main_shell.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +39,7 @@ class AppRoutes {
     login: (context) => LoginPage(),
     signup: (context) => SignupPage(),
     
-    therapy: (context) => TherapyPage(),
+    therapy: (context) => TherapyLobbyScreen(),
     device: (context) => DevicePage(),
     trend: (context) => TrendPage(),
     chat: (context) => ChatPage(),

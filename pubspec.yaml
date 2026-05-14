@@ -67,9 +67,12 @@ dependencies:
   flutter_dotenv: ^6.0.0
 
   # AI / Camera
-  camera: ^0.10.5
+  camera: ^0.10.0
   google_mlkit_pose_detection: ^0.10.0
-  google_mlkit_selfie_segmentation: ^0.3.0
+  google_mlkit_selfie_segmentation: ^0.6.0
+
+  # Animation
+  flutter_animate: ^4.5.0
 
   # Utility
   collection: ^1.18.0       

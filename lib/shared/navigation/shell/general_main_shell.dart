@@ -3,7 +3,6 @@ import 'package:flexiback/features/device/presentation/pages/device_page.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flexiback/features/relation/presentation/pages/chat_page.dart';
 import 'package:flexiback/features/profile/presentation/pages/profile_page.dart';
-import 'package:flexiback/features/zz/therapy.dart';
 import 'package:flexiback/features/trend/presentation/pages/trend_page.dart';
 import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_navigation_bar/responsive_navigation_bar.dart';
 
 import '../../../features/profile/presentation/controller/profile_provider.dart';
+import '../../../features/therapy/presentation/screens/therapy_screen.dart';
 import '../items/geneeral_items.dart';
 class GeneralMainShell extends StatefulWidget {
   final String? userId;
@@ -28,7 +28,7 @@ class _GeneralMainShellState extends State<GeneralMainShell> {
   int _currentindex = 2;
 
   List<Widget> get _pages => [
-    TherapyPage(),
+    TherapyLobbyScreen(),
     DevicePage(
       setCurrent: (GeneralMainTap newCurrent) {
         setState(() {

@@ -5,6 +5,8 @@ import 'package:flexiback/features/device/presentation/controller/device_provide
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
 import 'package:flexiback/config/theme/app/app_theme.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
+import 'package:flexiback/features/therapy/presentation/providers/stage_provider.dart';
+import 'package:flexiback/features/therapy/presentation/providers/therapy_provider.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -45,7 +47,15 @@ void main() async {
 
         ChangeNotifierProvider(
           create: (_) => TrendProvider()
-        )
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => StageProvider()
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => TherapyProvider()
+        ),
         
       ],
       child: const MyApp(),
