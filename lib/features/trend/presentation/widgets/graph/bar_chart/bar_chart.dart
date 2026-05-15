@@ -101,7 +101,7 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 45,
+                    reservedSize: 49,
                     getTitlesWidget: (value, meta) {
                       final int index = value.toInt();
                       

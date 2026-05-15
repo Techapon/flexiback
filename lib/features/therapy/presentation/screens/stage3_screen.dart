@@ -78,14 +78,17 @@ class _Stage3ScreenState extends State<Stage3Screen> {
     _busy = true;
     try {
       final inputImage = _toInputImage(img);
-      if (inputImage == null) return;
+      // print('📷 format: ${img.format.raw}, planes: ${img.planes.length}, size: ${img.width}x${img.height}');
+      if (inputImage == null) { print('❌ inputImage null'); return; }
+      
       final poses = await _detector!.processImage(inputImage);
+      // if (poses.isNotEmpty) {
+      //   print('🖼 previewSize: ${_cam!.value.previewSize}');
+      //   print('🦴 nose x: ${poses.first.landmarks[PoseLandmarkType.nose]?.x}');
+      // }
       if (!mounted) return;
-
       final pose = poses.isNotEmpty ? poses.first : null;
       context.read<StageProvider>().processPose(pose);
-
-      // update knee trails
       if (pose != null) _updateTrails(pose);
     } finally {
       _busy = false;
@@ -109,52 +112,49 @@ class _Stage3ScreenState extends State<Stage3Screen> {
     }
   }
 
- InputImage? _toInputImage(CameraImage img) {
-  try {
-    final int width  = img.width;
-    final int height = img.height;
+  InputImage? _toInputImage(CameraImage img) {
+    try {
+      final int width  = img.width;
+      final int height = img.height;
 
-    final yPlane = img.planes[0];
-    final uPlane = img.planes[1];
-    final vPlane = img.planes[2];
+      final yPlane = img.planes[0];
+      final uPlane = img.planes[1];
+      final vPlane = img.planes[2];
 
-    // NV21 size = Y + VU
-    final nv21 = Uint8List(width * height * 3 ~/ 2);
+      final nv21 = Uint8List(width * height * 3 ~/ 2);
 
-    // copy Y row by row (ตาม rowStride จริง)
-    int dstIndex = 0;
-    for (int row = 0; row < height; row++) {
-      final srcStart = row * yPlane.bytesPerRow;
-      nv21.setRange(dstIndex, dstIndex + width, yPlane.bytes, srcStart);
-      dstIndex += width;
-    }
-
-    // interleave VU row by row
-    final uvHeight = height ~/ 2;
-    final uvWidth  = width  ~/ 2;
-    for (int row = 0; row < uvHeight; row++) {
-      for (int col = 0; col < uvWidth; col++) {
-        final vIdx = row * vPlane.bytesPerRow + col * vPlane.bytesPerPixel!;
-        final uIdx = row * uPlane.bytesPerRow + col * uPlane.bytesPerPixel!;
-        nv21[dstIndex++] = vPlane.bytes[vIdx];
-        nv21[dstIndex++] = uPlane.bytes[uIdx];
+      int dstIndex = 0;
+      for (int row = 0; row < height; row++) {
+        final srcStart = row * yPlane.bytesPerRow;
+        nv21.setRange(dstIndex, dstIndex + width, yPlane.bytes, srcStart);
+        dstIndex += width;
       }
-    }
 
-    return InputImage.fromBytes(
-      bytes: nv21,
-      metadata: InputImageMetadata(
-        size: Size(width.toDouble(), height.toDouble()),
-        rotation: InputImageRotation.rotation90deg,
-        format: InputImageFormat.nv21,
-        bytesPerRow: width,
-      ),
-    );
-  } catch (e) {
-    print('❌ toInputImage error: $e');
-    return null;
+      final uvHeight = height ~/ 2;
+      final uvWidth  = width  ~/ 2;
+      for (int row = 0; row < uvHeight; row++) {
+        for (int col = 0; col < uvWidth; col++) {
+          final vIdx = row * vPlane.bytesPerRow + col * vPlane.bytesPerPixel!;
+          final uIdx = row * uPlane.bytesPerRow + col * uPlane.bytesPerPixel!;
+          nv21[dstIndex++] = vPlane.bytes[vIdx];
+          nv21[dstIndex++] = uPlane.bytes[uIdx];
+        }
+      }
+
+      return InputImage.fromBytes(
+        bytes: nv21,
+        metadata: InputImageMetadata(
+          size: Size(width.toDouble(), height.toDouble()),
+          rotation: InputImageRotation.rotation90deg,
+          format: InputImageFormat.nv21,
+          bytesPerRow: width,
+        ),
+      );
+    } catch (e) {
+      print('❌ toInputImage error: $e');
+      return null;
+    }
   }
-}
 
 
   @override
@@ -208,6 +208,7 @@ class _Stage3ScreenState extends State<Stage3Screen> {
           // ── Skeleton ─────────────────────────────────
           if (stage.currentPose != null)
             CustomPaint(
+              size: Size.infinite,
               painter: PosePainter(
                 pose: stage.currentPose!,
                 imageSize: Size(
@@ -219,10 +220,11 @@ class _Stage3ScreenState extends State<Stage3Screen> {
             ),
 
           // ── Hip line ──────────────────────────────────
-          CustomPaint(painter: HipLinePainter(hipY: hipY)),
+          CustomPaint(size: Size.infinite, painter: HipLinePainter(hipY: hipY)),
 
           // ── Knee trail ────────────────────────────────
           CustomPaint(
+            size: Size.infinite,
             painter: KneeTrailPainter(
               leftTrail:  _leftTrail.toList(),
               rightTrail: _rightTrail.toList(),
@@ -231,6 +233,7 @@ class _Stage3ScreenState extends State<Stage3Screen> {
 
           // ── Target circle above hip ───────────────────
           CustomPaint(
+            size: Size.infinite,
             painter: Stage2TargetPainter(
               center: Offset(targetX, targetY),
               radius: circleRadius,

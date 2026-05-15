@@ -69,21 +69,25 @@ class _Stage1ScreenState extends State<Stage1Screen> {
   }
 
   Future<void> _onFrame(CameraImage img) async {
-  if (_busy) return;
-  _busy = true;
-  try {
-    final inputImage = _toInputImage(img);
-    print('📷 format: ${img.format.raw}, planes: ${img.planes.length}, size: ${img.width}x${img.height}');
-    if (inputImage == null) { print('❌ inputImage null'); return; }
-    
-    final poses = await _detector!.processImage(inputImage);
-    print('🦴 poses: ${poses.length}');
-    if (!mounted) return;
-    context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
-  } finally {
-    _busy = false;
+    if (_busy) return;
+    _busy = true;
+    try {
+      final inputImage = _toInputImage(img);
+      // print('📷 format: ${img.format.raw}, planes: ${img.planes.length}, size: ${img.width}x${img.height}');
+      if (inputImage == null) { print('❌ inputImage null'); return; }
+      
+      final poses = await _detector!.processImage(inputImage);
+      if (poses.isNotEmpty) {
+        print('🖼 previewSize: ${_cam!.value.previewSize}');
+        print('🦴 nose x: ${poses.first.landmarks[PoseLandmarkType.nose]?.x}');
+        print('📐 imageSize in provider: ${context.read<StageProvider>().state}');
+      }
+      if (!mounted) return;
+      context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
+    } finally {
+      _busy = false;
+    }
   }
-}
 
   InputImage? _toInputImage(CameraImage img) {
     try {
@@ -168,18 +172,19 @@ class _Stage1ScreenState extends State<Stage1Screen> {
           Opacity(opacity: 0.55, child: CameraPreview(_cam!)),
 
           // ── Zone lines (CAT/COW) ─────────────────────
-          const CustomPaint(painter: Stage1ZonePainter()),
+          CustomPaint(size: Size.infinite, painter: Stage1ZonePainter()),
 
           // ── Skeleton ─────────────────────────────────
           if (stage.currentPose != null)
           
             CustomPaint(
+              size: Size.infinite,
               painter: PosePainter(
                 pose: stage.currentPose!,
-                imageSize: stage.state.timeLeft > 0
-                    ? Size(_cam!.value.previewSize!.height,
-                           _cam!.value.previewSize!.width)
-                    : size,
+                imageSize: Size(
+                  _cam!.value.previewSize!.height,
+                  _cam!.value.previewSize!.width,
+                ),
                 animTime: state.animTime,
               ),
             ),

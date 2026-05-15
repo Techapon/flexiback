@@ -157,20 +157,25 @@ class StageProvider extends ChangeNotifier {
   // ── Stage 2: Lateral Side Reach ──────────────────
   void _processStage2(Pose pose) {
     final isLeft    = _state.targetSide == DetectionSide.left;
+    // front camera mirror: isLeft UI → rightWrist จริง
     final wristType = isLeft
-        ? PoseLandmarkType.leftWrist
-        : PoseLandmarkType.rightWrist;
+        ? PoseLandmarkType.rightWrist
+        : PoseLandmarkType.leftWrist;
 
     final wrist = pose.landmarks[wristType];
     if (wrist == null || wrist.likelihood < 0.4) return;
 
-    final w = _imageSize.width;
-    final h = _imageSize.height;
-    final targetCenter = Offset(isLeft ? w * 0.18 : w * 0.82, h * 0.50);
-    final wristPos     = Offset(wrist.x * w, wrist.y * h);
+    // ใช้ normalized (0-1) เปรียบเทียบกัน ไม่ต้องคูณ imageSize
+    // targetCenter normalized: isLeft → ขวาหน้าจอ (0.82)
+    const targetNormX_left  = 0.82;
+    const targetNormX_right = 0.18;
+    const targetNormY       = 0.50;
+    const baseRadius        = 0.12; // normalized radius ~12% ของหน้าจอ
 
-    const baseRadius = 52.0;
-    final inCircle   = PoseUtils.isInsideCircle(wristPos, targetCenter, baseRadius);
+    final targetNormX = isLeft ? targetNormX_left : targetNormX_right;
+    final dx = wrist.x - targetNormX;
+    final dy = wrist.y - targetNormY;
+    final inCircle = (dx * dx + dy * dy) < (baseRadius * baseRadius);
 
     int            newHoldFrames = inCircle
         ? _state.holdFrames + 1
@@ -212,9 +217,10 @@ class StageProvider extends ChangeNotifier {
 
     final hipY   = (lHip.y + rHip.y) / 2;
     final isLeft = _state.targetSide == DetectionSide.left;
+    // front camera mirror: isLeft UI → rightKnee จริง
     final knee   = isLeft
-        ? pose.landmarks[PoseLandmarkType.leftKnee]
-        : pose.landmarks[PoseLandmarkType.rightKnee];
+        ? pose.landmarks[PoseLandmarkType.rightKnee]
+        : pose.landmarks[PoseLandmarkType.leftKnee];
 
     if (knee == null || knee.likelihood < 0.35) return;
 
@@ -270,7 +276,8 @@ class StageProvider extends ChangeNotifier {
 
   Offset targetCircleCenter(double w, double h) {
     final isLeft = _state.targetSide == DetectionSide.left;
-    return Offset(isLeft ? w * 0.18 : w * 0.82, h * 0.50);
+    // front camera mirror: isLeft UI → wrist อยู่ขวาจริง
+    return Offset(isLeft ? w * 0.82 : w * 0.18, h * 0.50);
   }
 
   double targetCircleRadius() =>
