@@ -9,6 +9,8 @@ class StageProvider extends ChangeNotifier {
   StageState _state = const StageState();
   StageState get state => _state;
 
+  Size get imageSize => _imageSize; 
+
   int _stageNumber = 1;
   Timer? _gameTimer;
   Timer? _feedbackTimer;
@@ -22,7 +24,15 @@ class StageProvider extends ChangeNotifier {
   String _phase = 'DOWN';
   String _prevPhase = 'DOWN';
 
+  // ── Smoothing ────────────────────────────────────
+  // เก็บ smoothed positions เพื่อลด jitter
+  final Map<PoseLandmarkType, Offset> _smoothed = {};
+  static const double _alpha = 0.35; // EMA factor: ต่ำ = smooth มาก, สูง = responsive มาก
+
   Pose? get currentPose => _currentPose;
+
+  /// คืน smoothed map ทั้งหมด — ส่งเข้า PosePainter / AvatarPainter
+  Map<PoseLandmarkType, Offset> get smoothedMap => _smoothed;
   int get stageNumber => _stageNumber;
   bool get isRunning => _gameTimer?.isActive ?? false;
 
@@ -87,6 +97,20 @@ class StageProvider extends ChangeNotifier {
       return;
     }
 
+    // ── EMA smoothing ────────────────────────────
+    for (final entry in pose.landmarks.entries) {
+      final lm = entry.value;
+      if (lm.likelihood < 0.25) continue;
+      final cur = Offset(lm.x, lm.y);
+      final prev = _smoothed[entry.key];
+      _smoothed[entry.key] = prev == null
+          ? cur
+          : Offset(
+              prev.dx + _alpha * (cur.dx - prev.dx),
+              prev.dy + _alpha * (cur.dy - prev.dy),
+            );
+    }
+
     switch (_stageNumber) {
       case 1: _processStage1(pose);
       case 2: _processStage2(pose);
@@ -109,10 +133,12 @@ class StageProvider extends ChangeNotifier {
     final avgWristY    = (lw.y + rw.y) / 2;
     final avgShoulderY = (ls.y + rs.y) / 2;
 
+    // ML Kit คืน pixel coordinates — threshold เป็น pixel (5% ของ image height)
+    final thresh = 0.05;  
     String cur;
-    if (avgWristY < avgShoulderY - 0.05) {
+    if (avgWristY < avgShoulderY - thresh) {
       cur = 'UP';
-    } else if (avgWristY > avgShoulderY + 0.05) {
+    } else if (avgWristY > avgShoulderY + thresh) {
       cur = 'DOWN';
     } else {
       cur = _phase;
@@ -158,23 +184,23 @@ class StageProvider extends ChangeNotifier {
   void _processStage2(Pose pose) {
     final isLeft    = _state.targetSide == DetectionSide.left;
     // front camera mirror: isLeft UI → rightWrist จริง
+    // front camera mirror: isLeft UI = rightWrist ใน landmark
+    // แต่เนื่องจากแก้ rotation270 แล้ว mirror ถูกต้อง = leftWrist
+    // แก้ใน _processStage2() และ _processStage3()
     final wristType = isLeft
-        ? PoseLandmarkType.rightWrist
+        ? PoseLandmarkType.rightWrist  // isLeft UI = rightWrist ใน ML Kit
         : PoseLandmarkType.leftWrist;
 
     final wrist = pose.landmarks[wristType];
     if (wrist == null || wrist.likelihood < 0.4) return;
 
-    // ใช้ normalized (0-1) เปรียบเทียบกัน ไม่ต้องคูณ imageSize
-    // targetCenter normalized: isLeft → ขวาหน้าจอ (0.82)
-    const targetNormX_left  = 0.82;
-    const targetNormX_right = 0.18;
-    const targetNormY       = 0.50;
-    const baseRadius        = 0.12; // normalized radius ~12% ของหน้าจอ
+    // painter flip X: isLeft UI → ขวาของ image (0.82)
+    final targetX = isLeft ? _imageSize.width * 0.82 : _imageSize.width * 0.18;
+    final targetY = _imageSize.height * 0.50;
+    final baseRadius = _imageSize.width * 0.12; // 12% ของความกว้าง image
 
-    final targetNormX = isLeft ? targetNormX_left : targetNormX_right;
-    final dx = wrist.x - targetNormX;
-    final dy = wrist.y - targetNormY;
+    final dx = wrist.x - targetX;
+    final dy = wrist.y - targetY;
     final inCircle = (dx * dx + dy * dy) < (baseRadius * baseRadius);
 
     int            newHoldFrames = inCircle
@@ -210,37 +236,40 @@ class StageProvider extends ChangeNotifier {
 
   // ── Stage 3: Marching Core Drill ─────────────────
   void _processStage3(Pose pose) {
-    final lHip  = pose.landmarks[PoseLandmarkType.leftHip];
-    final rHip  = pose.landmarks[PoseLandmarkType.rightHip];
-
+    final lHip = pose.landmarks[PoseLandmarkType.leftHip];
+    final rHip = pose.landmarks[PoseLandmarkType.rightHip];
     if (lHip == null || rHip == null) return;
 
     final hipY   = (lHip.y + rHip.y) / 2;
+    final hipX   = (lHip.x + rHip.x) / 2;
     final isLeft = _state.targetSide == DetectionSide.left;
-    // front camera mirror: isLeft UI → rightKnee จริง
-    final knee   = isLeft
+
+    // mirror: isLeft UI = rightKnee ใน ML Kit
+    final knee = isLeft
         ? pose.landmarks[PoseLandmarkType.rightKnee]
         : pose.landmarks[PoseLandmarkType.leftKnee];
-
     if (knee == null || knee.likelihood < 0.35) return;
 
-    final ok = knee.y < hipY - 0.10;
+    final kneeThresh = _imageSize.height * 0.08;
+    final okY = knee.y > hipY + kneeThresh;
+    final okX = isLeft
+        ? knee.x > hipX   // isLeft UI = เข่าอยู่ขวาของ hip ใน ML Kit
+        : knee.x < hipX;  // isRight UI = เข่าอยู่ซ้ายของ hip ใน ML Kit
+    final ok = okY && okX;
 
-    int           newHoldFrames = ok
-        ? _state.holdFrames + 1
-        : math.max(0, _state.holdFrames - 1);
-    bool          newReached  = _state.reached;
-    int           newReps     = _state.reps;
-    String        newFeedback = _state.feedback;
-    double        newFlash    = _state.flashAlpha;
-    DetectionSide newSide     = _state.targetSide;
+    int           newHoldFrames = ok ? _state.holdFrames + 1 : 0;
+    bool          newReached    = _state.reached;
+    int           newReps       = _state.reps;
+    String        newFeedback   = _state.feedback;
+    double        newFlash      = _state.flashAlpha;
+    DetectionSide newSide       = _state.targetSide;
 
     if (newHoldFrames >= StageState.holdThreshold && !newReached) {
-      newReached  = true;
-      newReps     = _state.reps + 1;
-      newFeedback = '${isLeft ? 'Left' : 'Right'} knee lifted! Rep $newReps';
-      newFlash    = 0.18;
-      newSide     = isLeft ? DetectionSide.right : DetectionSide.left;
+      newReached    = true;
+      newReps       = _state.reps + 1;
+      newFeedback   = '${isLeft ? 'Left' : 'Right'} knee lifted! Rep $newReps';
+      newFlash      = 0.18;
+      newSide       = isLeft ? DetectionSide.right : DetectionSide.left;
       newHoldFrames = 0;
       _triggerFeedbackClear();
     } else if (!ok) {
@@ -271,13 +300,15 @@ class StageProvider extends ChangeNotifier {
     final lHip = _currentPose?.landmarks[PoseLandmarkType.leftHip];
     final rHip = _currentPose?.landmarks[PoseLandmarkType.rightHip];
     if (lHip == null || rHip == null) return screenHeight * hipZoneFraction;
-    return ((lHip.y + rHip.y) / 2) * screenHeight;
+    // ML Kit คืน pixel → แปลงเป็น fraction แล้ว scale ไป screen
+    final hipFraction = (lHip.y + rHip.y) / 2 / _imageSize.height;
+    return hipFraction * screenHeight;
   }
 
-  Offset targetCircleCenter(double w, double h) {
+  Offset targetCircleCenter(double screenW, double screenH) {
     final isLeft = _state.targetSide == DetectionSide.left;
-    // front camera mirror: isLeft UI → wrist อยู่ขวาจริง
-    return Offset(isLeft ? w * 0.82 : w * 0.18, h * 0.50);
+    // front camera mirror แก้แล้ว: isLeft UI = ซ้ายหน้าจอ user
+    return Offset(isLeft ? screenW * 0.18 : screenW * 0.82, screenH * 0.50);
   }
 
   double targetCircleRadius() =>
@@ -291,7 +322,8 @@ class StageProvider extends ChangeNotifier {
     _prevPhase  = 'DOWN';
     _currentPose = null;
     _startTime   = null;
-    onTimeUp     = null;   // clear callback เมื่อ reset stage
+    onTimeUp     = null;
+    _smoothed.clear();
   }
 
   @override

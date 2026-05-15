@@ -74,26 +74,22 @@ class _Stage3ScreenState extends State<Stage3Screen> {
   }
 
   Future<void> _onFrame(CameraImage img) async {
-    if (_busy) return;
-    _busy = true;
-    try {
-      final inputImage = _toInputImage(img);
-      // print('📷 format: ${img.format.raw}, planes: ${img.planes.length}, size: ${img.width}x${img.height}');
-      if (inputImage == null) { print('❌ inputImage null'); return; }
-      
-      final poses = await _detector!.processImage(inputImage);
-      // if (poses.isNotEmpty) {
-      //   print('🖼 previewSize: ${_cam!.value.previewSize}');
-      //   print('🦴 nose x: ${poses.first.landmarks[PoseLandmarkType.nose]?.x}');
-      // }
-      if (!mounted) return;
-      final pose = poses.isNotEmpty ? poses.first : null;
-      context.read<StageProvider>().processPose(pose);
-      if (pose != null) _updateTrails(pose);
-    } finally {
-      _busy = false;
+  if (_busy) return;
+  _busy = true;
+  try {
+    final inputImage = _toInputImage(img);
+    if (inputImage == null) return;
+    final poses = await _detector!.processImage(inputImage);
+    if (!mounted) return;
+    if (poses.isNotEmpty) {
+      _updateTrails(poses.first);  // ← เพิ่มบรรทัดนี้
     }
+    context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
+    if (mounted) setState(() {});  // ← บังคับ repaint trail
+  } finally {
+    _busy = false;
   }
+}
 
   void _updateTrails(Pose pose) {
     final size = MediaQuery.of(context).size;
@@ -145,7 +141,7 @@ class _Stage3ScreenState extends State<Stage3Screen> {
         bytes: nv21,
         metadata: InputImageMetadata(
           size: Size(width.toDouble(), height.toDouble()),
-          rotation: InputImageRotation.rotation90deg,
+          rotation: InputImageRotation.rotation270deg,
           format: InputImageFormat.nv21,
           bytesPerRow: width,
         ),
@@ -179,17 +175,17 @@ class _Stage3ScreenState extends State<Stage3Screen> {
     }
 
     final isLeft  = state.targetSide == DetectionSide.left;
-    final hipY    = stage.hipLevelY(size.height);
-    final targetY = hipY - size.height * 0.12;
+    final hipY = stage.hipLevelY(size.height);
 
     // target circle follows knee x position
+    // ── แก้เป็น ───────────────────────────────────
     final kneeType = isLeft
         ? PoseLandmarkType.leftKnee
         : PoseLandmarkType.rightKnee;
-    final kneeLm = stage.currentPose?.landmarks[kneeType];
-    final targetX = kneeLm != null
-        ? kneeLm.x * size.width
-        : size.width / 2;
+    final smoothedKnee = stage.smoothedMap[kneeType];
+    
+    final targetX = isLeft ? size.width * 0.30 : size.width * 0.70;
+    final targetY = hipY - size.height * 0.10;  // เหนือ hip 18%
 
     final circleRadius = 44.0 + 8.0 * math.sin(state.animTime * 4);
     final activeColor  = isLeft ? AiAppColors.gold : AiAppColors.coral;
@@ -208,7 +204,6 @@ class _Stage3ScreenState extends State<Stage3Screen> {
           // ── Skeleton ─────────────────────────────────
           if (stage.currentPose != null)
             CustomPaint(
-              size: Size.infinite,
               painter: PosePainter(
                 pose: stage.currentPose!,
                 imageSize: Size(
@@ -220,11 +215,10 @@ class _Stage3ScreenState extends State<Stage3Screen> {
             ),
 
           // ── Hip line ──────────────────────────────────
-          CustomPaint(size: Size.infinite, painter: HipLinePainter(hipY: hipY)),
+          CustomPaint(painter: HipLinePainter(hipY: hipY)),
 
           // ── Knee trail ────────────────────────────────
           CustomPaint(
-            size: Size.infinite,
             painter: KneeTrailPainter(
               leftTrail:  _leftTrail.toList(),
               rightTrail: _rightTrail.toList(),
@@ -233,7 +227,6 @@ class _Stage3ScreenState extends State<Stage3Screen> {
 
           // ── Target circle above hip ───────────────────
           CustomPaint(
-            size: Size.infinite,
             painter: Stage2TargetPainter(
               center: Offset(targetX, targetY),
               radius: circleRadius,

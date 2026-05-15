@@ -125,7 +125,7 @@ class _Stage1ScreenState extends State<Stage1Screen> {
         bytes: nv21,
         metadata: InputImageMetadata(
           size: Size(width.toDouble(), height.toDouble()),
-          rotation: InputImageRotation.rotation90deg,
+          rotation: InputImageRotation.rotation270deg,
           format: InputImageFormat.nv21,
           bytesPerRow: width,
         ),
@@ -186,6 +186,7 @@ class _Stage1ScreenState extends State<Stage1Screen> {
                   _cam!.value.previewSize!.width,
                 ),
                 animTime: state.animTime,
+                smoothed: stage.smoothedMap,
               ),
             ),
 

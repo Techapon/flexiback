@@ -12,12 +12,14 @@ import '../../../../core/utils/pose_utils.dart';
 class AvatarPainter extends CustomPainter {
   final Pose pose;
   final Size imageSize;
-  final double animTime; // Python: t
+  final double animTime;
+  final Map<PoseLandmarkType, Offset>? smoothed;
 
   AvatarPainter({
     required this.pose,
     required this.imageSize,
     required this.animTime,
+    this.smoothed,
   });
 
   @override
@@ -29,8 +31,14 @@ class AvatarPainter extends CustomPainter {
     Offset? lp(PoseLandmarkType type, {double vis = 0.25}) {
       final lm = pose.landmarks[type];
       if (lm == null || lm.likelihood < vis) return null;
-      return Offset(lm.x * imageSize.width * scaleX,
-                    lm.y * imageSize.height * scaleY);
+      // ดึง smoothed ก่อน ถ้ามี
+      final nx = smoothed?[type]?.dx ?? lm.x;
+      final ny = smoothed?[type]?.dy ?? lm.y;
+      // flip X เหมือน PosePainter
+      return Offset(
+        size.width - nx * scaleX,   // ← flip X
+        ny * scaleY,
+      );
     }
 
     final nose  = lp(PoseLandmarkType.nose);
@@ -293,5 +301,5 @@ class AvatarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(AvatarPainter old) =>
-      old.pose != pose || old.animTime != animTime;
+      old.pose != pose || old.animTime != animTime || old.smoothed != smoothed;
 }

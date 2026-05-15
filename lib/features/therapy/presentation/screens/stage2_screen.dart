@@ -109,7 +109,7 @@ class _Stage2ScreenState extends State<Stage2Screen> {
         bytes: nv21,
         metadata: InputImageMetadata(
           size: Size(width.toDouble(), height.toDouble()),
-          rotation: InputImageRotation.rotation90deg,
+          rotation: InputImageRotation.rotation270deg,
           format: InputImageFormat.nv21,
           bytesPerRow: width,
         ),
@@ -162,18 +162,20 @@ class _Stage2ScreenState extends State<Stage2Screen> {
                 constraints.maxHeight,
               );
               return CustomPaint(
-                size: Size.infinite,
                 painter: AvatarPainter(
                   pose: stage.currentPose!,
-                  imageSize: canvasSize,
+                  imageSize: Size(           // ← camera size จริง เหมือน Stage1
+                    _cam!.value.previewSize!.height,
+                    _cam!.value.previewSize!.width,
+                  ),
                   animTime: state.animTime,
+                  smoothed: stage.smoothedMap,
                 ),
               );
             }),
 
           // ── Target circle ────────────────────────────
           CustomPaint(
-            size: Size.infinite,
             painter: Stage2TargetPainter(
               center: stage.targetCircleCenter(size.width, size.height),
               radius: stage.targetCircleRadius(),

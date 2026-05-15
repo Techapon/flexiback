@@ -11,13 +11,15 @@ import '../../../../config/theme/colors/app_color.dart';
 
 class PosePainter extends CustomPainter {
   final Pose pose;
-  final Size imageSize; // เก็บไว้เพื่อ compatibility แต่ไม่ใช้แล้ว
+  final Size imageSize;
   final double animTime;
+  final Map<PoseLandmarkType, Offset>? smoothed;
 
   PosePainter({
     required this.pose,
     required this.imageSize,
     required this.animTime,
+    this.smoothed,
   });
 
   static const _bodyConnections = [
@@ -52,11 +54,16 @@ class PosePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // normalized → canvas pixels โดยตรง
+    // ML Kit pixel → canvas + flip X (กล้องหน้า mirror)
+    final scaleX = size.width  / imageSize.width;
+    final scaleY = size.height / imageSize.height;
+
     Offset? _lm(PoseLandmarkType type, {double vis = 0.3}) {
       final lm = pose.landmarks[type];
       if (lm == null || lm.likelihood < vis) return null;
-      return Offset(lm.x * size.width, lm.y * size.height);
+      final px = smoothed?[type]?.dx ?? lm.x;
+      final py = smoothed?[type]?.dy ?? lm.y;
+      return Offset(size.width - px * scaleX, py * scaleY);
     }
 
     final linePaint = Paint()
@@ -87,7 +94,7 @@ class PosePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(PosePainter old) =>
-      old.pose != pose || old.animTime != animTime;
+      old.pose != pose || old.animTime != animTime || old.smoothed != smoothed;
 }
 
 
