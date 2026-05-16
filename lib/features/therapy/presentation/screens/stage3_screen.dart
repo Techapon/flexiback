@@ -194,7 +194,20 @@ class _Stage3ScreenState extends State<Stage3Screen> {
     final tcx = smoothedKnee != null
       ? size.width - smoothedKnee.dx * (size.width / _imgW)
       : isLeft ? size.width * 0.30 : size.width * 0.70;
-    final tcy = hipY - size.height * 0.12;
+    
+    final smoothed = stage.smoothedMap;
+    final lSh = smoothed[PoseLandmarkType.leftShoulder];
+    final rSh = smoothed[PoseLandmarkType.rightShoulder];
+    // final lHip = smoothed[PoseLandmarkType.leftHip];
+    // final rHip = smoothe[PoseLandmarkType.rightHip];
+
+    final shoulderY = lSh != null && rSh != null
+        ? ((lSh.dy + rSh.dy) / 2) * (size.height / 1280.0)
+        : hipY - size.height * 0.2;
+
+    // torsoHeight = ระยะจาก shoulder ถึง hip ของผู้ใช้จริง
+    final torsoH  = stage.torsoHeight() * (size.height / 1280.0);
+    final tcy     = hipY - torsoH * 0.4;
 
     final circleRadius = 44.0 + 8.0 * math.sin(state.animTime * 4);
 

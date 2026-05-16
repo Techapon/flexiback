@@ -32,7 +32,7 @@ class StageState {
   });
 
   /// Python: THRESH = 6 — จำนวน frame ที่ต้อง hold ก่อนนับ rep
-  static const int holdThreshold = 6;
+  static const int holdThreshold = 3;
 
   bool get isTimeUp => timeLeft <= 0;
 

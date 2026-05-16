@@ -238,25 +238,32 @@ class StageProvider extends ChangeNotifier {
   void _processStage3(Pose pose) {
     final lHip = pose.landmarks[PoseLandmarkType.leftHip];
     final rHip = pose.landmarks[PoseLandmarkType.rightHip];
+    final lSh  = pose.landmarks[PoseLandmarkType.leftShoulder];
+    final rSh  = pose.landmarks[PoseLandmarkType.rightShoulder];
     if (lHip == null || rHip == null) return;
 
     final isLeft = _state.targetSide == DetectionSide.left;
-
-    // mirror: isLeft UI = rightKnee ใน ML Kit
     final knee = isLeft
         ? pose.landmarks[PoseLandmarkType.rightKnee]
         : pose.landmarks[PoseLandmarkType.leftKnee];
     if (knee == null || knee.likelihood < 0.35) return;
 
-        // ใช้ lm.y โดยตรง (portrait Y) ไม่ต้องแปลง rotation
-    final hipY  = (lHip.y + rHip.y) / 2;
-    final kneeY = knee.y;
-    // final ok    = kneeY < hipY - _imageSize.height * 0.10;
-    final ok = kneeY < hipY - 128;
+    final hipY    = (lHip.y + rHip.y) / 2;
+    final kneeY   = knee.y;
 
-    print('hipY=$hipY kneeY=$kneeY diff=${hipY - kneeY}');
+    // torsoHeight — scale ตามระยะห่างผู้ใช้
+    final shoulderY = (lSh != null && rSh != null)
+        ? (lSh.y + rSh.y) / 2
+        : hipY - 200.0;
+    final torsoHeight = (hipY - shoulderY).abs();
 
-    int           newHoldFrames = ok ? _state.holdFrames + 1 : math.max(0, _state.holdFrames - 1);
+    // threshold = 40% ของ torso แทน pixel คงที่
+    final ok = kneeY < hipY - torsoHeight * 0.4;
+
+    int newHoldFrames = ok 
+    ? _state.holdFrames + 1 
+    : math.max(0, _state.holdFrames - 2); 
+
     bool          newReached    = _state.reached;
     int           newReps       = _state.reps;
     String        newFeedback   = _state.feedback;
@@ -293,6 +300,16 @@ class StageProvider extends ChangeNotifier {
       _state = _state.copyWith(feedback: '');
       notifyListeners();
     });
+  }
+
+  // ใน stage_provider.dart เพิ่ม
+  double torsoHeight() {
+    final lHip = _currentPose?.landmarks[PoseLandmarkType.leftHip];
+    final rHip = _currentPose?.landmarks[PoseLandmarkType.rightHip];
+    final lSh  = _currentPose?.landmarks[PoseLandmarkType.leftShoulder];
+    final rSh  = _currentPose?.landmarks[PoseLandmarkType.rightShoulder];
+    if (lHip == null || rHip == null || lSh == null || rSh == null) return 200.0;
+    return ((lHip.y + rHip.y) / 2 - (lSh.y + rSh.y) / 2).abs();
   }
 
   double hipLevelY(double screenHeight) {
