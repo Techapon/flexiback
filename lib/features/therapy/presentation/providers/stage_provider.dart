@@ -240,20 +240,21 @@ class StageProvider extends ChangeNotifier {
     final rHip = pose.landmarks[PoseLandmarkType.rightHip];
     if (lHip == null || rHip == null) return;
 
-    // ML Kit pixel → normalized
-    final hy = (lHip.y + rHip.y) / 2 / _imageSize.height;
     final isLeft = _state.targetSide == DetectionSide.left;
 
-    // Python flip ไว้แล้ว → LEFT=LEFT, แต่ Flutter กล้องหน้า mirror
-    // → isLeft UI = rightKnee ใน ML Kit (เหมือนเดิม)
+    // mirror: isLeft UI = rightKnee ใน ML Kit
     final knee = isLeft
         ? pose.landmarks[PoseLandmarkType.rightKnee]
         : pose.landmarks[PoseLandmarkType.leftKnee];
     if (knee == null || knee.likelihood < 0.35) return;
 
-    // normalized เหมือน Python: lk.y < hy - 0.10
-    final kneeNorm = knee.y / _imageSize.height;
-    final ok = kneeNorm < hy - 0.10;
+        // ใช้ lm.y โดยตรง (portrait Y) ไม่ต้องแปลง rotation
+    final hipY  = (lHip.y + rHip.y) / 2;
+    final kneeY = knee.y;
+    // final ok    = kneeY < hipY - _imageSize.height * 0.10;
+    final ok = kneeY < hipY - 128;
+
+    print('hipY=$hipY kneeY=$kneeY diff=${hipY - kneeY}');
 
     int           newHoldFrames = ok ? _state.holdFrames + 1 : math.max(0, _state.holdFrames - 1);
     bool          newReached    = _state.reached;
@@ -298,9 +299,8 @@ class StageProvider extends ChangeNotifier {
     final lHip = _currentPose?.landmarks[PoseLandmarkType.leftHip];
     final rHip = _currentPose?.landmarks[PoseLandmarkType.rightHip];
     if (lHip == null || rHip == null) return screenHeight * hipZoneFraction;
-    // normalized เหมือน Python: hy = (lh.y + rh.y) / 2
-    final hy = (lHip.y + rHip.y) / 2 / _imageSize.height;
-    return hy * screenHeight;
+    // lm.y คือ portrait Y โดยตรง (rotation0deg behavior)
+    return ((lHip.y + rHip.y) / 2) / _imageSize.height * screenHeight;
   }
 
   Offset targetCircleCenter(double screenW, double screenH) {

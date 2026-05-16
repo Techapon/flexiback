@@ -58,12 +58,20 @@ class PosePainter extends CustomPainter {
     final scaleX = size.width  / imageSize.width;
     final scaleY = size.height / imageSize.height;
 
+    final imgW = imageSize.width;   // 720
+    final imgH = imageSize.height;  // 1280
+
     Offset? _lm(PoseLandmarkType type, {double vis = 0.3}) {
       final lm = pose.landmarks[type];
       if (lm == null || lm.likelihood < vis) return null;
-      final px = smoothed?[type]?.dx ?? lm.x;
-      final py = smoothed?[type]?.dy ?? lm.y;
-      return Offset(size.width - px * scaleX, py * scaleY);
+
+      final rawX = lm.x;
+      final rawY = lm.y;
+
+      // ไม่ต้องแปลง rotation — ML Kit คืน portrait coordinates แล้ว
+      // flip X สำหรับกล้องหน้า
+      return Offset(size.width - rawX * (size.width / imageSize.width),
+                    rawY * (size.height / imageSize.height));
     }
 
     final linePaint = Paint()

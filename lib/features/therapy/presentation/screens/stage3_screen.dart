@@ -14,12 +14,8 @@ import '../providers/stage_provider.dart';
 import '../widgets/hud_widget.dart';
 import '../widgets/pose_painter.dart';
 
-/// Stage 3 — Marching Core Drill
-/// Python: run_stage3() — skeleton + hip line + knee trail + target circle
-
 class Stage3Screen extends StatefulWidget {
   const Stage3Screen({super.key});
-
   @override
   State<Stage3Screen> createState() => _Stage3ScreenState();
 }
@@ -29,10 +25,13 @@ class _Stage3ScreenState extends State<Stage3Screen> {
   PoseDetector? _detector;
   bool _busy = false;
 
-  // Python: kt = {"LEFT": deque(maxlen=12), "RIGHT": deque(maxlen=12)}
   final Queue<Offset> _leftTrail  = Queue();
   final Queue<Offset> _rightTrail = Queue();
   static const int _maxTrail = 12;
+
+  // image dimensions หลัง setImageSize (portrait): w=720, h=1280
+  static const double _imgW = 720.0;
+  static const double _imgH = 1280.0;
 
   @override
   void initState() {
@@ -56,11 +55,10 @@ class _Stage3ScreenState extends State<Stage3Screen> {
     final stage = context.read<StageProvider>();
     stage.setStage(3);
     stage.setImageSize(Size(
-      _cam!.value.previewSize!.height,
-      _cam!.value.previewSize!.width,
+      _cam!.value.previewSize!.height, // 720
+      _cam!.value.previewSize!.width,  // 1280
     ));
 
-    // ผูก callback
     stage.onTimeUp = () {
       if (!mounted) return;
       final therapy = context.read<TherapyProvider>();
@@ -74,35 +72,46 @@ class _Stage3ScreenState extends State<Stage3Screen> {
   }
 
   Future<void> _onFrame(CameraImage img) async {
-  if (_busy) return;
-  _busy = true;
-  try {
-    final inputImage = _toInputImage(img);
-    if (inputImage == null) return;
-    final poses = await _detector!.processImage(inputImage);
-    if (!mounted) return;
-    if (poses.isNotEmpty) {
-      _updateTrails(poses.first);  // ← เพิ่มบรรทัดนี้
+    if (_busy) return;
+    _busy = true;
+    try {
+      final inputImage = _toInputImage(img);
+      if (inputImage == null) return;
+      final poses = await _detector!.processImage(inputImage);
+      if (!mounted) return;
+      if (poses.isNotEmpty) {
+        _updateTrails(poses.first);
+      }
+      context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
+      if (mounted) setState(() {});
+    } finally {
+      _busy = false;
     }
-    context.read<StageProvider>().processPose(poses.isNotEmpty ? poses.first : null);
-    if (mounted) setState(() {});  // ← บังคับ repaint trail
-  } finally {
-    _busy = false;
   }
-}
+
+  /// แปลง landmark pixel landscape → screen portrait + flip X
+  /// rotation270: portrait_x = lm.y, portrait_y = imgH - lm.x
+  Offset _lmToScreen(double lmX, double lmY, Size screenSize) {
+    final px = screenSize.width  - (lmY / _imgW) * screenSize.width;  // flip X
+    final py =                     (_imgH - lmX) / _imgH * screenSize.height;
+    return Offset(px, py);
+  }
 
   void _updateTrails(Pose pose) {
     final size = MediaQuery.of(context).size;
     final lk = pose.landmarks[PoseLandmarkType.leftKnee];
     final rk = pose.landmarks[PoseLandmarkType.rightKnee];
 
+    // trail วาดบนหน้าจอ ต้องแปลง rotation270 + flip X
+    // แต่ trail แสดง knee ที่ user เห็น → ใช้ leftKnee/rightKnee ตาม mirror
+    // leftKnee ใน ML Kit = ขวาบนหน้าจอ (หลัง flip X)
     if (lk != null && lk.likelihood > 0.3) {
-      final pt = Offset(lk.x * size.width, lk.y * size.height);
+      final pt = _lmToScreen(lk.x, lk.y, size);
       _leftTrail.addLast(pt);
       if (_leftTrail.length > _maxTrail) _leftTrail.removeFirst();
     }
     if (rk != null && rk.likelihood > 0.3) {
-      final pt = Offset(rk.x * size.width, rk.y * size.height);
+      final pt = _lmToScreen(rk.x, rk.y, size);
       _rightTrail.addLast(pt);
       if (_rightTrail.length > _maxTrail) _rightTrail.removeFirst();
     }
@@ -112,14 +121,13 @@ class _Stage3ScreenState extends State<Stage3Screen> {
     try {
       final int width  = img.width;
       final int height = img.height;
-
       final yPlane = img.planes[0];
       final uPlane = img.planes[1];
       final vPlane = img.planes[2];
 
       final nv21 = Uint8List(width * height * 3 ~/ 2);
-
       int dstIndex = 0;
+
       for (int row = 0; row < height; row++) {
         final srcStart = row * yPlane.bytesPerRow;
         nv21.setRange(dstIndex, dstIndex + width, yPlane.bytes, srcStart);
@@ -147,11 +155,9 @@ class _Stage3ScreenState extends State<Stage3Screen> {
         ),
       );
     } catch (e) {
-      print('❌ toInputImage error: $e');
       return null;
     }
   }
-
 
   @override
   void dispose() {
@@ -174,57 +180,47 @@ class _Stage3ScreenState extends State<Stage3Screen> {
       );
     }
 
-    final hipY = stage.hipLevelY(size.height);
-    final isLeft = state.targetSide == DetectionSide.left;
+    final isLeft      = state.targetSide == DetectionSide.left;
+    final hipY        = stage.hipLevelY(size.height);
+    final activeColor = isLeft ? AiAppColors.gold : AiAppColors.coral;
 
-    // tcx ตาม knee X เหมือน Python — mirror flip X
-    final kneeType = isLeft
-        ? PoseLandmarkType.rightKnee   // mirror
+    // tcx ตาม knee X:
+    // isLeft UI → rightKnee ใน ML Kit (mirror)
+    // rotation270 + flip X: portrait_x = screenW - (lm.y / imgW) * screenW
+    final kneeKey = isLeft
+        ? PoseLandmarkType.rightKnee
         : PoseLandmarkType.leftKnee;
-    final smoothedKnee = stage.smoothedMap[kneeType];
+    final smoothedKnee = stage.smoothedMap[kneeKey];
     final tcx = smoothedKnee != null
-        ? (1.0 - smoothedKnee.dx / stage.imageSize.width) * size.width
-        : isLeft ? size.width * 0.30 : size.width * 0.70;
-
-    // tcy = hip_ly - 0.12*h เหมือน Python
+      ? size.width - smoothedKnee.dx * (size.width / _imgW)
+      : isLeft ? size.width * 0.30 : size.width * 0.70;
     final tcy = hipY - size.height * 0.12;
 
-    final targetX = tcx;
-    final targetY = tcy;
-
-
     final circleRadius = 44.0 + 8.0 * math.sin(state.animTime * 4);
-    final activeColor  = isLeft ? AiAppColors.gold : AiAppColors.coral;
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ── Virtual Background ────────────────────────
           VirtualBgWidget(stage: 3, animTime: state.animTime),
-
-          // ── Camera feed ──────────────────────────────
           Opacity(opacity: 0.55, child: CameraPreview(_cam!)),
 
-          // ── Skeleton ─────────────────────────────────
           if (stage.currentPose != null)
             CustomPaint(
               painter: PosePainter(
                 pose: stage.currentPose!,
                 imageSize: Size(
-                  _cam!.value.previewSize!.height,
-                  _cam!.value.previewSize!.width,
+                  _cam!.value.previewSize!.height, // 720
+                  _cam!.value.previewSize!.width,  // 1280
                 ),
                 animTime: state.animTime,
-                smoothed: stage.smoothedMap, // ← เพิ่ม
+                smoothed: stage.smoothedMap,
               ),
             ),
 
-          // ── Hip line ──────────────────────────────────
           CustomPaint(painter: HipLinePainter(hipY: hipY)),
 
-          // ── Knee trail ────────────────────────────────
           CustomPaint(
             painter: KneeTrailPainter(
               leftTrail:  _leftTrail.toList(),
@@ -232,10 +228,9 @@ class _Stage3ScreenState extends State<Stage3Screen> {
             ),
           ),
 
-          // ── Target circle above hip ───────────────────
           CustomPaint(
             painter: Stage2TargetPainter(
-              center: Offset(targetX, targetY),
+              center: Offset(tcx, tcy),
               radius: circleRadius,
               holdProgress: (state.holdFrames / StageState.holdThreshold).clamp(0.0, 1.0),
               isLeft: isLeft,
@@ -243,43 +238,29 @@ class _Stage3ScreenState extends State<Stage3Screen> {
             ),
           ),
 
-          // ── LIFT label ────────────────────────────────
           Positioned(
-            top: targetY - circleRadius - 28,
-            left: targetX - 40,
-            child: Text(
-              '^ LIFT',
-              style: TextStyle(
-                color: activeColor,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            top: tcy - circleRadius - 28,
+            left: tcx - 40,
+            child: Text('^ LIFT',
+              style: TextStyle(color: activeColor, fontSize: 14, fontWeight: FontWeight.bold)),
           ),
 
-          // ── Prompt bottom ─────────────────────────────
           Positioned(
             bottom: 52, left: 0, right: 0,
             child: Center(
               child: Text(
                 'Lift  ${isLeft ? 'LEFT' : 'RIGHT'}  knee',
                 style: TextStyle(
-                  color: activeColor,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  color: activeColor, fontSize: 22, fontWeight: FontWeight.bold,
                   shadows: const [Shadow(color: Colors.black, offset: Offset(2,2), blurRadius: 4)],
                 ),
               ),
             ),
           ),
 
-          // ── Flash ─────────────────────────────────────
           FlashOverlay(alpha: state.flashAlpha, color: AiAppColors.teal),
-
-          // ── Feedback ──────────────────────────────────
           FeedbackWidget(text: state.feedback, color: AiAppColors.teal),
 
-          // ── HowTo Panel ───────────────────────────────
           HowToPanel(lines: const [
             '1. Stand, feet hip-width',
             '2. Lift ONE knee HIGH',
@@ -290,27 +271,20 @@ class _Stage3ScreenState extends State<Stage3Screen> {
             '   Activates deep back',
           ]),
 
-          // ── HUD ───────────────────────────────────────
           Positioned(
             top: 0, left: 0, right: 0,
             child: HudWidget(
-              stage: 3,
-              reps: state.reps,
-              timeLeft: state.timeLeft,
-              stageName: 'Marching Core Drill',
+              stage: 3, reps: state.reps,
+              timeLeft: state.timeLeft, stageName: 'Marching Core Drill',
             ),
           ),
 
-          // ── Intro overlay ─────────────────────────────
           if (therapy.status == SessionStatus.waiting)
             StageIntroOverlay(
               stage: 3,
               name: therapy.currentStageName,
               description: therapy.currentStageDescription,
-              onStart: () {
-                therapy.startCurrentStage();
-                stage.startGame();
-              },
+              onStart: () { therapy.startCurrentStage(); stage.startGame(); },
             ),
 
           if (therapy.status == SessionStatus.stageDone)
