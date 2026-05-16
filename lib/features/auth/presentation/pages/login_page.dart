@@ -54,117 +54,124 @@ class _LoginPageState extends State<LoginPage> {
           ),
           child: SingleChildScrollView(
             clipBehavior: Clip.none,
-            child: Column(
-              spacing: 24,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-            
-                CircleAvatar(
-                  backgroundColor: AppColor.base1,
-                  radius: 83,
-                  child: CircleAvatar(
-                    backgroundColor: AppColor.cream1,
-                    radius: 78,
-                    child: CircleAvatar(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 650
+                ),
+                child: Column(
+                  spacing: 24,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                
+                    CircleAvatar(
                       backgroundColor: AppColor.base1,
-                      radius: 73,
+                      radius: 83,
                       child: CircleAvatar(
-                        backgroundColor: AppColor.grey2,
-                        radius: 63,
+                        backgroundColor: AppColor.cream1,
+                        radius: 78,
                         child: CircleAvatar(
-                          radius: 60,
-                          backgroundImage: AssetImage("assets/brand/app_icon.png"),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            
-                Column(
-                  spacing: 12,
-                  children: [
-                    Custom_Textfeild(
-                      hint: "email",
-                      type: TextInputType.text,
-                      obscureText: false,
-                      controller: emailC,
-                      icon: Icons.email_outlined,
-                    ),
-            
-                    Custom_Textfeild(
-                      hint: "password",
-                      type: TextInputType.text,
-                      obscureText: true,
-                      controller: passwordC,
-                      icon: Icons.lock_outline_rounded,
-                    ),
-                  ],
-                ),
-
-                Column(
-                  children: [
-
-                    Auth_Btn(
-                      text: "Login",
-                      onTap: () async {
-                        if (authProvider.isLoading) return;
-                        await authProvider.login(
-                          emailC.text.trim(),
-                          passwordC.text.trim(),
-                        );
-
-                        if (authProvider.isLoggedIn) {
-                          Role userRole = authProvider.getUser.role;
-                          if (userRole == Role.General) {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              AppRoutes.generalMainShell,
-                              arguments: authProvider.getUser.id,
-                              
-                            );
-                          } else if (userRole == Role.Therapist) {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              AppRoutes.therapistMainShell,
-                            );
-                          }
-                        }
-                        
-                      },
-                      isLoading: authProvider.isLoading,
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account? ",
-                          style: TextStyle(
-                            color: AppColor.cream3,
-                            fontSize: 16,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, AppRoutes.signup);
-                          },
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              color: AppColor.cream4,
-                              fontSize: 16,
+                          backgroundColor: AppColor.base1,
+                          radius: 73,
+                          child: CircleAvatar(
+                            backgroundColor: AppColor.grey2,
+                            radius: 63,
+                            child: CircleAvatar(
+                              radius: 60,
+                              backgroundImage: AssetImage("assets/brand/app_icon.png"),
                             ),
                           ),
                         ),
+                      ),
+                    ),
+                
+                    Column(
+                      spacing: 12,
+                      children: [
+                        Custom_Textfeild(
+                          hint: "email",
+                          type: TextInputType.text,
+                          obscureText: false,
+                          controller: emailC,
+                          icon: Icons.email_outlined,
+                        ),
+                
+                        Custom_Textfeild(
+                          hint: "password",
+                          type: TextInputType.text,
+                          obscureText: true,
+                          controller: passwordC,
+                          icon: Icons.lock_outline_rounded,
+                        ),
                       ],
-                    )
+                    ),
+                
+                    Column(
+                      children: [
+                
+                        Auth_Btn(
+                          text: "Login",
+                          onTap: () async {
+                            if (authProvider.isLoading) return;
+                            await authProvider.login(
+                              emailC.text.trim(),
+                              passwordC.text.trim(),
+                            );
+                
+                            if (authProvider.isLoggedIn) {
+                              Role userRole = authProvider.getUser.role;
+                              if (userRole == Role.General) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.generalMainShell,
+                                  arguments: authProvider.getUser.id,
+                                  
+                                );
+                              } else if (userRole == Role.Therapist) {
+                                Navigator.pushReplacementNamed(
+                                  context,
+                                  AppRoutes.therapistMainShell,
+                                );
+                              }
+                            }
+                            
+                          },
+                          isLoading: authProvider.isLoading,
+                        ),
+                
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Don't have an account? ",
+                              style: TextStyle(
+                                color: AppColor.cream3,
+                                fontSize: 16,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, AppRoutes.signup);
+                              },
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  color: AppColor.cream4,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                
+                
+                
                   ],
                 ),
-
-            
-            
-              ],
+              ),
             ),
           ),
         )

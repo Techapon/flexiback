@@ -240,24 +240,22 @@ class StageProvider extends ChangeNotifier {
     final rHip = pose.landmarks[PoseLandmarkType.rightHip];
     if (lHip == null || rHip == null) return;
 
-    final hipY   = (lHip.y + rHip.y) / 2;
-    final hipX   = (lHip.x + rHip.x) / 2;
+    // ML Kit pixel → normalized
+    final hy = (lHip.y + rHip.y) / 2 / _imageSize.height;
     final isLeft = _state.targetSide == DetectionSide.left;
 
-    // mirror: isLeft UI = rightKnee ใน ML Kit
+    // Python flip ไว้แล้ว → LEFT=LEFT, แต่ Flutter กล้องหน้า mirror
+    // → isLeft UI = rightKnee ใน ML Kit (เหมือนเดิม)
     final knee = isLeft
         ? pose.landmarks[PoseLandmarkType.rightKnee]
         : pose.landmarks[PoseLandmarkType.leftKnee];
     if (knee == null || knee.likelihood < 0.35) return;
 
-    final kneeThresh = _imageSize.height * 0.08;
-    final okY = knee.y > hipY + kneeThresh;
-    final okX = isLeft
-        ? knee.x > hipX   // isLeft UI = เข่าอยู่ขวาของ hip ใน ML Kit
-        : knee.x < hipX;  // isRight UI = เข่าอยู่ซ้ายของ hip ใน ML Kit
-    final ok = okY && okX;
+    // normalized เหมือน Python: lk.y < hy - 0.10
+    final kneeNorm = knee.y / _imageSize.height;
+    final ok = kneeNorm < hy - 0.10;
 
-    int           newHoldFrames = ok ? _state.holdFrames + 1 : 0;
+    int           newHoldFrames = ok ? _state.holdFrames + 1 : math.max(0, _state.holdFrames - 1);
     bool          newReached    = _state.reached;
     int           newReps       = _state.reps;
     String        newFeedback   = _state.feedback;
@@ -300,9 +298,9 @@ class StageProvider extends ChangeNotifier {
     final lHip = _currentPose?.landmarks[PoseLandmarkType.leftHip];
     final rHip = _currentPose?.landmarks[PoseLandmarkType.rightHip];
     if (lHip == null || rHip == null) return screenHeight * hipZoneFraction;
-    // ML Kit คืน pixel → แปลงเป็น fraction แล้ว scale ไป screen
-    final hipFraction = (lHip.y + rHip.y) / 2 / _imageSize.height;
-    return hipFraction * screenHeight;
+    // normalized เหมือน Python: hy = (lh.y + rh.y) / 2
+    final hy = (lHip.y + rHip.y) / 2 / _imageSize.height;
+    return hy * screenHeight;
   }
 
   Offset targetCircleCenter(double screenW, double screenH) {

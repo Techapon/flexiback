@@ -174,18 +174,24 @@ class _Stage3ScreenState extends State<Stage3Screen> {
       );
     }
 
-    final isLeft  = state.targetSide == DetectionSide.left;
     final hipY = stage.hipLevelY(size.height);
+    final isLeft = state.targetSide == DetectionSide.left;
 
-    // target circle follows knee x position
-    // ── แก้เป็น ───────────────────────────────────
+    // tcx ตาม knee X เหมือน Python — mirror flip X
     final kneeType = isLeft
-        ? PoseLandmarkType.leftKnee
-        : PoseLandmarkType.rightKnee;
+        ? PoseLandmarkType.rightKnee   // mirror
+        : PoseLandmarkType.leftKnee;
     final smoothedKnee = stage.smoothedMap[kneeType];
-    
-    final targetX = isLeft ? size.width * 0.30 : size.width * 0.70;
-    final targetY = hipY - size.height * 0.10;  // เหนือ hip 18%
+    final tcx = smoothedKnee != null
+        ? (1.0 - smoothedKnee.dx / stage.imageSize.width) * size.width
+        : isLeft ? size.width * 0.30 : size.width * 0.70;
+
+    // tcy = hip_ly - 0.12*h เหมือน Python
+    final tcy = hipY - size.height * 0.12;
+
+    final targetX = tcx;
+    final targetY = tcy;
+
 
     final circleRadius = 44.0 + 8.0 * math.sin(state.animTime * 4);
     final activeColor  = isLeft ? AiAppColors.gold : AiAppColors.coral;
@@ -211,6 +217,7 @@ class _Stage3ScreenState extends State<Stage3Screen> {
                   _cam!.value.previewSize!.width,
                 ),
                 animTime: state.animTime,
+                smoothed: stage.smoothedMap, // ← เพิ่ม
               ),
             ),
 

@@ -52,7 +52,7 @@ class _SignupPageState extends State<SignupPage> {
       backgroundColor: AppColor.base1,
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Green header with back button and illustration
             Container(
@@ -148,171 +148,176 @@ class _SignupPageState extends State<SignupPage> {
             ),
       
             // Form content
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 36, vertical: 32),
-              child: Column(
-                spacing: 12,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  Column(
-                    spacing: 6,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "email",
-                        style: TextStyle(
-                          color: AppColor.main1,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 700
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 36, vertical: 32),
+                child: Column(
+                  spacing: 12,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+              
+                    Column(
+                      spacing: 6,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "email",
+                          style: TextStyle(
+                            color: AppColor.main1,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      
-                      Custom_Textfeild(
-                        hint: 'email here..',
-                        type: TextInputType.emailAddress,
-                        obscureText: false,
-                        controller: emailC,
-                        errorText: authProvider.errorEmail,
-                        icon: Icons.email,
-                      ),
-
-                    ],
-                  ),
-
-                  Column(
-                    spacing: 6,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Password field
-                      Text(
-                        "password",
-                        style: TextStyle(
-                          color: AppColor.main2,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                        
+                        Custom_Textfeild(
+                          hint: 'email here..',
+                          type: TextInputType.emailAddress,
+                          obscureText: false,
+                          controller: emailC,
+                          errorText: authProvider.errorEmail,
+                          icon: Icons.email,
                         ),
-                      ),
-                      Custom_Textfeild(
-                        hint: 'password here..',
-                        type: TextInputType.text,
-                        obscureText: true,
-                        controller: passwordC,
-                        errorText: authProvider.errorPassword,
-                        icon: Icons.lock_outline_rounded,
-                      ),
-                      Custom_Textfeild(
-                        hint: 'comfirm password..',
-                        type: TextInputType.text,
-                        obscureText: true,
-                        controller: confirmPasswordC,
-                        errorText: authProvider.errorConfirmPassword,
-                        icon: Icons.check_rounded,
-                      ),
-                    ],
-                  ),
-
-                  Column(
-                    spacing: 6,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "your role",
-                        style: TextStyle(
-                          color: AppColor.main2,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+              
+                      ],
+                    ),
+              
+                    Column(
+                      spacing: 6,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Password field
+                        Text(
+                          "password",
+                          style: TextStyle(
+                            color: AppColor.main2,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-
-                      Row(
-                        spacing: 12,
-                        children: [
-                          RadioMenuButton(
-                            value: Role.General,
-                            groupValue: roleSelect,
-                            onChanged: (value) {
-                              setState(() {
-                                roleSelect = value!;
-                              });
-                            },
-                            child: Text(
-                              Role.General.entity
+                        Custom_Textfeild(
+                          hint: 'password here..',
+                          type: TextInputType.text,
+                          obscureText: true,
+                          controller: passwordC,
+                          errorText: authProvider.errorPassword,
+                          icon: Icons.lock_outline_rounded,
+                        ),
+                        Custom_Textfeild(
+                          hint: 'comfirm password..',
+                          type: TextInputType.text,
+                          obscureText: true,
+                          controller: confirmPasswordC,
+                          errorText: authProvider.errorConfirmPassword,
+                          icon: Icons.check_rounded,
+                        ),
+                      ],
+                    ),
+              
+                    Column(
+                      spacing: 6,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "your role",
+                          style: TextStyle(
+                            color: AppColor.main2,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+              
+                        Row(
+                          spacing: 12,
+                          children: [
+                            RadioMenuButton(
+                              value: Role.General,
+                              groupValue: roleSelect,
+                              onChanged: (value) {
+                                setState(() {
+                                  roleSelect = value!;
+                                });
+                              },
+                              child: Text(
+                                Role.General.entity
+                              ),
+                            ),
+                        
+                            RadioMenuButton(
+                              value: Role.Therapist,
+                              groupValue: roleSelect,
+                              onChanged: (value) {
+                                setState(() {
+                                  roleSelect = value!;
+                                });
+                              },
+                              child: Text(
+                                Role.Therapist.entity
+                              )
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    
+                    // Sign up button
+                    Auth_Btn(
+                      text: 'Sign up',
+                      isLoading: authProvider.isLoading,
+                      onTap: () async {
+                        if (authProvider.isLoading) return;
+                        await authProvider.signup(
+                          emailC.text.trim(),
+                          passwordC.text.trim(),
+                          confirmPasswordC.text.trim(),
+                          roleSelect
+                        );
+              
+                        if (authProvider.error == null && authProvider.isSignUp) {
+                          showSuccessDialog(
+                            context: context,
+                            message: "Welcome to FlexiBack, Please comfirm your email🦊",
+                          );
+                          emailC.clear();
+                          passwordC.clear();
+                          confirmPasswordC.clear();
+                        }
+                      },
+                    ),
+                    
+                    // Navigate to login
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Alerady have an Account?",
+                          style: TextStyle(
+                            color: AppColor.grey3,
+                            fontSize: 14,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (authProvider.isLoading) return;
+                            Navigator.pop(context);
+                            authProvider.clearError();
+                          },
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                              color: AppColor.cream3,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                      
-                          RadioMenuButton(
-                            value: Role.Therapist,
-                            groupValue: roleSelect,
-                            onChanged: (value) {
-                              setState(() {
-                                roleSelect = value!;
-                              });
-                            },
-                            child: Text(
-                              Role.Therapist.entity
-                            )
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-      
-                  // Sign up button
-                  Auth_Btn(
-                    text: 'Sign up',
-                    isLoading: authProvider.isLoading,
-                    onTap: () async {
-                      if (authProvider.isLoading) return;
-                      await authProvider.signup(
-                        emailC.text.trim(),
-                        passwordC.text.trim(),
-                        confirmPasswordC.text.trim(),
-                        roleSelect
-                      );
-
-                      if (authProvider.error == null && authProvider.isSignUp) {
-                        showSuccessDialog(
-                          context: context,
-                          message: "Welcome to FlexiBack, Please comfirm your email🦊",
-                        );
-                        emailC.clear();
-                        passwordC.clear();
-                        confirmPasswordC.clear();
-                      }
-                    },
-                  ),
-      
-                  // Navigate to login
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Alerady have an Account?",
-                        style: TextStyle(
-                          color: AppColor.grey3,
-                          fontSize: 14,
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (authProvider.isLoading) return;
-                          Navigator.pop(context);
-                          authProvider.clearError();
-                        },
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            color: AppColor.cream3,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                ],
+                      ],
+                    ),
+              
+                  ],
+                ),
               ),
             ),
           ],
