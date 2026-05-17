@@ -4,17 +4,17 @@ import 'package:flexiback/core/utils/week_getter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../device/domain/entities/daily_progress_entity.dart';
-
 class SimpleBarChart extends StatefulWidget {
-  List<DailyProgressEntity> rawData;
+  List<(DateTime, double)> rawData;
   Widget Function(List<(DateTime, double)> data,int index) bottomTitle;
   Function(int index) onTapBar;
+  double? maxY;
   SimpleBarChart({
     super.key, 
     required this.rawData,
     required this.bottomTitle,
-    required this.onTapBar
+    required this.onTapBar,
+    this.maxY,
   });
 
   @override
@@ -25,15 +25,19 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
 
   @override
   Widget build(BuildContext context) {
-    late List<(DateTime, double)> data = List.generate(
-      widget.rawData.length,
-      (i) {
-        return (widget.rawData[i].dateTime!,widget.rawData[i].straightScore!);
+    late List<(DateTime, double)> data = widget.rawData;
+
+    double? calculatedMaxY = widget.maxY;
+    if (calculatedMaxY == null) {
+      double maxSessionValue = 0;
+      if (data.isNotEmpty) {
+        maxSessionValue = data.map((e) => e.$2).reduce((a, b) => a > b ? a : b);
       }
-    );
+      calculatedMaxY = maxSessionValue;
+    }
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final minWidth = (data.length * 50.0).clamp(screenWidth, double.infinity);
+    final minWidth = (data.length * 55.0).clamp(screenWidth, double.infinity);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -48,7 +52,7 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
           child: BarChart(
             BarChartData(
               minY: 0,
-              maxY: 100,
+              maxY: calculatedMaxY,
               // ── 1. กำหนด Bar แต่ละแท่ง ──
               barGroups: List.generate(data.length, (i) {
               
@@ -101,7 +105,7 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
                 bottomTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 49,
+                    reservedSize: 52,
                     getTitlesWidget: (value, meta) {
                       final int index = value.toInt();
                       
@@ -120,7 +124,7 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
                 ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
-                    interval: 50,
+                    interval: calculatedMaxY/2,
                     showTitles: true,
                     reservedSize: 32,
                     getTitlesWidget: (value, meta) {
@@ -156,7 +160,7 @@ class _SimpleBarChartState extends State<SimpleBarChart> {
               gridData: FlGridData(
                 show: true,
                 drawVerticalLine: false,
-                horizontalInterval: 50
+                horizontalInterval: calculatedMaxY/2
               ),
             ),
           ),

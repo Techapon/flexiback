@@ -3,13 +3,13 @@ import 'package:flexiback/features/device/domain/entities/daily_progress_entity.
 import 'package:flutter/material.dart';
 
 class DetailScoreBar extends StatelessWidget {
-  final DailyProgressEntity currentData;
+  final double score;
+  final DateTime date;
   final String Function(DateTime date) dateFormated;
   const DetailScoreBar({
     super.key, 
-    // required this.rawData,
-    // required this.currentIndex,
-    required this.currentData,
+    required this.score,
+    required this.date,
     required this.dateFormated
   });
 
@@ -45,7 +45,7 @@ class DetailScoreBar extends StatelessWidget {
                 ),
               ),
               Text(
-                "${currentData.straightScore?.toStringAsFixed(1)}",
+                "${score.toStringAsFixed(1)}",
                 style: TextStyle(
                   color: AppColor.black1,
                   fontSize: 18,
@@ -65,7 +65,7 @@ class DetailScoreBar extends StatelessWidget {
                 ),
               ),
               Text(
-                "${dateFormated(currentData.dateTime!)}",
+                "${dateFormated(date)}",
                 style: TextStyle(
                   color: AppColor.black1,
                   fontSize: 18,

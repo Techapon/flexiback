@@ -14,6 +14,8 @@ import 'package:flexiback/features/trend/domain/service/charts/aggregate_device_
 import 'package:flexiback/features/trend/domain/service/charts/aggregate_device_usage_month.dart';
 import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_device_usage_day.dart';
 import 'package:flexiback/features/trend/domain/service/charts/fill_the_gap_device_usage_month.dart';
+import 'package:flexiback/features/trend/domain/service/charts/aggregate_therapy_session_day.dart';
+import 'package:flexiback/features/trend/domain/service/charts/aggregate_therapy_session_month.dart';
 import 'package:flexiback/features/trend/presentation/widgets/date_bar.dart';
 import 'package:flexiback/features/trend/presentation/widgets/graph/bar_chart/stacked_bar_chart.dart';
 import 'package:flexiback/features/trend/presentation/controller/trend_provider.dart';
@@ -59,7 +61,8 @@ class _GraphTrendState extends State<GraphTrend> {
 
   List<ImageTextEntity> recordType = [
     ImageTextEntity(path: "assets/emoji/setting.png",text: RecordType.deviceUsage.entity, decorate: ''),
-    ImageTextEntity(path: "assets/emoji/graph.png",text: RecordType.dailyProgress.entity, decorate: '')
+    ImageTextEntity(path: "assets/emoji/graph.png",text: RecordType.dailyProgress.entity, decorate: ''),
+    ImageTextEntity(path: "assets/emoji/graph.png",text: RecordType.therapySession.entity, decorate: '')
   ];
 
   RecordType recordTypeSelected = RecordType.deviceUsage;
@@ -102,6 +105,7 @@ class _GraphTrendState extends State<GraphTrend> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _trendProvider = context.read<TrendProvider>();
       _trendProvider.getDailyProgress(widget.userId!);
+      _trendProvider.getTherapySessions(widget.userId!);
 
       if (_trendProvider.fullData == null && widget.fromCalendar != true) {
         _trendProvider.getFullDataUsage(widget.userId!, widget.lastedtDay!);
@@ -614,7 +618,8 @@ class _GraphTrendState extends State<GraphTrend> {
                                           child: AspectRatio(
                                             aspectRatio: 1.5,
                                             child: SimpleBarChart(
-                                              rawData: rawData,
+                                              maxY: 100,
+                                              rawData: rawData.map((e) => (e.dateTime!, e.straightScore!)).toList(),
                                               bottomTitle: (data,index) {
                                                 return Column(
                                                   children: [
@@ -660,7 +665,8 @@ class _GraphTrendState extends State<GraphTrend> {
                                                     ),
                                                     Expanded(
                                                       child: DetailScoreBar(
-                                                        currentData:  curentData,
+                                                        score: curentData.straightScore ?? 0.0,
+                                                        date: curentData.dateTime!,
                                                         dateFormated: (date) => dateFormatDetail(date),
                                                       )
                                                     )
@@ -709,6 +715,144 @@ class _GraphTrendState extends State<GraphTrend> {
                                   ),
                                 )
                                                   
+                              ],
+                            ),
+                          );
+                        }(),
+
+                      if (recordTypeSelected == RecordType.therapySession)
+                        (){
+                          final originData = trendProvider.therapySessionList ?? [];
+                          if (originData.isEmpty) {
+                            return Expanded(
+                              child: Center(
+                                child: Text("No Therapy Sessions", style: TextStyle(color: AppColor.grey3, fontWeight: FontWeight.bold, fontSize: 16))
+                              )
+                            );
+                          }
+                          
+                          final rawData = dailyPeroidSelected == ChartPeriod.day
+                            ? aggregateTherapySessionDay(originData)
+                            : aggregateTherapySessionMonth(originData);
+
+                          String Function(List<(DateTime, double)>, int) botTitle1 = dailyPeroidSelected == ChartPeriod.day 
+                            ? (data, index) => "${weekGetter(data[index].$1.weekday)}."
+                            : (data, index) => "${monthGetter(data[index].$1.month)}.";
+                            
+                          String botTitle2 = dailyPeroidSelected == ChartPeriod.day 
+                            ? "d/M/yy"
+                            : "yy";
+
+                          String Function(DateTime) dateFormat = (date) => DateFormat("dd / MM / yy").format(date);
+                          String Function(DateTime) dateFormatDetail = (date) => DateFormat("d/M/yy").format(date);
+
+                          final curentData = rawData[dailyBarTouchCurrentIndex];
+                          final int originCurrentIndex = dailyBarTouchCurrentIndex;
+
+                          final double? change = (originCurrentIndex <= 0)
+                            ? null
+                            : curentData.$2 - rawData[originCurrentIndex-1].$2;
+
+                          final double? changePercent = (change == null || curentData.$2 == 0)
+                            ? null
+                            : (change / curentData.$2) * 100;
+
+                          return Expanded(
+                            child: Column(
+                              spacing: 16,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${dateFormat(rawData.first.$1)} - ${dateFormat(rawData.last.$1)}",
+                                  style: TextStyle(
+                                    color: AppColor.grey3,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                          
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      spacing: 16,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          child: AspectRatio(
+                                            aspectRatio: 1.5,
+                                            child: SimpleBarChart(
+                                              rawData: rawData,
+                                              bottomTitle: (data,index) {
+                                                return Column(
+                                                  children: [
+                                                    Text(
+                                                      "${botTitle1(data,index)}",
+                                                      style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),
+                                                    ),
+                                                    Text(
+                                                      DateFormat("$botTitle2").format(data[index].$1),
+                                                      style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                              onTapBar: (index) {
+                                                setState(() {
+                                                  dailyBarTouchCurrentIndex = index;
+                                                });
+                                              },
+                                            )
+                                          ),
+                                        ),
+                                        Container(
+                                          child: Column(
+                                            spacing: 16,
+                                            children: [
+                                              IntrinsicHeight(
+                                                child: Row(
+                                                  spacing: 8,
+                                                  children: [
+                                                    IntrinsicWidth(
+                                                      child: Custom_Dropdown(
+                                                        valueListenable_title: valueListenable_dailyPeroid,
+                                                        List_items: dailyPeroid,
+                                                        onChanged: (vale) {
+                                                          setState(() {
+                                                            dailyBarTouchCurrentIndex = 0;
+                                                            dailyPeroidSelected = ChartPeriod.fromEntity(vale);
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: DetailScoreBar(
+                                                        score: curentData.$2,
+                                                        date: curentData.$1,
+                                                        dateFormated: (date) => dateFormatDetail(date),
+                                                      )
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              DetailBox(
+                                                icon: change != null 
+                                                  ? change > 0 ? LucideIcons.trendingUp : LucideIcons.trendingDown
+                                                  : LucideIcons.minus,
+                                                title: "Change",
+                                                content: change == null 
+                                                  ? '--' 
+                                                  : "${change.toStringAsFixed(1)} scores, ${changePercent!.toStringAsFixed(2)}% change",
+                                                contentColor: change != null 
+                                                  ? change > 0 ? AppColor.green1 : AppColor.red1
+                                                  : null,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
                           );

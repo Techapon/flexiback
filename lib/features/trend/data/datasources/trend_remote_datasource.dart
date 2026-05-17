@@ -5,6 +5,7 @@ import 'package:flexiback/features/device/data/models/daily_progress_model.dart'
 import 'package:flexiback/features/device/data/models/fulldata_model.dart';
 import 'package:flexiback/features/device/domain/entities/full_data_entity.dart';
 import 'package:flexiback/features/trend/data/models/overview_model.dart';
+import 'package:flexiback/features/trend/data/models/therapy_session_trend_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TrendRemoteDatasource {
@@ -85,6 +86,22 @@ class TrendRemoteDatasource {
         .order("date_time", ascending: true);
 
       return (response as List).map((item) => DailyProgressModel.fromMap(item)).toList();
+    } on PostgrestException catch (e) {
+      throw CoreFailure.databaseError(e.message);
+    } catch (e) {
+      throw CoreFailure.unknown(e.toString());
+    }
+  }
+
+  Future<List<TherapySessionTrendModel>> getTherapySessions(String userId) async {
+    try {
+      final response = await supabase
+        .from("therapy_sessions")
+        .select()
+        .eq("user_id", userId)
+        .order("created_at", ascending: true);
+
+      return (response as List).map((item) => TherapySessionTrendModel.fromMap(item)).toList();
     } on PostgrestException catch (e) {
       throw CoreFailure.databaseError(e.message);
     } catch (e) {

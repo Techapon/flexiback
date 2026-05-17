@@ -11,7 +11,9 @@ import 'package:flexiback/features/trend/domain/usecases/get_full_data_usage_use
 import 'package:flexiback/features/trend/domain/usecases/get_overview_usecase.dart';
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/therapy_session_trend_entity.dart';
 import '../../domain/service/charts/aggregate_device_usage_day.dart';
+import '../../domain/usecases/get_therapy_sessions_usecase.dart';
 
 class TrendProvider extends ChangeNotifier {
 
@@ -21,6 +23,7 @@ class TrendProvider extends ChangeNotifier {
     deviceOverviewList?.clear();
     fullData = null;
     dailyProgressList?.clear();
+    therapySessionList?.clear();
   }
 
   final getOverviewUsecase =
@@ -29,6 +32,8 @@ class TrendProvider extends ChangeNotifier {
     GetFullDataUsageUsecase(TrendRepositoryImpl(TrendRemoteDatasource()));
   final getDailyProgressTrendUsecase =
     GetDailyProgressTrendUsecase(TrendRepositoryImpl(TrendRemoteDatasource()));
+  final getTherapySessionsUsecase =
+    GetTherapySessionsUsecase(TrendRepositoryImpl(TrendRemoteDatasource()));
 
   bool isLoading = false;
   String? error;
@@ -46,6 +51,9 @@ class TrendProvider extends ChangeNotifier {
 
   // Daily Progress
   List<DailyProgressEntity>? dailyProgressList;
+
+  // Therapy Session
+  List<TherapySessionTrendEntity>? therapySessionList;
 
   // calandar
   CalendarEntity? deviceUsageCalendar;
@@ -115,6 +123,21 @@ class TrendProvider extends ChangeNotifier {
 
     try {
       dailyProgressList = await getDailyProgressTrendUsecase.call(userId);
+    } catch (e) {
+      error = e.toString();
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> getTherapySessions(String userId) async {
+    error = null;
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      therapySessionList = await getTherapySessionsUsecase.call(userId);
     } catch (e) {
       error = e.toString();
     }

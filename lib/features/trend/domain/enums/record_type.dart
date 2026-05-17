@@ -6,6 +6,9 @@ enum RecordType {
   ),
   dailyProgress(
     entity: "Daily Progress"
+  ),
+  therapySession(
+    entity: "Therapy Session"
   );
 
   final String entity;
