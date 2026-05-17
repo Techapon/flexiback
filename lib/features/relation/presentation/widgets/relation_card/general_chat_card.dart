@@ -2,6 +2,7 @@ import 'package:flexiback/config/theme/colors/app_color.dart';
 import 'package:flexiback/core/utils/text_uppercase.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flexiback/features/relation/presentation/pages/message.dart';
+import 'package:flexiback/features/relation/presentation/widgets/personal_profile_dialog.dart' show PersonalProfileDialog;
 import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/domain/entities/general_entity.dart';
 import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
@@ -10,7 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
-class GeneralChatCard extends StatelessWidget {
+import '../../../../../core/enums/role.dart';
+import '../../../../trend/presentation/controller/trend_provider.dart';
+
+class GeneralChatCard extends StatefulWidget {
   final RelationEntity freinds;
   const GeneralChatCard({
     super.key,
@@ -18,10 +22,15 @@ class GeneralChatCard extends StatelessWidget {
   });
 
   @override
+  State<GeneralChatCard> createState() => _GeneralChatCardState();
+}
+
+class _GeneralChatCardState extends State<GeneralChatCard> {
+
+  @override
   Widget build(BuildContext context) {
     final relationProvider = context.watch<RelationProvider>(); 
-
-    final profile = freinds.userProfile! as GeneralEntity;
+    final profile = widget.freinds.userProfile! as GeneralEntity;
     
     return Column(
       spacing: 16,
@@ -30,38 +39,50 @@ class GeneralChatCard extends StatelessWidget {
         Row(
           spacing: 16,
           children: [
-            Container(
-              height: 65,
-              width: 65,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColor.base1,
-                  width: 3
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColor.black1.withOpacity(0.1),
-                    blurRadius: 15,
-                    spreadRadius: 2,
-                    offset: Offset(0, 5),
+            GestureDetector(
+              onTap: () {
+                final trendProvider = context.read<TrendProvider>();
+                trendProvider.disposeProvi();
+                trendProvider.getOverviewData(profile.id);
+
+                showDialog(
+                  context: context,
+                  builder: (context) => PersonalProfileDialog(userRole: Role.General,relationUserProfile: profile,)
+                );
+              },
+              child: Container(
+                height: 65,
+                width: 65,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColor.base1,
+                    width: 3
                   ),
-                ],
-            
-                image: (profile.img != null)
-                    ? DecorationImage(
-                        image: NetworkImage("${profile.img}"),
-                        fit: BoxFit.cover,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColor.black1.withOpacity(0.1),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+              
+                  image: (profile.img != null)
+                      ? DecorationImage(
+                          image: NetworkImage("${profile.img}"),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: (profile.img == null)
+                    ? Icon(
+                        LucideIcons.user300,
+                        color: AppColor.grey3,
+                        size: 40,
                       )
                     : null,
               ),
-              child: (profile.img == null)
-                  ? Icon(
-                      LucideIcons.user300,
-                      color: AppColor.grey3,
-                      size: 40,
-                    )
-                  : null,
             ),
   
             Flexible(
@@ -136,7 +157,7 @@ class GeneralChatCard extends StatelessWidget {
               relationProvider.getChat(profile.id);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Message(freinds: freinds,))
+                MaterialPageRoute(builder: (context) => Message(freinds: widget.freinds,))
               );
             },
             borderRadius: 28,

@@ -4,8 +4,8 @@ import 'package:flexiback/features/relation/domain/entities/relation_entity.dart
 import 'package:flexiback/features/relation/domain/entities/message_entity.dart';
 import 'package:flexiback/features/relation/domain/enums/message_enums.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
-import 'package:flexiback/features/relation/presentation/widgets/text_box_sender.dart';
-import 'package:flexiback/features/relation/presentation/widgets/text_box_talker.dart';
+import 'package:flexiback/features/relation/presentation/widgets/messages_box/text_box_sender.dart';
+import 'package:flexiback/features/relation/presentation/widgets/messages_box/text_box_talker.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -293,6 +293,12 @@ class _MessageState extends State<Message> {
                               final bool isBeforeMessageMine = index == 0 
                                 ? false
                                 : chatList[index -1].isMine!;
+                              
+                              // final bool isBeforeMessageMine = index == 0 
+                              //   ? false
+                              //   : chatList[index -1].isMine!;
+
+                              print("IS MINE ${isBeforeMessageMine}");
                               
                               if (message.isMine!) {
                                 return Padding(

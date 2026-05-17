@@ -8,12 +8,14 @@ class Appbar1 extends StatelessWidget implements PreferredSizeWidget {
   final String? pathImag;
   final IconData? icon;
   final Function? action;
+  final bool? getBack;
   const Appbar1({
     super.key,
     required this.title,
     this.pathImag,
     this.icon,
-    this.action
+    this.action,
+    this.getBack
   });
 
   @override
@@ -34,18 +36,59 @@ class Appbar1 extends StatelessWidget implements PreferredSizeWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: [
+
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Text(
-                title.toUpperCase(),
-                style: GoogleFonts.paytoneOne(
-                  fontSize: 26,
-                  wordSpacing: 4,
-                  foreground: Paint()..shader = LinearGradient(
-                    colors:AppColor.mainGradientColrs
-                  ).createShader(Rect.fromLTWH(0, 0, 100, 70))
-                ),
+              Row(
+                spacing: 16,
+                children: [
+                  if (getBack ?? false)
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 7,
+                      ),
+                      child: Row(
+                        spacing: 8,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColor.base1,
+                              elevation: 2,
+                              shadowColor: AppColor.black1.withOpacity(.2),
+                              
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back_rounded,
+                              color: AppColor.black1,
+                              size: 36,
+                            )
+                          ),                  
+                        ],
+                      ),
+                    ),
+
+                  ShaderMask(
+                    blendMode: BlendMode.srcIn,
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        colors: AppColor.mainGradientColrs,
+                      ).createShader(bounds);
+                    },
+                    child: Text(
+                      title.toUpperCase(),
+                      style: GoogleFonts.paytoneOne(
+                        fontSize: 26,
+                        wordSpacing: 4,
+                      ),
+                    ),
+                  )
+                ],
               ),
 
               if (pathImag != null)

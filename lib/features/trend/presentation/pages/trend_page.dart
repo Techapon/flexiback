@@ -205,7 +205,7 @@ class _TrendPageState extends State<TrendPage> {
                                   onPressed: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId,lastedtDay: deviceUsageCalendar.last,fromCalendar: false,))
+                                      MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId,lastedtDay: deviceUsageCalendar.last,fromCalendar: false,isFromTherapistView: false,))
                                     );
                                   },
                                   child: ShaderMask(
@@ -353,7 +353,7 @@ class _TrendPageState extends State<TrendPage> {
                       trendProvider.getFullDataUsage(widget.userId!, selectedDay);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId!,lastedtDay: null,fromCalendar: true,))
+                        MaterialPageRoute(builder: (context) => GraphTrend(userId: widget.userId!,lastedtDay: null,fromCalendar: true,isFromTherapistView: false,))
                       );
                     }
                   ),

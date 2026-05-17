@@ -20,10 +20,10 @@ class TrendProvider extends ChangeNotifier {
   void disposeProvi() {
     _subscription?.cancel();
     overviewData = null;
-    deviceOverviewList?.clear();
+    deviceOverviewList = null;
     fullData = null;
-    dailyProgressList?.clear();
-    therapySessionList?.clear();
+    dailyProgressList = null;
+    deviceUsageCalendar = null;
   }
 
   final getOverviewUsecase =

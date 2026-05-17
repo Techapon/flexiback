@@ -1,7 +1,9 @@
 import 'package:flexiback/config/theme/colors/app_color.dart';
+import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/utils/text_uppercase.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
 import 'package:flexiback/features/relation/presentation/pages/message.dart';
+import 'package:flexiback/features/relation/presentation/widgets/personal_profile_dialog.dart';
 import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/domain/entities/therapist_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
@@ -31,38 +33,46 @@ class ThrapistUserChatCard extends StatelessWidget {
           Row(
             spacing: 16,
             children: [
-              Container(
-                height: 65,
-                width: 65,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColor.base1,
-                    width: 3
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColor.black1.withOpacity(0.1),
-                      blurRadius: 15,
-                      spreadRadius: 2,
-                      offset: Offset(0, 5),
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => PersonalProfileDialog(userRole: Role.Therapist,relationUserProfile: profile,)
+                  );
+                },
+                child: Container(
+                  height: 65,
+                  width: 65,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColor.base1,
+                      width: 3
                     ),
-                  ],
-              
-                  image: (profile.img != null)
-                      ? DecorationImage(
-                          image: NetworkImage("${profile.img}"),
-                          fit: BoxFit.cover,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.black1.withOpacity(0.1),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                
+                    image: (profile.img != null)
+                        ? DecorationImage(
+                            image: NetworkImage("${profile.img}"),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: (profile.img == null)
+                      ? Icon(
+                          LucideIcons.user300,
+                          color: AppColor.grey3,
+                          size: 40,
                         )
                       : null,
                 ),
-                child: (profile.img == null)
-                    ? Icon(
-                        LucideIcons.user300,
-                        color: AppColor.grey3,
-                        size: 40,
-                      )
-                    : null,
               ),
         
               Flexible(

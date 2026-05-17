@@ -5,20 +5,20 @@ import 'package:flexiback/core/enums/role.dart';
 import 'package:flexiback/core/mappers/get_role.dart';
 import 'package:flexiback/features/relation/presentation/pages/message.dart';
 import 'package:flexiback/features/relation/presentation/pages/noti.dart';
-import 'package:flexiback/shared/widgets/general/gradient_button.dart';
 import 'package:flexiback/features/profile/presentation/controller/profile_provider.dart';
-import 'package:flexiback/features/relation/domain/entities/relation_entity.dart';
 import 'package:flexiback/features/relation/domain/entities/relation_reqeuest_entity.dart';
 import 'package:flexiback/features/relation/domain/enums/relation_enums.dart';
 import 'package:flexiback/features/relation/presentation/controller/relation_provider.dart';
-import 'package:flexiback/features/relation/presentation/widgets/general_chat_card.dart';
-import 'package:flexiback/features/relation/presentation/widgets/therapist_chat_card.dart';
+import 'package:flexiback/features/relation/presentation/widgets/relation_card/general_chat_card.dart';
+import 'package:flexiback/features/relation/presentation/widgets/relation_card/therapist_chat_card.dart';
 import 'package:flexiback/shared/widgets/appbar/appbar1.dart';
 import 'package:flexiback/shared/widgets/dialog/comfirm/dialog_comfirm.dart';
 import 'package:flexiback/shared/widgets/dialog/error/dialog_error.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
+
+import '../../../trend/presentation/controller/trend_provider.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -60,7 +60,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final relationProvider = context.watch<RelationProvider>();
     final profileProvider = context.watch<ProfileProvider>();
-
 
     if (!profileProvider.isLoading && profileProvider.profile != null) {
       userRole = profileProvider.role;
@@ -554,6 +553,7 @@ class _ChatPageState extends State<ChatPage> {
                               itemCount: friends.length,
                               itemBuilder: (context, index) {
                                 final friend = friends[index];
+
                                 if (getRole(friend.userProfile!.role) == Role.Therapist) {
                                   return ThrapistUserChatCard(freinds: friend);
                                 } else if (getRole(friend.userProfile!.role) == Role.General) {
