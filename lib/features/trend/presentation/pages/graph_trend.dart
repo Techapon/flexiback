@@ -62,7 +62,7 @@ class _GraphTrendState extends State<GraphTrend> {
   List<ImageTextEntity> recordType = [
     ImageTextEntity(path: "assets/emoji/setting.png",text: RecordType.deviceUsage.entity, decorate: ''),
     ImageTextEntity(path: "assets/emoji/graph.png",text: RecordType.dailyProgress.entity, decorate: ''),
-    ImageTextEntity(path: "assets/emoji/graph.png",text: RecordType.therapySession.entity, decorate: '')
+    ImageTextEntity(path: "assets/emoji/therapy.png",text: RecordType.therapySession.entity, decorate: '')
   ];
 
   RecordType recordTypeSelected = RecordType.deviceUsage;
