@@ -163,9 +163,9 @@ class _TherapyScreenState extends State<TherapyScreen> {
 
   Widget _buildStageScreen(int stage, {Key? key}) {
     return switch (stage) {
-      // 1 => Stage1Screen(key: key),
-      // 2 => Stage2Screen(key: key),
-      1 => Stage3Screen(key: key),
+      1 => Stage1Screen(key: key),
+      2 => Stage2Screen(key: key),
+      3 => Stage3Screen(key: key),
       _ => const SizedBox.shrink(),
     };
   }

@@ -1,5 +1,8 @@
+import 'package:flexiback/features/therapy/data/repositories/therapy_repository_impl.dart';
+import 'package:flexiback/features/therapy/domain/usecases/upload_session_usecase.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/datasources/therapy_datasource.dart';
 import '../../domain/entities/stage_result.dart';
 import '../../domain/entities/therapy_session.dart';
 
@@ -11,6 +14,8 @@ import '../../domain/entities/therapy_session.dart';
 /// idle → waiting → playing → stageDone → waiting → ... → completed
 
 class TherapyProvider extends ChangeNotifier {
+  final UploadSessionUsecase uploadSessionUsecase = UploadSessionUsecase(TherapyRepositoryImpl(TherapyDatasource()));
+
   TherapySession _session = const TherapySession();
 
   TherapySession get session => _session;
@@ -18,6 +23,7 @@ class TherapyProvider extends ChangeNotifier {
   SessionStatus get status => _session.status;
   List<int> get scores => _session.scores;
   bool get isCompleted => _session.status == SessionStatus.completed;
+  
 
   // ── Stage metadata ───────────────────────────────
   static const _stageNames = [
@@ -82,17 +88,29 @@ class TherapyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  String? error;
   /// Python: key == ord('n') หลัง complete screen — ไป stage ถัดไป
-  void goToNextStage() {
+  void goToNextStage() async {
     if (_session.status != SessionStatus.stageDone) return;
 
     if (_session.isLastStage) {
-      _session = _session.copyWith(status: SessionStatus.completed);
+       _session = _session.copyWith(
+        status: SessionStatus.completed,
+        endedAt: DateTime.now(), // บันทึกเวลาจบ
+      );
+
+      // Save to DB
+      try {
+        uploadSessionUsecase(_session);
+      } catch (e) {
+        error = e.toString();
+      }
+
     } else {
       _session = _session.copyWith(
         currentStage: currentStage + 1,
         status: SessionStatus.waiting,
-      );
+      );  
     }
     notifyListeners();
   }

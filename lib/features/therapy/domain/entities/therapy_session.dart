@@ -13,16 +13,18 @@ enum SessionStatus {
 }
 
 class TherapySession {
-  final int currentStage;       // 1, 2, 3
+  final int currentStage;
   final SessionStatus status;
   final List<StageResult> stageResults;
   final DateTime? startedAt;
+  final DateTime? endedAt; // เพิ่ม
 
   const TherapySession({
     this.currentStage = 1,
     this.status = SessionStatus.idle,
     this.stageResults = const [],
     this.startedAt,
+    this.endedAt, // เพิ่ม
   });
 
   static const int totalStages = 3;
@@ -50,12 +52,14 @@ class TherapySession {
     SessionStatus? status,
     List<StageResult>? stageResults,
     DateTime? startedAt,
+    DateTime? endedAt,
   }) {
     return TherapySession(
       currentStage: currentStage ?? this.currentStage,
       status: status ?? this.status,
       stageResults: stageResults ?? this.stageResults,
       startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
     );
   }
 
